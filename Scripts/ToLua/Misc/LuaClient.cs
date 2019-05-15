@@ -20,9 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 using UnityEngine;
-using System.Collections.Generic;
 using LuaInterface;
-using System.Collections;
 using System.IO;
 using System;
 #if UNITY_5_4_OR_NEWER
@@ -31,7 +29,7 @@ using UnityEngine.SceneManagement;
 
 public class LuaClient : MonoBehaviour
 {
-    public static LuaClient Instance
+    public static LuaClient instance
     {
         get;
         protected set;
@@ -168,7 +166,7 @@ public class LuaClient : MonoBehaviour
 
     protected void Awake()
     {
-        Instance = this;
+        instance = this;
         Init();
 
 #if UNITY_5_4_OR_NEWER
@@ -236,7 +234,7 @@ public class LuaClient : MonoBehaviour
             }
 
             state.Dispose();
-            Instance = null;
+            instance = null;
         }
     }
 
@@ -252,7 +250,7 @@ public class LuaClient : MonoBehaviour
 
     public static LuaState GetMainState()
     {
-        return Instance.luaState;
+        return instance.luaState;
     }
 
     public LuaLooper GetLooper()

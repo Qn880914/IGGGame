@@ -257,7 +257,7 @@ namespace IGG.Editor
                 return;
             }
 
-            LuaClient.Instance.AttachProfiler();
+            LuaClient.instance.AttachProfiler();
         }
 
         [MenuItem("Lua/Detach Profiler", false, 152)]
@@ -268,7 +268,7 @@ namespace IGG.Editor
                 return;
             }
 
-            LuaClient.Instance.DetachProfiler();
+            LuaClient.instance.DetachProfiler();
         }
     }
 }

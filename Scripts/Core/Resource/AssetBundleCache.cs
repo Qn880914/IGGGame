@@ -12,113 +12,55 @@ using Object = UnityEngine.Object;
 namespace IGG.Core.Resource
 {
     /// <summary>
-    /// Author  xuzhihui
-    /// Date    2018.06.13
-    /// Desc    AssetBundle缓存信息
+    ///     <para> assetbundle cache info </para>
     /// </summary>
     public class AssetBundleInfo
     {
         /// <summary>
         /// AssetBundle
         /// </summary>
-        private AssetBundle m_bundle;
-
-        /// <summary>
-        /// AssetBundle名
-        /// </summary>
-        private string m_name;
-
-        /// <summary>
-        /// 常驻
-        /// </summary>
-        private bool m_persistent;
-
-        /// <summary>
-        /// 引用计数
-        /// </summary>
-        private int m_reference;
-
-        /// <summary>
-        /// 释放时间
-        /// </summary>
-        private float m_unloadTime;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name">AssetBundle名</param>
-        /// <param name="ab">AssetBundle对象</param>
-        /// <param name="persistent">是否常驻</param>
-        /// <param name="reference">初始引用计数</param>
-        public AssetBundleInfo(string name, AssetBundle ab, bool persistent, int reference = 0)
+        private AssetBundle m_AssetBundle;
+        public AssetBundle assetBundle
         {
-            m_name = name;
-            m_persistent = persistent;
-            m_reference = reference;
-
-            Bundle = ab;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="name">AssetBundle名</param>
-        /// <param name="persistent">是否常驻</param>
-        /// <param name="reference">初始引用计数</param>
-        public AssetBundleInfo(string name, bool persistent, int reference = 0)
-        {
-            m_name = name;
-            m_persistent = persistent;
-            m_reference = reference;
-        }
-
-        public string Name
-        {
-            get { return m_name; }
-            set { m_name = value; }
-        }
-
-        /// <summary>
-        /// AssetBundle对象
-        /// </summary>
-        public AssetBundle Bundle
-        {
-            get { return m_bundle; }
+            get { return m_AssetBundle; }
             set
             {
-                if (value == null || m_bundle == value)
+                if (value == null || m_AssetBundle == value)
                 {
                     return;
                 }
 
-                m_bundle = value;
+                m_AssetBundle = value;
             }
         }
 
         /// <summary>
-        /// 是否常驻
+        /// AssetBundle名
         /// </summary>
-        public bool Persistent
-        {
-            get { return m_persistent; }
-            set { m_persistent = value; }
-        }
+        private string m_Name;
+        public string name { get { return m_Name; } set { m_Name = value; } }
+
+        /// <summary>
+        /// 常驻
+        /// </summary>
+        private bool m_Persistent;
+        public bool persistent { get { return m_Persistent; } set { m_Persistent = value; } }
 
         /// <summary>
         /// 引用计数
         /// </summary>
-        public int ReferencedCount
+        private int m_ReferenceCount;
+        public int referencedCount
         {
-            get { return m_reference; }
-
+            get { return m_ReferenceCount; }
             set
             {
-                m_reference = value;
-                if (IsCanRemove)
+                m_ReferenceCount = value;
+                if (canRemove)
                 {
                     if (ConstantData.AssetBundleCacheTime > 0)
                     {
-                        m_unloadTime = Time.realtimeSinceStartup;
+                        m_UnloadTime = Time.realtimeSinceStartup;
                     }
                     else
                     {
@@ -127,33 +69,61 @@ namespace IGG.Core.Resource
                 }
                 else
                 {
-                    m_unloadTime = 0;
+                    m_UnloadTime = 0;
                 }
             }
         }
 
         /// <summary>
+        /// 释放时间
+        /// </summary>
+        private float m_UnloadTime;
+
+        /// <summary>
         /// 是否可以删除
         /// </summary>
-        public bool IsCanRemove
+        public bool canRemove
         {
             get
             {
-                if (!(!Persistent && ReferencedCount == 0))
-                {
-                    return false;
-                }
-
-                return true;
+                return (!persistent && referencedCount == 0);
             }
         }
 
         /// <summary>
         /// 缓存时间到
         /// </summary>
-        public bool IsTimeOut
+        public bool timeOut
         {
-            get { return Time.realtimeSinceStartup - m_unloadTime >= ConstantData.AssetBundleCacheTime; }
+            get { return Time.realtimeSinceStartup - m_UnloadTime >= ConstantData.AssetBundleCacheTime; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name">AssetBundle名</param>
+        /// <param name="ab">AssetBundle对象</param>
+        /// <param name="persistent">是否常驻</param>
+        /// <param name="reference">初始引用计数</param>
+        public AssetBundleInfo(string name, AssetBundle assetbundle, bool persistent, int referenceCount = 0)
+        {
+            m_Name = name;
+            m_Persistent = persistent;
+            m_ReferenceCount = referenceCount;
+            m_AssetBundle = assetbundle;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name">AssetBundle名</param>
+        /// <param name="persistent">是否常驻</param>
+        /// <param name="reference">初始引用计数</param>
+        public AssetBundleInfo(string name, bool persistent, int referenceCount = 0)
+        {
+            m_Name = name;
+            m_Persistent = persistent;
+            m_ReferenceCount = referenceCount;
         }
 
         /// <summary>
@@ -164,12 +134,12 @@ namespace IGG.Core.Resource
         /// <returns></returns>
         public Object LoadAsset(string name, Type type)
         {
-            if (Bundle == null)
+            if (null == m_AssetBundle)
             {
                 return null;
             }
 
-            return Bundle.LoadAsset(name, type);
+            return m_AssetBundle.LoadAsset(name, type);
         }
 
         /// <summary>
@@ -178,14 +148,14 @@ namespace IGG.Core.Resource
         /// <typeparam name="T">资源类型</typeparam>
         /// <param name="name">资源名</param>
         /// <returns>资源对象</returns>
-        public T LoadAsset<T>(string name)where T : Object
+        public T LoadAsset<T>(string name) where T : Object
         {
-            if (Bundle == null)
+            if (null == m_AssetBundle)
             {
                 return null;
             }
 
-            return Bundle.LoadAsset<T>(name);
+            return m_AssetBundle.LoadAsset<T>(name);
         }
 
         /// <summary>
@@ -193,40 +163,37 @@ namespace IGG.Core.Resource
         /// </summary>
         public void Unload()
         {
-            if (Bundle != null)
+            if (null != m_AssetBundle)
             {
-                //Logger.Log(string.Format("-->Unload AssetBundle: {0}", m_name));
-                Bundle.Unload(true);
-                Bundle = null;
+                m_AssetBundle.Unload(true);
+                m_AssetBundle = null;
             }
         }
     }
 
     /// <summary>
-    /// Author  xuzhihui
-    /// Date    2018.12.29
-    /// Desc    AssetBundle缓存
+    ///     <para> assebundle cache </para>
     /// </summary>
     public class AssetBundleCache
     {
         /// <summary>
         /// 缓存队列
         /// </summary>
-        private readonly Dictionary<string, AssetBundleInfo> m_caches = new Dictionary<string, AssetBundleInfo>();
+        private readonly Dictionary<string, AssetBundleInfo> m_dicAssetBundleInfos = new Dictionary<string, AssetBundleInfo>();
 
         /// <summary>
         /// 加载任务
         /// </summary>
-        private readonly LoaderTask m_task;
+        private readonly LoaderTask m_LoaderTask;
 
         /// <summary>
         /// 上一次清除时间
         /// </summary>
-        private float m_lastClear;
+        private float m_LastClearTime;
 
         public AssetBundleCache(LoaderTask task)
         {
-            m_task = task;
+            m_LoaderTask = task;
         }
 
         /// <summary>
@@ -235,9 +202,9 @@ namespace IGG.Core.Resource
         public void Update()
         {
             if (ConstantData.AssetBundleCacheTime > 0 &&
-                Time.realtimeSinceStartup - m_lastClear >= ConstantData.AssetBundleCacheTime)
+                Time.realtimeSinceStartup - m_LastClearTime >= ConstantData.AssetBundleCacheTime)
             {
-                m_lastClear = Time.realtimeSinceStartup;
+                m_LastClearTime = Time.realtimeSinceStartup;
                 Clear();
             }
         }
@@ -250,25 +217,29 @@ namespace IGG.Core.Resource
         /// <param name="includePersistent">是否包含常驻资源</param>
         public void Clear(bool onlyRefZero = true, bool onlyTimeout = true, bool includePersistent = false)
         {
-            string[] keys = new string[m_caches.Count];
-            m_caches.Keys.CopyTo(keys, 0);
+            string[] keys = new string[m_dicAssetBundleInfos.Count];
+            m_dicAssetBundleInfos.Keys.CopyTo(keys, 0);
 
             for (int i = 0; i < keys.Length; ++i)
             {
                 string key = keys[i];
-                AssetBundleInfo item = m_caches[key];
+                bool needUnload = false;
+                AssetBundleInfo assetBundleInfo = m_dicAssetBundleInfos[key];
                 if (onlyRefZero)
                 {
                     // 只清除引用计数为0的
-                    if (item.IsCanRemove && (!onlyTimeout || item.IsTimeOut))
+                    if (assetBundleInfo.canRemove && (!onlyTimeout || assetBundleInfo.timeOut))
                     {
-                        UnloadAssetBundleInfo(key);
+                        needUnload = true;
                     }
                 }
-                else if (includePersistent || item.IsCanRemove)
+                else if (includePersistent || assetBundleInfo.canRemove)
                 {
-                    UnloadAssetBundleInfo(key);
+                    needUnload = true;
                 }
+
+                if(needUnload)
+                    UnloadAssetBundleInfo(key);
             }
         }
 
@@ -280,15 +251,15 @@ namespace IGG.Core.Resource
         /// <returns></returns>
         private AssetBundleInfo AddAssetBundleInfo(string name, bool persistent)
         {
-            AssetBundleInfo info;
-            if (!m_caches.TryGetValue(name, out info))
+            AssetBundleInfo assetBundleInfo;
+            if (!m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
             {
-                info = new AssetBundleInfo(name, persistent);
-                m_caches.Add(name, info);
+                assetBundleInfo = new AssetBundleInfo(name, persistent);
+                m_dicAssetBundleInfos.Add(name, assetBundleInfo);
             }
 
-            ++info.ReferencedCount;
-            return info;
+            ++assetBundleInfo.referencedCount;
+            return assetBundleInfo;
         }
 
         /// <summary>
@@ -300,21 +271,21 @@ namespace IGG.Core.Resource
         /// <returns>是否移除</returns>
         public bool RemoveAssetBundleInfo(string name, bool immediate = false, bool onlyRemove = false)
         {
-            AssetBundleInfo item;
-            if (!m_caches.TryGetValue(name, out item))
+            AssetBundleInfo assetBundleInfo;
+            if (!m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
             {
                 return false;
             }
 
-            if (item.ReferencedCount <= 0)
+            if (assetBundleInfo.referencedCount <= 0)
             {
-                UnityEngine.Debug.LogWarningFormat("-->RemoveAssetBundleInfo {0} {1}", name, item.ReferencedCount);
+                UnityEngine.Debug.LogWarningFormat("-->RemoveAssetBundleInfo {0} {1}", name, assetBundleInfo.referencedCount);
                 return true;
             }
 
-            --item.ReferencedCount;
+            --assetBundleInfo.referencedCount;
 
-            if ((ConstantData.AssetBundleCacheTime < 0.001f || immediate) && item.IsCanRemove)
+            if ((ConstantData.AssetBundleCacheTime < 0.001f || immediate) && assetBundleInfo.canRemove)
             {
                 UnloadAssetBundleInfo(name, onlyRemove);
             }
@@ -330,19 +301,17 @@ namespace IGG.Core.Resource
         /// <returns>缓存对象</returns>
         private AssetBundleInfo GetAssetBundleInfo(string name, bool persistent)
         {
-            if (!m_caches.ContainsKey(name))
+            AssetBundleInfo assetBundleInfo;
+            if(m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
             {
-                return null;
+                ++assetBundleInfo.referencedCount;
+                if (persistent)
+                {
+                    assetBundleInfo.persistent = true;
+                }
             }
 
-            AssetBundleInfo item = m_caches[name];
-            ++item.ReferencedCount;
-            if (persistent)
-            {
-                item.Persistent = true;
-            }
-
-            return item;
+            return assetBundleInfo;
         }
 
         /// <summary>
@@ -352,12 +321,9 @@ namespace IGG.Core.Resource
         /// <returns></returns>
         private AssetBundleInfo GetAssetBundleInfo(string name)
         {
-            if (!m_caches.ContainsKey(name))
-            {
-                return null;
-            }
-
-            return m_caches[name];
+            AssetBundleInfo assetBundleInfo;
+            m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo);
+            return assetBundleInfo;
         }
 
         /// <summary>
@@ -366,16 +332,16 @@ namespace IGG.Core.Resource
         /// <param name="name"></param>
         /// <param name="ab"></param>
         /// <returns></returns>
-        public AssetBundleInfo SetAssetBundle(string name, AssetBundle ab)
+        public AssetBundleInfo SetAssetBundle(string name, AssetBundle assetBundle)
         {
-            AssetBundleInfo info;
-            if (!m_caches.TryGetValue(name, out info))
+            AssetBundleInfo assetBundleInfo;
+            if (!m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
             {
-                info = AddAssetBundleInfo(name, false);
+                assetBundleInfo = AddAssetBundleInfo(name, false);
             }
 
-            info.Bundle = ab;
-            return info;
+            assetBundleInfo.assetBundle = assetBundle;
+            return assetBundleInfo;
         }
 
         /// <summary>
@@ -385,13 +351,13 @@ namespace IGG.Core.Resource
         /// <param name="onlyRemove">仅删除,不卸载</param>
         private void UnloadAssetBundleInfo(string key, bool onlyRemove = false)
         {
-            AssetBundleInfo item = m_caches[key];
-            if (item != null && !onlyRemove)
+            AssetBundleInfo assetBundleInfo = m_dicAssetBundleInfos[key];
+            if (null != assetBundleInfo && !onlyRemove)
             {
-                item.Unload();
+                assetBundleInfo.Unload();
             }
 
-            m_caches.Remove(key);
+            m_dicAssetBundleInfos.Remove(key);
         }
 
         /// <summary>
@@ -403,52 +369,49 @@ namespace IGG.Core.Resource
         /// <param name="persistent">是否常驻</param>
         /// <param name="async">是否异步</param>
         /// <returns>已缓存(是-引用计数+1,并返回true, 否-返回false)</returns>
-        public bool CheckAssetBundleInfo(LoaderGroup group, string name, LoadManager.GroupLoadedCallback onLoaded,
+        public bool CheckAssetBundleInfo(LoaderGroup group, string name, LoadManager.LoaderGroupCompleteCallback callback,
             bool persistent, bool async)
         {
-            AssetBundleInfo info = GetAssetBundleInfo(name, persistent);
-            if (info == null)
+            AssetBundleInfo assetBundleInfo = GetAssetBundleInfo(name, persistent);
+            if (null == assetBundleInfo)
             {
                 AddAssetBundleInfo(name, persistent);
                 return false;
             }
 
-            if (info.Bundle == null)
+            if (null == assetBundleInfo.assetBundle)
             {
                 return false;
             }
 
-            if (onLoaded != null)
+            if (null != callback)
             {
                 if (!async)
                 {
-                    onLoaded(group, info);
+                    callback(group, assetBundleInfo);
                 }
                 else
                 {
-                    m_task.AddAsyncCallback(onLoaded, group, info);
+                    m_LoaderTask.AddAsyncCallback(callback, group, assetBundleInfo);
                 }
             }
 
             return true;
         }
 
-        public void Dump()
+        public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
-            sb.AppendFormat("-->Dump Bundle Cache. Count = {0}\n", m_caches.Count);
-            var iter = m_caches.GetEnumerator();
-            while (iter.MoveNext())
+            stringBuilder.AppendFormat("-->Dump Bundle Cache. Count = {0}\n", m_dicAssetBundleInfos.Count);
+            foreach(var assetBundleInfoPair in m_dicAssetBundleInfos)
             {
-                AssetBundleInfo item = iter.Current.Value;
-                sb.AppendFormat("{0} count:{1} persistent:{2}\n", iter.Current.Key, item.ReferencedCount,
-                    item.Persistent);
+                stringBuilder.AppendFormat("{0} count:{1} persistent:{2}\n", assetBundleInfoPair.Key,
+                    assetBundleInfoPair.Value.referencedCount,
+                    assetBundleInfoPair.Value.persistent);
             }
 
-            iter.Dispose();
-
-            UnityEngine.Debug.Log(sb.ToString());
+            return stringBuilder.ToString();
         }
     }
 }

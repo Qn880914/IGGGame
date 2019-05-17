@@ -4,29 +4,21 @@ using UnityEngine;
 
 namespace IGG.Core.Resource
 {
+    /// <summary>
+    ///     <para> assetbundle loader </para>
+    /// </summary>
     public class BundleLoader : Loader
     {
         private AssetBundleCreateRequest m_AssetBundleCreateRequest;
 
-        private bool m_NeedUnpack;
+        private bool m_NeedDecompress;
         private int m_StageCount;
         private int m_StageCurrent;
-        private LzmaCompressRequest m_UnpackRequest;
+        private LzmaCompressRequest m_LzmaCompressRequest;
 
         public BundleLoader()
             : base(LoaderType.Bundle)
         {
-            m_StageCurrent = 0;
-            m_StageCount = 1;
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-
-            m_AssetBundleCreateRequest = null;
-            m_UnpackRequest = null;
-
             m_StageCurrent = 0;
             m_StageCount = 1;
         }
@@ -38,20 +30,20 @@ namespace IGG.Core.Resource
             string path = LoadManager.instance.GetResourcePath(this.path);
             if (string.IsNullOrEmpty(path))
             {
-                OnLoaded(null);
+                OnFailed();
                 return;
             }
 
-            m_NeedUnpack = ConstantData.EnableCustomCompress && path.Contains(ConstantData.StreamingAssetsPath);
+            m_NeedDecompress = ConstantData.EnableCustomCompress && path.Contains(ConstantData.StreamingAssetsPath);
 
             if (async)
             {
-                if (m_NeedUnpack)
+                if (m_NeedDecompress)
                 {
                     m_StageCount = 2;
 
                     byte[] bytes = FileUtil.ReadByteFromFile(path);
-                    m_UnpackRequest = LzmaCompressRequest.CreateDecompress(bytes);
+                    m_LzmaCompressRequest = LzmaCompressRequest.CreateDecompress(bytes);
                 }
                 else
                 {
@@ -60,18 +52,18 @@ namespace IGG.Core.Resource
             }
             else
             {
-                AssetBundle ab = null;
+                AssetBundle assetbundle = null;
                 try
                 {
-                    if (m_NeedUnpack)
+                    if (m_NeedDecompress)
                     {
                         byte[] bytes = FileUtil.ReadByteFromFile(path);
-                        bytes = Unpack(bytes);
-                        ab = AssetBundle.LoadFromMemory(bytes);
+                        bytes = Decompress(bytes);
+                        assetbundle = AssetBundle.LoadFromMemory(bytes);
                     }
                     else
                     {
-                        ab = AssetBundle.LoadFromFile(path);
+                        assetbundle = AssetBundle.LoadFromFile(path);
                     }
                 }
                 catch (Exception e)
@@ -80,15 +72,15 @@ namespace IGG.Core.Resource
                 }
                 finally
                 {
-                    OnLoaded(ab);
+                    OnComplete(assetbundle);
                 }
             }
         }
 
-        private byte[] Unpack(byte[] bytes)
+        private byte[] Decompress(byte[] bytes)
         {
             byte[] result = new byte[1];
-            int size = LzmaHelper.Uncompress(bytes, ref result);
+            int size = LzmaHelper.Decompress(bytes, ref result);
             if (size == 0)
             {
                 UnityEngine.Debug.LogError("Uncompress Failed");
@@ -107,40 +99,45 @@ namespace IGG.Core.Resource
                     if (m_AssetBundleCreateRequest.isDone)
                     {
                         ++m_StageCurrent;
-                        OnLoaded(m_AssetBundleCreateRequest.assetBundle);
+                        OnComplete(m_AssetBundleCreateRequest.assetBundle);
                     }
                     else
                     {
-                        DoProgress(m_AssetBundleCreateRequest.progress);
+                        OnProgress(m_AssetBundleCreateRequest.progress);
                     }
                 }
-                else if (m_UnpackRequest != null)
+                else if (m_LzmaCompressRequest != null)
                 {
-                    if (m_UnpackRequest.IsDone)
+                    if (m_LzmaCompressRequest.isDone)
                     {
                         ++m_StageCurrent;
-                        m_AssetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(m_UnpackRequest.Bytes);
+                        m_AssetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(m_LzmaCompressRequest.bytes);
 
-                        m_UnpackRequest.Dispose();
-                        m_UnpackRequest = null;
+                        m_LzmaCompressRequest.Dispose();
+                        m_LzmaCompressRequest = null;
                     }
                     else
                     {
-                        DoProgress(m_UnpackRequest.Progress);
+                        OnProgress(m_LzmaCompressRequest.progress);
                     }
                 }
             }
         }
 
-        private void DoProgress(float rate)
+        protected override void OnProgress(float progress)
         {
-            OnProgress((m_StageCurrent + rate) / m_StageCount);
+            base.OnProgress((m_StageCurrent + progress) / m_StageCount);
         }
 
-        private void OnLoaded(AssetBundle ab)
+        public override void Reset()
         {
-            //Logger.Log(string.Format("BundlLoader {0} - {1} use {2}ms", Path, IsAsync, m_watch.ElapsedMilliseconds));
-            OnComplete(ab);
+            base.Reset();
+
+            m_AssetBundleCreateRequest = null;
+            m_LzmaCompressRequest = null;
+
+            m_StageCurrent = 0;
+            m_StageCount = 1;
         }
     }
 }

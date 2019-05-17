@@ -6,18 +6,14 @@ using System;
 
 public class LzmaCompressRequest
 {
-    private byte[] m_result;
+    private byte[] m_Bytes;
+    public byte[] bytes{ get { return m_Bytes; } }
 
-    public bool IsDone { get; private set; }
+    public bool isDone { get; private set; }
 
-    public string Error { get; private set; }
+    public string error { get; private set; }
 
-    public float Progress { get; private set; }
-
-    public byte[] Bytes
-    {
-        get { return m_result; }
-    }
+    public float progress { get; private set; }
 
     public void Dispose()
     {
@@ -25,7 +21,7 @@ public class LzmaCompressRequest
 
     private void OnDone(LoomBase param)
     {
-        IsDone = true;
+        isDone = true;
     }
 
     public void Compress(byte[] data)
@@ -34,16 +30,16 @@ public class LzmaCompressRequest
         {
             try
             {
-                m_result = new byte[1];
-                int size = LzmaHelper.Compress(data, ref m_result);
+                m_Bytes = new byte[1];
+                int size = LzmaHelper.Compress(data, ref m_Bytes);
                 if (size == 0)
                 {
-                    Error = "Compress Failed";
+                    error = "Compress Failed";
                 }
             }
             catch (Exception e)
             {
-                Error = e.Message;
+                error = e.Message;
             }
             finally
             {
@@ -58,16 +54,16 @@ public class LzmaCompressRequest
         {
             try
             {
-                m_result = new byte[1];
-                int size = LzmaHelper.Uncompress(data, ref m_result);
+                m_Bytes = new byte[1];
+                int size = LzmaHelper.Decompress(data, ref m_Bytes);
                 if (size == 0)
                 {
-                    Error = "Compress Failed";
+                    error = "Compress Failed";
                 }
             }
             catch (Exception e)
             {
-                Error = e.Message;
+                error = e.Message;
             }
             finally
             {
@@ -76,18 +72,18 @@ public class LzmaCompressRequest
         });
     }
 
-    public static LzmaCompressRequest CreateCompress(byte[] data)
+    public static LzmaCompressRequest CreateCompress(byte[] bytes)
     {
         LzmaCompressRequest request = new LzmaCompressRequest();
-        request.Compress(data);
+        request.Compress(bytes);
 
         return request;
     }
 
-    public static LzmaCompressRequest CreateDecompress(byte[] data)
+    public static LzmaCompressRequest CreateDecompress(byte[] bytes)
     {
         LzmaCompressRequest request = new LzmaCompressRequest();
-        request.Decompress(data);
+        request.Decompress(bytes);
 
         return request;
     }

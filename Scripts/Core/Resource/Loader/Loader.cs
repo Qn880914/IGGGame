@@ -2,12 +2,18 @@
 
 namespace IGG.Core.Resource
 {
+    /// <summary>
+    ///     <para> Loader base class </para>
+    /// </summary>
     public class Loader
     {
         public delegate void CompleteCallback(Loader loader, object data);
 
         public delegate void ProgressCallback(Loader loader, float progress);
 
+        /// <summary>
+        /// use for performance detection
+        /// </summary>
         protected readonly Stopwatch m_StopWatch = new Stopwatch();
 
         private CompleteCallback m_CompleteCallback;
@@ -54,7 +60,7 @@ namespace IGG.Core.Resource
         public virtual void Update()
         { }
 
-        protected void OnProgress(float progress)
+        protected virtual void OnProgress(float progress)
         {
             m_ProgressCallback?.Invoke(this, progress);
         }
@@ -69,7 +75,7 @@ namespace IGG.Core.Resource
             OnProgress(1);
         }
 
-        protected void OnLoadFail()
+        protected void OnFailed()
         {
             UnityEngine.Debug.LogErrorFormat("Loader Type:  {0}    path  : {1}", type, path);
             OnComplete(null);

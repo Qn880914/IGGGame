@@ -16,23 +16,23 @@ namespace IGG.Core.Resource
         {
             base.Start();
 
-            LoadSceneMode mode = LoadSceneMode.Single;
+            LoadSceneMode loadSceneMode = LoadSceneMode.Single;
             if (param != null)
             {
                 bool additive = (bool)param;
                 if (additive)
                 {
-                    mode = LoadSceneMode.Additive;
+                    loadSceneMode = LoadSceneMode.Additive;
                 }
             }
 
             if (async)
             {
-                m_AsyncOperation = SceneManager.LoadSceneAsync(path, mode);
+                m_AsyncOperation = SceneManager.LoadSceneAsync(path, loadSceneMode);
             }
             else
             {
-                SceneManager.LoadScene(path, mode);
+                SceneManager.LoadScene(path, loadSceneMode);
                 OnComplete(true);
             }
         }
@@ -44,7 +44,7 @@ namespace IGG.Core.Resource
 
             if (m_AsyncOperation == null)
             {
-                OnComplete(false);
+                OnFailed();
             }
             else if (m_AsyncOperation.isDone)
             {

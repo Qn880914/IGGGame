@@ -6,35 +6,19 @@ using UnityEngine.Networking;
 namespace IGG.Core.Resource
 {
     /// <summary>
-    ///     <para> AssetBundle 加载器 </para>
+    ///     <para> AssetBundle loader </para>
     /// </summary>
     public class CacheBundleLoader : Loader
     {
         /// <summary>
-        /// AssetBundle加载请求
+        ///     <para> assetbundle load request </para>
         /// </summary>
         private UnityWebRequest m_UnityWebRequest;
 
-        /// <summary>
-        /// 构造
-        /// </summary>
         public CacheBundleLoader() 
             : base(LoaderType.Bundle)
         { }
 
-        /// <summary>
-        /// 重置
-        /// </summary>
-        public override void Reset()
-        {
-            base.Reset();
-
-            m_UnityWebRequest = null;
-        }
-
-        /// <summary>
-        /// 开始加载
-        /// </summary>
         public override void Start()
         {
             base.Start();
@@ -47,7 +31,6 @@ namespace IGG.Core.Resource
 
             bool isCache = false;
             string path = LoadManager.instance.GetResourcePath(this.path, ref isCache, async);
-            // IGG.Logging.Logger.Log(string.Format("-->CacheBundleLoader {0} - {1}:{2}", Path, path, IsAsync));
             if (async)
             {
                 string pathDst = FileUtil.GetAssetBundleFullPath(path);
@@ -57,8 +40,8 @@ namespace IGG.Core.Resource
             {
                 if (isCache)
                 {
-                    AssetBundle ab = AssetBundle.LoadFromFile(path);
-                    OnLoaded(ab);
+                    AssetBundle assetbundle = AssetBundle.LoadFromFile(path);
+                    OnComplete(assetbundle);
                 }
                 else
                 {
@@ -79,15 +62,12 @@ namespace IGG.Core.Resource
                         }
                     }
 
-                    AssetBundle ab = AssetBundle.LoadFromFile(pathDst);
-                    OnLoaded(ab);
+                    AssetBundle assetbundle = AssetBundle.LoadFromFile(pathDst);
+                    OnComplete(assetbundle);
                 }
             }
         }
 
-        /// <summary>
-        /// 更新
-        /// </summary>
         public override void Update()
         {
             if (state != LoaderState.Loading || null == m_UnityWebRequest)
@@ -95,7 +75,7 @@ namespace IGG.Core.Resource
 
             if (m_UnityWebRequest.isDone)
             {
-                OnLoaded((m_UnityWebRequest.downloadHandler as DownloadHandlerAssetBundle).assetBundle);
+                OnComplete((m_UnityWebRequest.downloadHandler as DownloadHandlerAssetBundle).assetBundle);
             }
             else
             {
@@ -103,14 +83,11 @@ namespace IGG.Core.Resource
             }
         }
 
-        /// <summary>
-        /// 加载完成
-        /// </summary>
-        /// <param name="ab"></param>
-        private void OnLoaded(AssetBundle ab)
+        public override void Reset()
         {
-            // IGG.Logging.Logger.Log(string.Format("NewBundlLoader {0} - {1} use {2}ms", Path, IsAsync, m_watch.ElapsedMilliseconds));
-            OnComplete(ab);
+            base.Reset();
+
+            m_UnityWebRequest = null;
         }
     }
 }

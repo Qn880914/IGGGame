@@ -164,7 +164,7 @@ namespace IGG.Core.Resource
                     {
                         Reference = 0,
                         Loader = CreateLoader(type),
-                        Callbacks = new List<LoadManager.LoadedHandler>()
+                        Callbacks = new List<LoadManager.CompleteCallback>()
                     };
                 }
 
@@ -186,14 +186,14 @@ namespace IGG.Core.Resource
         /// </summary>
         /// <param name="loader">加载器</param>
         /// <param name="onLoaded">回调</param>
-        public void PushCallback(Loader loader, LoadManager.LoadedHandler onLoaded)
+        public void PushCallback(Loader loader, LoadManager.CompleteCallback completeCallback)
         {
-            if (onLoaded == null)
+            if (null == completeCallback)
             {
                 return;
             }
 
-            m_loaders[loader.path].Callbacks.Add(onLoaded);
+            m_loaders[loader.path].Callbacks.Add(completeCallback);
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace IGG.Core.Resource
                 LoaderGroup group = m_groups[index];
                 group.Update();
 
-                if (group.IsFinish)
+                if (group.isFinish)
                 {
                     group.Reset();
                     m_groupPool.Enqueue(group);
@@ -304,7 +304,7 @@ namespace IGG.Core.Resource
         /// <param name="insert">插入</param>
         /// <returns></returns>
         public void AddLoadTask(LoaderGroup group, LoaderType type, string path, object param,
-                                LoadManager.GroupLoadedCallback onLoaded, bool async,
+                                LoadManager.LoaderGroupCompleteCallback completeCallback, bool async,
                                 LoadManager.LoadPriority priority = LoadManager.LoadPriority.Normal, bool insert = false)
         {
             if (!async)
@@ -312,10 +312,7 @@ namespace IGG.Core.Resource
                 Loader loader = PopLoader(type, path, param, false);
                 PushCallback(loader, (data) =>
                 {
-                    if (onLoaded != null)
-                    {
-                        onLoaded(group, data);
-                    }
+                    completeCallback?.Invoke(group, data);
                 });
                 loader.Start();
 
@@ -329,7 +326,7 @@ namespace IGG.Core.Resource
                 group = PopGroup(priority);
             }
 
-            group.Add(type, path, param, onLoaded, true, insert);
+            group.Add(type, path, param, completeCallback, true, insert);
         }
 
         /// <summary>
@@ -338,16 +335,16 @@ namespace IGG.Core.Resource
         /// <param name="onLoaded">回调</param>
         /// <param name="group">加载组</param>
         /// <param name="data">资源对象</param>
-        public void AddAsyncCallback(LoadManager.GroupLoadedCallback onLoaded, LoaderGroup group, object data)
+        public void AddAsyncCallback(LoadManager.LoaderGroupCompleteCallback callback, LoaderGroup group, object data)
         {
-            if (onLoaded == null)
+            if (null == callback)
             {
                 return;
             }
 
             AsyncCallbackInfo info = new AsyncCallbackInfo
             {
-                OnLoaded = onLoaded,
+                completeCallback = callback,
                 Group = group,
                 Data = data
             };
@@ -363,7 +360,7 @@ namespace IGG.Core.Resource
             for (int i = 0; i < m_asyncCallbackInfos.Count; ++i)
             {
                 AsyncCallbackInfo info = m_asyncCallbackInfos[i];
-                info.OnLoaded(info.Group, info.Data);
+                info.completeCallback(info.Group, info.Data);
             }
 
             m_asyncCallbackInfos.Clear();
@@ -377,7 +374,7 @@ namespace IGG.Core.Resource
             /// <summary>
             /// 回调函数列表
             /// </summary>
-            public List<LoadManager.LoadedHandler> Callbacks;
+            public List<LoadManager.CompleteCallback> Callbacks;
 
             /// <summary>
             /// 加载器
@@ -408,7 +405,7 @@ namespace IGG.Core.Resource
             /// <summary>
             /// 回调函数
             /// </summary>
-            public LoadManager.GroupLoadedCallback OnLoaded;
+            public LoadManager.LoaderGroupCompleteCallback completeCallback;
         }
     }
 }

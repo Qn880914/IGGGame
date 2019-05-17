@@ -8,53 +8,41 @@ using UnityEngine;
 
 public class AssetBundleMapping : ScriptableObject
 {
-    public AssetBundleInfo[] Assetbundles;
+    public AssetBundleInfo[] assetBundleInfos;
 
-    private Dictionary<string, string> m_mapping;
+    private Dictionary<string, string> m_PathMapAssetBundleName;
 
     public void Init()
     {
-        m_mapping = new Dictionary<string, string>();
+        m_PathMapAssetBundleName = new Dictionary<string, string>();
 
-        for (int i = 0; i < Assetbundles.Length; ++i)
+        foreach(var assetBundleInfo in assetBundleInfos)
         {
-            AssetBundleInfo info = Assetbundles[i];
-            for (int j = 0; j < info.Files.Length; ++j)
+            for (int i = 0; i < assetBundleInfo.paths.Length; ++i)
             {
-                if (!m_mapping.ContainsKey(info.Files[j]))
-                {
-                    m_mapping.Add(info.Files[j], info.Name);
-                }
+                m_PathMapAssetBundleName[assetBundleInfo.paths[i]] = assetBundleInfo.assetBundleName;
             }
         }
     }
 
-    public string GetAssetBundleNameFromAssetPath(string assetPath)
+    public string GetAssetBundleNameFromAssetPath(string path)
     {
-        assetPath = assetPath.ToLower();
-        if (assetPath.StartsWith("data/"))
+        path = path.ToLower();
+        if (path.StartsWith("data/"))
         {
-            assetPath = assetPath.Substring(assetPath.IndexOf('/') + 1);
+            path = path.Substring(path.IndexOf('/') + 1);
         }
 
-        string abName;
-        if (!m_mapping.TryGetValue(assetPath, out abName))
-        {
-            //disappear动画有些建筑有，有些建筑没有。不算错误。
-            if (!assetPath.Contains("_disappear.prefab"))
-            {
-                UnityEngine.Debug.LogErrorFormat("No Found Asset: {0}", assetPath);
-            }
-            return "";
-        }
+        string name;
+        m_PathMapAssetBundleName.TryGetValue(path, out name);
 
-        return abName;
+        return name;
     }
 
     [Serializable]
     public class AssetBundleInfo
     {
-        public string[] Files;
-        public string Name;
+        public string[] paths;
+        public string assetBundleName;
     }
 }

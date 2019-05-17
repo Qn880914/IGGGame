@@ -19,13 +19,6 @@ namespace IGG.Core.Resource
         {
         }
 
-        public override void Reset()
-        {
-            base.Reset();
-
-            m_AssetBundleRequest = null;
-        }
-
         public override void Start()
         {
             base.Start();
@@ -33,7 +26,7 @@ namespace IGG.Core.Resource
             BundleAssetLoadParam param = this.param as BundleAssetLoadParam;
             if (param == null || param.assetBundle == null || param.type == null || string.IsNullOrEmpty(path))
             {
-                OnLoaded(null);
+                OnFailed();
                 return;
             }
 
@@ -44,7 +37,7 @@ namespace IGG.Core.Resource
             else
             {
                 Object asset = param.assetBundle.LoadAsset(path, param.type);
-                OnLoaded(asset);
+                OnComplete(asset);
             }
         }
 
@@ -57,7 +50,7 @@ namespace IGG.Core.Resource
 
             if (m_AssetBundleRequest.isDone)
             {
-                OnLoaded(m_AssetBundleRequest.asset);
+                OnComplete(m_AssetBundleRequest.asset);
             }
             else
             {
@@ -65,11 +58,11 @@ namespace IGG.Core.Resource
             }
         }
 
-        private void OnLoaded(Object asset)
+        public override void Reset()
         {
-            //Logger.Log(string.Format("BundleAssetLoader {0} - {1} use {2}ms", m_path, m_async, m_watch.ElapsedMilliseconds));
+            base.Reset();
 
-            OnComplete(asset);
+            m_AssetBundleRequest = null;
         }
     }
 }

@@ -12,24 +12,13 @@ namespace IGG.Core.Resource
         {
         }
 
-        public override void Reset()
-        {
-            base.Reset();
-
-            if (m_UnityWebRequest != null)
-            {
-                m_UnityWebRequest.Dispose();
-                m_UnityWebRequest = null;
-            }
-        }
-
         public override void Start()
         {
             base.Start();
 
             if (async)
             {
-                string path = this.path;
+                string fullPath = this.path;
 
                 bool hasHead = (bool)param;
                 if (!hasHead)
@@ -45,11 +34,11 @@ namespace IGG.Core.Resource
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (addFileHead)
                     {
-                        path = string.Format("file:///{0}", path);
+                        fullPath = string.Format("file:///{0}", path);
                     }
                 }
 
-                m_UnityWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(path);
+                m_UnityWebRequest = UnityWebRequestAssetBundle.GetAssetBundle(fullPath);
             }
             else
             {
@@ -78,12 +67,12 @@ namespace IGG.Core.Resource
             {
                 if (m_UnityWebRequest == null)
                 {
-                    OnComplete(null);
+                    OnFailed();
                 }
                 else if (!string.IsNullOrEmpty(m_UnityWebRequest.error))
                 {
                     UnityEngine.Debug.LogError(m_UnityWebRequest.error);
-                    OnComplete(null);
+                    OnFailed();
                 }
                 else if (m_UnityWebRequest.isDone)
                 {
@@ -93,6 +82,17 @@ namespace IGG.Core.Resource
                 {
                     OnProgress(m_UnityWebRequest.downloadProgress);
                 }
+            }
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+
+            if (m_UnityWebRequest != null)
+            {
+                m_UnityWebRequest.Dispose();
+                m_UnityWebRequest = null;
             }
         }
     }

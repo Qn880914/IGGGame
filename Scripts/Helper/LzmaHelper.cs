@@ -93,7 +93,7 @@ public class LzmaHelper
     }
 
     // 返回解压后大小
-    public static int Uncompress(byte[] inBuffer, ref byte[] outBuffer)
+    public static int Decompress(byte[] inBuffer, ref byte[] outBuffer)
     {
         int uncompressedSize = (int) BitConverter.ToUInt64(inBuffer, 5);
 
@@ -137,12 +137,12 @@ public class LzmaHelper
         return true;
     }
 
-    public static bool Uncompress(string inPath, string outPath)
+    public static bool Decompress(string inPath, string outPath)
     {
         byte[] inBuffer = File.ReadAllBytes(inPath);
         byte[] outBuffer = g_outBuffer;
 
-        int size = Uncompress(inBuffer, ref outBuffer);
+        int size = Decompress(inBuffer, ref outBuffer);
         if (size == 0)
         {
             return false;

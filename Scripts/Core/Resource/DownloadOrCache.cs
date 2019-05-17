@@ -10,60 +10,59 @@ namespace IGG.Core.Resource
 {
     public class DownloadOrCache
     {
-        private readonly List<string> m_files = new List<string>();
-        private readonly List<UnityWebRequestAsyncOperation> m_requests = new List<UnityWebRequestAsyncOperation>();
+        private readonly List<string> m_ListFiles = new List<string>();
+        private readonly List<UnityWebRequestAsyncOperation> m_ListWebRequestAsyncOpe = new List<UnityWebRequestAsyncOperation>();
 
-        private readonly int m_thread;
-        private Action m_onCompleted;
-        private Action<int, int, int> m_onProgress;
-        private float m_progress;
-        private int m_total;
+        private readonly int m_Thread;
+        private Action m_ActionComplete;
+        private Action<int, int, int> m_ActionProgress;
+        private float m_Progress;
+        private int m_Total;
 
-        public DownloadOrCache(int thread = 1, List<string> files = null, Action<int, int, int> onProgress = null,
-            Action onCompleted = null)
+        public bool isFinish { get; private set; }
+
+        public DownloadOrCache(int thread = 1, List<string> files = null, Action<int, int, int> actionProgress = null,
+            Action actionComplete = null)
         {
-            m_onProgress = onProgress;
-            m_onCompleted = onCompleted;
+            m_ActionProgress = actionProgress;
+            m_ActionComplete = actionComplete;
 
-            m_thread = thread;
+            m_Thread = thread;
 
             if (files != null)
             {
-                m_files.AddRange(files);
+                m_ListFiles.AddRange(files);
             }
 
-            m_total = m_files.Count;
+            m_Total = m_ListFiles.Count;
         }
-
-        public bool IsFinish { get; private set; }
 
         public void Add(string path)
         {
-            if (m_files.Contains(path))
+            if (m_ListFiles.Contains(path))
             {
                 return;
             }
 
-            ++m_total;
-            m_files.Add(path);
+            ++m_Total;
+            m_ListFiles.Add(path);
 
-            IsFinish = false;
+            isFinish = false;
         }
 
         public void Update()
         {
-            if (IsFinish)
+            if (isFinish)
             {
                 return;
             }
 
-            m_progress = 0;
+            m_Progress = 0;
 
             int index = 0;
-            while (index < m_requests.Count)
+            while (index < m_ListWebRequestAsyncOpe.Count)
             {
-                UnityWebRequestAsyncOperation request = m_requests[index];
-                // Logging.Logger.Log(string.Format("--> {0} {1}", request.progress, m_progress));
+                UnityWebRequestAsyncOperation request = m_ListWebRequestAsyncOpe[index];
 
                 if (request.isDone)
                 {
@@ -72,34 +71,34 @@ namespace IGG.Core.Resource
                         request.webRequest.Dispose();
                     }
 
-                    m_requests.RemoveAt(index);
+                    m_ListWebRequestAsyncOpe.RemoveAt(index);
                 }
                 else
                 {
-                    m_progress += request.progress;
+                    m_Progress += request.progress;
                     ++index;
                 }
             }
 
-            OnProgress(m_progress);
+            OnProgress(m_Progress);
 
-            if (m_files.Count > 0)
+            if (m_ListFiles.Count > 0)
             {
-                while (m_requests.Count < m_thread)
+                while (m_ListWebRequestAsyncOpe.Count < m_Thread)
                 {
-                    string path = m_files[0];
-                    m_files.RemoveAt(0);
+                    string path = m_ListFiles[0];
+                    m_ListFiles.RemoveAt(0);
 
                     UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(path, FileUtil.DefaultHash, 0);
-                    m_requests.Add(request.SendWebRequest());
+                    m_ListWebRequestAsyncOpe.Add(request.SendWebRequest());
 
-                    if (m_files.Count == 0)
+                    if (m_ListFiles.Count == 0)
                     {
                         break;
                     }
                 }
             }
-            else if (m_requests.Count == 0)
+            else if (m_ListWebRequestAsyncOpe.Count == 0)
             {
                 // 完成
                 OnCompleted();
@@ -108,13 +107,12 @@ namespace IGG.Core.Resource
 
         private void OnProgress(float rate)
         {
-            if (m_onProgress != null)
+            if (null != m_ActionProgress)
             {
-                int finish = m_total - (m_files.Count + m_requests.Count);
-                int progress = (int) ((finish + rate) * 100f / m_total);
+                int finish = m_Total - (m_ListFiles.Count + m_ListWebRequestAsyncOpe.Count);
+                int progress = (int) ((finish + rate) * 100f / m_Total);
 
-                // Logging.Logger.Log(string.Format("-->OnProgress {0} {1}, {2} {3} {4}", rate, progress, m_files.Count, m_requests.Count, m_total));
-                m_onProgress(progress, finish, m_total);
+                m_ActionProgress(progress, finish, m_Total);
             }
         }
 
@@ -122,15 +120,12 @@ namespace IGG.Core.Resource
         {
             OnProgress(0f);
 
-            if (m_onCompleted != null)
-            {
-                m_onCompleted();
-            }
+            m_ActionComplete?.Invoke();
 
-            m_onProgress = null;
-            m_onCompleted = null;
+            m_ActionProgress = null;
+            m_ActionComplete = null;
 
-            IsFinish = true;
+            isFinish = true;
         }
     }
 }

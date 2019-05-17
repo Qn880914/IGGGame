@@ -4,7 +4,6 @@ using System;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
-
 #endif
 
 #endregion
@@ -12,7 +11,8 @@ using UnityEditor;
 namespace IGG.Core.Resource
 {
     /// <summary>
-    ///     <para> 普通资源加载器(编辑器专用) </para>
+    ///     <para> normal resources loader </para>
+    ///   Note :  only use for Editor 
     /// </summary>
     public class AssetLoader : Loader
     {
@@ -46,7 +46,7 @@ namespace IGG.Core.Resource
 #else
 			if(!async)
 			{
-				OnLoadCompleted(null);
+				OnFailed();
 			}
 #endif
         }

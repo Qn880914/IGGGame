@@ -3,13 +3,15 @@
 namespace IGG.Core.Resource
 {
     /// <summary>
-    ///     <para> Resources 文件加载器(加载Resources文件夹下的资源，使用Resources.Load)</para>
+    ///     <para> Resources file loader </para>
+    ///     Note : use for load file that under the Resources folder
     /// </summary>
     public class ResourceLoader : Loader
     {
         private ResourceRequest m_ResourceRequest;
 
-        public ResourceLoader() : base(LoaderType.Resource)
+        public ResourceLoader()
+            : base(LoaderType.Resource)
         { }
 
         public override void Start()
@@ -31,7 +33,7 @@ namespace IGG.Core.Resource
                 return;
 
             if (null == m_ResourceRequest)
-                OnLoadFail();
+                OnFailed();
             else if (m_ResourceRequest.isDone)
             {
                 OnComplete(m_ResourceRequest.asset);
@@ -39,6 +41,12 @@ namespace IGG.Core.Resource
             }
             else
                 OnProgress(m_ResourceRequest.progress);
+        }
+
+        public override void Reset()
+        {
+            m_ResourceRequest = null;
+            base.Reset();
         }
     }
 }

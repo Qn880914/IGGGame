@@ -10,31 +10,22 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 加载列表
         /// </summary>
-        private readonly List<LoaderInfo> m_loaders = new List<LoaderInfo>();
+        private readonly List<LoaderInfo> m_ListLoaderInfos = new List<LoaderInfo>();
 
         /// <summary>
         ///  加载任务
         /// </summary>
-        private readonly LoaderTask m_task;
+        private readonly LoaderTask m_LoaderTask;
 
         /// <summary>
         /// 当前加载器
         /// </summary>
-        private LoaderInfo m_loader;
-
-        /// <summary>
-        /// 构造
-        /// </summary>
-        /// <param name="task">加载任务</param>
-        public LoaderGroup(LoaderTask task)
-        {
-            m_task = task;
-        }
+        private LoaderInfo m_LoaderInfo;
 
         /// <summary>
         /// 是否已经完成
         /// </summary>
-        public bool IsFinish { get; private set; }
+        public bool isFinish { get; private set; }
 
         /// <summary>
         /// 优先级
@@ -44,17 +35,15 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 加载中
         /// </summary>
-        public bool InLoading { get; private set; }
+        public bool isLoading { get; private set; }
 
         /// <summary>
-        /// 重置
+        /// 构造
         /// </summary>
-        public void Reset()
+        /// <param name="task">加载任务</param>
+        public LoaderGroup(LoaderTask task)
         {
-            IsFinish = false;
-            InLoading = false;
-
-            m_loader = null;
+            m_LoaderTask = task;
         }
 
         /// <summary>
@@ -62,10 +51,10 @@ namespace IGG.Core.Resource
         /// </summary>
         public void Update()
         {
-            if (m_loader != null)
+            if (null != m_LoaderInfo)
             {
-                m_loader.Loader.Update();
-                if (m_loader.Loader.isCompleted)
+                m_LoaderInfo.loader.Update();
+                if (m_LoaderInfo.loader.isCompleted)
                 {
                     LoadNext();
                 }
@@ -77,7 +66,7 @@ namespace IGG.Core.Resource
         /// </summary>
         public void Start()
         {
-            InLoading = true;
+            isLoading = true;
             LoadNext();
         }
 
@@ -86,32 +75,32 @@ namespace IGG.Core.Resource
         /// </summary>
         private void LoadNext()
         {
-            if (m_loader != null)
+            if (null != m_LoaderInfo)
             {
-                m_task.PushLoader(m_loader.Loader);
-                m_loader = null;
+                m_LoaderTask.PushLoader(m_LoaderInfo.loader);
+                m_LoaderInfo = null;
             }
 
-            if (m_loaders.Count == 0)
+            if (m_ListLoaderInfos.Count == 0)
             {
-                IsFinish = true;
+                isFinish = true;
                 return;
             }
 
-            m_loader = m_loaders[0];
-            m_loaders.RemoveAt(0);
+            m_LoaderInfo = m_ListLoaderInfos[0];
+            m_ListLoaderInfos.RemoveAt(0);
 
-            switch (m_loader.Loader.state)
+            switch (m_LoaderInfo.loader.state)
             {
                 case LoaderState.None:
                     PushCallback();
-                    m_loader.Loader.Start();
+                    m_LoaderInfo.loader.Start();
                     break;
                 case LoaderState.Loading:
                     PushCallback();
                     break;
                 case LoaderState.Complete:
-                    LoadCompleted(m_loader, m_loader.Loader.data);
+                    LoadCompleted(m_LoaderInfo, m_LoaderInfo.loader.data);
                     LoadNext();
                     break;
             }
@@ -126,27 +115,27 @@ namespace IGG.Core.Resource
         /// <param name="onLoaded">回调</param>
         /// <param name="async">异步</param>
         /// <param name="insert">插队</param>
-        public void Add(LoaderType type, string path, object param, LoadManager.GroupLoadedCallback onLoaded,
+        public void Add(LoaderType type, string path, object param, LoadManager.LoaderGroupCompleteCallback completeCallback,
                         bool async, bool insert)
         {
-            LoaderInfo loader = new LoaderInfo
+            LoaderInfo loaderInfo = new LoaderInfo
             {
-                Loader = m_task.PopLoader(type, path, param, async),
-                Callback = onLoaded
+                loader = m_LoaderTask.PopLoader(type, path, param, async),
+                completeCallback = completeCallback
             };
 
             if (insert)
             {
-                m_loaders.Insert(0, loader);
+                m_ListLoaderInfos.Insert(0, loaderInfo);
             }
             else
             {
-                m_loaders.Add(loader);
+                m_ListLoaderInfos.Add(loaderInfo);
             }
 
-            if (InLoading && IsFinish)
+            if (isLoading && isFinish)
             {
-                IsFinish = false;
+                isFinish = false;
                 LoadNext();
             }
         }
@@ -156,7 +145,7 @@ namespace IGG.Core.Resource
         /// </summary>
         private void PushCallback()
         {
-            m_task.PushCallback(m_loader.Loader, (data) => { LoadCompleted(m_loader, data); });
+            m_LoaderTask.PushCallback(m_LoaderInfo.loader, (data) => { LoadCompleted(m_LoaderInfo, data); });
         }
 
         /// <summary>
@@ -166,12 +155,23 @@ namespace IGG.Core.Resource
         /// <param name="data">加载结果</param>
         private void LoadCompleted(LoaderInfo info, object data)
         {
-            if (info == null || info.Callback == null)
+            if (info == null)
             {
                 return;
             }
 
-            info.Callback(this, data);
+            info.completeCallback?.Invoke(this, data);
+        }
+
+        /// <summary>
+        /// 重置
+        /// </summary>
+        public void Reset()
+        {
+            isFinish = false;
+            isLoading = false;
+
+            m_LoaderInfo = null;
         }
 
         /// <summary>
@@ -182,12 +182,12 @@ namespace IGG.Core.Resource
             /// <summary>
             /// 回调
             /// </summary>
-            public LoadManager.GroupLoadedCallback Callback;
+            public LoadManager.LoaderGroupCompleteCallback completeCallback;
 
             /// <summary>
             /// 加载器
             /// </summary>
-            public Loader Loader;
+            public Loader loader;
         }
     }
 }

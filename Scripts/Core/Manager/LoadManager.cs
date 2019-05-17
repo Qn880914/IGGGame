@@ -3,7 +3,6 @@ using IGG.Game;
 using IGG.Utility;
 using SimpleJSON;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -17,11 +16,11 @@ namespace IGG.Core.Manager
         public void OnUpdate(float deltaTime)
         { }
 
-        public delegate void GroupLoadedCallback(LoaderGroup group, object data);
+        public delegate void LoaderGroupCompleteCallback(LoaderGroup group, object data);
 
-        public delegate void LoadedHandler(object data);
+        public delegate void CompleteCallback(object data);
 
-        public delegate void ProgressHandler(float rate);
+        public delegate void ProgressCallback(float progress);
 
         // 加载优先级
         public enum LoadPriority
@@ -115,8 +114,6 @@ namespace IGG.Core.Manager
 
             Resources.UnloadUnusedAssets();
             GC.Collect();
-
-            Dump();
         }
 
         private void ClearAfterPatch()
@@ -422,7 +419,7 @@ namespace IGG.Core.Manager
         // ------------------------------------------------------------------------------------------
         // 编辑器专用加载
         // 加载Assets目录下的文件(编辑器专用,带后缀)
-        public void LoadFile(string path, LoadedHandler onLoaded,
+        public void LoadFile(string path, CompleteCallback completeCallback,
             bool async = true, bool inData = true, LoadPriority priority = LoadPriority.Normal)
         {
 #if !UNITY_EDITOR && !UNITY_STANDALONE
@@ -431,22 +428,19 @@ namespace IGG.Core.Manager
 #endif
 
             string fullpath = string.Format("{0}/{1}", inData ? ConstantData.DataFullPath : Application.dataPath, path);
-            if (!CheckFileExist(fullpath, onLoaded))
+            if (!CheckFileExist(fullpath, completeCallback))
             {
                 return;
             }
 
             m_task.AddLoadTask(null, LoaderType.Stream, fullpath, false, (group, data) =>
             {
-                if (onLoaded != null)
-                {
-                    onLoaded(data);
-                }
+                completeCallback?.Invoke(data);
             }, async, priority);
         }
 
         // 加载资源(Assets目录下,带后缀)
-        public void LoadAssetFile(string path, LoadedHandler onLoaded, Type type = null,
+        public void LoadAssetFile(string path, CompleteCallback completeCallback, Type type = null,
             bool async = true, bool inData = true, LoadPriority priority = LoadPriority.Normal)
         {
 #if !UNITY_EDITOR && !UNITY_STANDALONE
@@ -455,7 +449,7 @@ namespace IGG.Core.Manager
 #endif
 
             string fullpath = string.Format("{0}/{1}", inData ? ConstantData.DataFullPath : Application.dataPath, path);
-            if (!CheckFileExist(fullpath, onLoaded))
+            if (!CheckFileExist(fullpath, completeCallback))
             {
                 return;
             }
@@ -465,16 +459,13 @@ namespace IGG.Core.Manager
                 : string.Format("Assets/{0}", path);
             m_task.AddLoadTask(null, LoaderType.Asset, fullpath, type, (group, data) =>
             {
-                if (onLoaded != null)
-                {
-                    onLoaded(data);
-                }
+                completeCallback?.Invoke(data);
             }, async, priority);
         }
 
         // 全平台加载
         // 加载流文件(remote==false时先从persistentData读,没有找到则从streamingAssets读,带后缀)
-        public void LoadStream(string path, LoadedHandler onLoaded,
+        public void LoadStream(string path, CompleteCallback completeCallback,
             bool async = true, bool remote = false, bool isFullPath = false,
             LoadPriority priority = LoadPriority.Normal)
         {
@@ -494,28 +485,22 @@ namespace IGG.Core.Manager
 
             m_task.AddLoadTask(null, LoaderType.Stream, fullpath, remote, (group, data) =>
             {
-                if (onLoaded != null)
-                {
-                    onLoaded(data);
-                }
+                completeCallback?.Invoke(data);
             }, async, priority);
         }
 
         // 加载资源(Resource目录下,不带后缀)
-        public void LoadResource(string path, LoadedHandler onLoaded,
+        public void LoadResource(string path, CompleteCallback completeCallback,
             bool async = true, LoadPriority priority = LoadPriority.Normal)
         {
             m_task.AddLoadTask(null, LoaderType.Resource, path, null, (group, data) =>
             {
-                if (onLoaded != null)
-                {
-                    onLoaded(data);
-                }
+                completeCallback?.Invoke(data);
             }, async, priority);
         }
 
         // 加载关卡
-        public void LoadScene(string name, LoadedHandler onLoaded, bool async = true, bool additive = false)
+        public void LoadScene(string name, CompleteCallback completeCallback, bool async = true, bool additive = false)
         {
             LoaderGroup group = m_task.PopGroup(LoadPriority.High);
             if (!additive)
@@ -531,10 +516,7 @@ namespace IGG.Core.Manager
                 {
                     m_task.AddLoadTask(group1, LoaderType.Scene, name, additive, (group2, data2) =>
                     {
-                        if (onLoaded != null)
-                        {
-                            onLoaded(data2);
-                        }
+                        completeCallback?.Invoke(data2);
                     }, async, group.Priority, true);
                 }, async);
             }
@@ -542,10 +524,7 @@ namespace IGG.Core.Manager
             {
                 m_task.AddLoadTask(group, LoaderType.Scene, name, additive, (group1, data1) =>
                 {
-                    if (onLoaded != null)
-                    {
-                        onLoaded(data1);
-                    }
+                    completeCallback?.Invoke(data1);
                 }, async);
             }
         }
@@ -565,25 +544,16 @@ namespace IGG.Core.Manager
         }
 
         // 加载AssetBundle(先从persistentData读,没有找到则从streamingAssets读)
-        public void LoadBundle(string path, LoadedHandler onLoaded,
+        public void LoadBundle(string path, CompleteCallback completeCallback,
             bool async = true, bool persistent = false, bool manifest = true,
             LoadPriority priority = LoadPriority.Normal)
         {
             path = path.ToLower();
             LoadAssetBundle(null, path, (group, data) =>
             {
-                AssetBundle ab = null;
+                AssetBundleInfo assetBundleInfo = data as AssetBundleInfo;
 
-                AssetBundleInfo info = data as AssetBundleInfo;
-                if (info != null)
-                {
-                    ab = info.Bundle;
-                }
-
-                if (onLoaded != null)
-                {
-                    onLoaded(ab);
-                }
+                completeCallback?.Invoke(null != assetBundleInfo ? assetBundleInfo.assetBundle : null);
             }, async, persistent, manifest, priority);
         }
 
@@ -605,7 +575,7 @@ namespace IGG.Core.Manager
 
         // 从AssetBundle中加载资源
         public void LoadAssetFromBundle(LoaderGroup group, string path, string name, Type type,
-            GroupLoadedCallback onLoaded,
+            LoaderGroupCompleteCallback callback,
             bool async = true, bool persistent = false,
             LoadPriority priority = LoadPriority.Normal)
         {
@@ -613,12 +583,12 @@ namespace IGG.Core.Manager
             LoadAssetBundle(group, path, (group1, data) =>
             {
                 AssetBundleInfo cache = data as AssetBundleInfo;
-                LoadBundleAsset(group1, cache, name, type, onLoaded, async);
+                LoadBundleAsset(group1, cache, name, type, callback, async);
             }, async, persistent, true, priority);
         }
 
         // 加载资源
-        public void LoadAsset(string path, Type type, LoadedHandler onLoaded,
+        public void LoadAsset(string path, Type type, CompleteCallback onLoaded,
             bool async = true, bool persistent = false, bool inData = true,
             LoadPriority priority = LoadPriority.Normal)
         {
@@ -680,15 +650,12 @@ namespace IGG.Core.Manager
         // ------------------------------------------------------------------------------------------
         // 从AssetBundle里加载资源
         private void LoadBundleAsset(LoaderGroup group, AssetBundleInfo info, string name, Type type,
-            GroupLoadedCallback onLoaded,
+            LoaderGroupCompleteCallback callback,
             bool async = true, LoadPriority priority = LoadPriority.Normal)
         {
             if (info == null || string.IsNullOrEmpty(name))
             {
-                if (onLoaded != null)
-                {
-                    onLoaded(group, null);
-                }
+                callback?.Invoke(group, null);
 
                 return;
             }
@@ -699,33 +666,27 @@ namespace IGG.Core.Manager
                 //Logger.Log(string.Format("-->LoadBundleAsset: {0}", name));
 
                 System.Object asset = info.LoadAsset(name, type);
-                if (onLoaded != null)
-                {
-                    onLoaded(group, asset);
-                }
+                callback?.Invoke(group, asset);
             }
             else
             {
                 // 异步,创建一个加载器后加载
                 BundleAssetLoadParam param = new BundleAssetLoadParam
                 {
-                    assetBundle = info.Bundle,
+                    assetBundle = info.assetBundle,
                     type = type
                 };
 
                 m_task.AddLoadTask(group, LoaderType.BundleAsset, name, param, (group1, data1) =>
                 {
                     // 加载回调
-                    if (onLoaded != null)
-                    {
-                        onLoaded(group1, data1);
-                    }
+                    callback?.Invoke(group1, data1);
                 }, true, priority, true);
             }
         }
 
         // 加载AssetBundle(先从persistentData读,没有找到则从streamingAssets读,带后缀)
-        private void LoadAssetBundle(LoaderGroup group, string path, GroupLoadedCallback onLoaded,
+        private void LoadAssetBundle(LoaderGroup group, string path, LoaderGroupCompleteCallback callback,
             bool async = true, bool persistent = false, bool manifest = true,
             LoadPriority priority = LoadPriority.Normal)
         {
@@ -742,15 +703,15 @@ namespace IGG.Core.Manager
                 {
                     // Manifest里没有这个AssetBundle,说明是一个错误的路径
                     UnityEngine.Debug.LogErrorFormat("ab不存在:{0}", path);
-                    if (onLoaded != null)
+                    if (null != callback)
                     {
                         if (!async)
                         {
-                            onLoaded(group, null);
+                            callback(group, null);
                         }
                         else
                         {
-                            m_task.AddAsyncCallback(onLoaded, group, null);
+                            m_task.AddAsyncCallback(callback, group, null);
                         }
                     }
 
@@ -762,7 +723,7 @@ namespace IGG.Core.Manager
             }
 
             // 检查是否有缓存
-            if (m_cache.CheckAssetBundleInfo(group, path, onLoaded, persistent, async))
+            if (m_cache.CheckAssetBundleInfo(group, path, callback, persistent, async))
             {
                 return;
             }
@@ -782,10 +743,7 @@ namespace IGG.Core.Manager
                 }
 
                 // 加载回调
-                if (onLoaded != null)
-                {
-                    onLoaded(group1, info);
-                }
+                callback?.Invoke(group1, info);
             }, async, priority);
         }
 
@@ -836,16 +794,13 @@ namespace IGG.Core.Manager
 
         // ------------------------------------------------------------------------------------------
         // 文件/目录是否存在
-        private bool CheckFileExist(string path, LoadedHandler onLoaded, bool isFile = true)
+        private bool CheckFileExist(string path, CompleteCallback completeCallback, bool isFile = true)
         {
             bool exist = isFile ? File.Exists(path) : Directory.Exists(path);
             if (!exist)
             {
                 // 不存在
-                if (onLoaded != null)
-                {
-                    onLoaded(null);
-                }
+                completeCallback?.Invoke(null);
 
                 return false;
             }
@@ -860,7 +815,7 @@ namespace IGG.Core.Manager
             //m_task.BeginFrontLoad();
         }
 
-        public void StartFrontLoad(ProgressHandler onProgress)
+        public void StartFrontLoad(ProgressCallback onProgress)
         {
             //m_task.StartFrontLoad(onProgress);
         }
@@ -955,9 +910,10 @@ namespace IGG.Core.Manager
         // }
 
         // ------------------------------------------------------------------------------------------
-        public void Dump()
+
+        public override string ToString()
         {
-            m_cache.Dump();
+            return m_cache.ToString();
         }
     }
 }

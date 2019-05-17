@@ -22,12 +22,12 @@ public class FullVersionResource
 		}
 
 		List<VersionData.VersionItem> list = new List<VersionData.VersionItem>();
-		List<string> files = IGG.FileUtil.GetAllChildFiles(BuildAssetBundle.AssetBundlePath, "ab");
+		List<string> files = IGG.FileUtil.GetAllChildFiles(BuildAssetBundle.assetBundlePath, "ab");
 
 		if (!ConstantData.EnableCache && ConstantData.EnableCustomCompress)
 		{
 			// 自定义压缩
-			string inPath = string.Format("{0}{1}", BuildAssetBundle.AssetBundlePath, ConstantData.MainVersion);
+			string inPath = string.Format("{0}{1}", BuildAssetBundle.assetBundlePath, ConstantData.MainVersion);
 			string outPath = "";
 			if (ConstantData.EnableMd5Name)
 			{
@@ -40,7 +40,7 @@ public class FullVersionResource
 			}
 
 			ThreadParam param = new ThreadParam();
-			param.pathSrc = BuildAssetBundle.AssetBundlePath;
+			param.pathSrc = BuildAssetBundle.assetBundlePath;
 			param.pathDst = ConstantData.StreamingAssetsPath;
 			param.list = list;
 			param.files = files;
@@ -87,7 +87,7 @@ public class FullVersionResource
 			// 直接拷贝
 			if (ConstantData.EnableMd5Name)
 			{
-				string pathSrc = BuildAssetBundle.AssetBundlePath;
+				string pathSrc = BuildAssetBundle.assetBundlePath;
 				string pathDst = ConstantData.StreamingAssetsPath;
 
 				{
@@ -108,10 +108,10 @@ public class FullVersionResource
 			else
 			{
 				// 把所有的ab文件拷贝进StreamAssets的ab目录下
-				IGG.FileUtil.CopyDirectory(BuildAssetBundle.AssetBundlePath, Application.streamingAssetsPath + "/ab/", ConstantData.AssetBundleExt);
+				IGG.FileUtil.CopyDirectory(BuildAssetBundle.assetBundlePath, Application.streamingAssetsPath + "/ab/", ConstantData.AssetBundleExt);
 
 				// 拷贝manifest进StreamAssets,并命名为data
-				string pathSrc = string.Format("{0}/{1}", BuildAssetBundle.AssetBundlePath, ConstantData.MainVersion);
+				string pathSrc = string.Format("{0}/{1}", BuildAssetBundle.assetBundlePath, ConstantData.MainVersion);
 				string pathDst = string.Format("{0}/ab/data", Application.streamingAssetsPath);
 				IGG.FileUtil.CopyFile(pathSrc, pathDst);
 			}

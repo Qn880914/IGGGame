@@ -6,42 +6,36 @@ using UnityEngine;
 
 public class BuildAssetBundle
 {
-    public static string AssetBundlePath
-    {
-        get
-        {
-            return IGG.EditorTools.EditorHelper.AssetBundleDir;
-        }
-    }
+    public static string assetBundlePath { get { return IGG.EditorTools.EditorHelper.assetBundleDir; } }
 
     // 获取资源存储路径
-    public static string GetAssetResourceSavePath(string Type, ResourcesPathMode Mode)
+    public static string GetAssetResourceSavePath(string type, ResourcesPathMode mode)
     {
-        StringBuilder Builder = new StringBuilder(string.Empty);
-        if (Mode == ResourcesPathMode.AssetBundle)
+        StringBuilder stringBuilder = new StringBuilder(string.Empty);
+        if (mode == ResourcesPathMode.AssetBundle)
         {
-            Builder.Append(AssetBundlePath);
+            stringBuilder.Append(assetBundlePath);
         }
 
-        string str = ResourcesPath.GetRelativePath(Type, Mode);
-        Builder.Append(str);
-        return Builder.ToString();
+        string path = ResourcesPath.GetRelativePath(type, mode);
+        stringBuilder.Append(path);
+        return stringBuilder.ToString();
     }
 
     public static void Build()
     {
-        ReimportAll(ConstantData.ClearAssetBundleBeforeBuild, ConstantData.ResetAssetBundleBeforeBuild, ConstantData.EnableAssetBundleRedundance);
+        ReimportAll(ConstantData.clearAssetBundle, ConstantData.resetAssetBundle, ConstantData.enableAssetBundleRedundance);
 
         AssetDatabase.RemoveUnusedAssetBundleNames();
 
-        BuildAssetBundleOptions options = BuildAssetBundleOptions.DeterministicAssetBundle;
+        BuildAssetBundleOptions buildOptions = BuildAssetBundleOptions.DeterministicAssetBundle;
         if (!ConstantData.EnableCache && ConstantData.EnableCustomCompress)
         {
             // 使用解压,AssetBundle不压缩,使用外部压缩
-            options |= BuildAssetBundleOptions.UncompressedAssetBundle;
+            buildOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
         }
 
-        BuildPipeline.BuildAssetBundles(AssetBundlePath, options, EditorUserBuildSettings.activeBuildTarget);
+        BuildPipeline.BuildAssetBundles(assetBundlePath, buildOptions, EditorUserBuildSettings.activeBuildTarget);
         AssetDatabase.Refresh();
     }
 
@@ -410,16 +404,16 @@ public class BuildAssetBundle
     }
 
     // 构建所有索引
-    public static void ReimportAll(bool clear = true, bool reset = false, bool redundance = true)
+    public static void ReimportAll(bool clearAssetBundle = true, bool reset = false, bool redundance = true)
     {
-        if (clear)
+        if (clearAssetBundle)
         {
             // 清除现有ab目录
-            IGG.FileUtil.ClearFileDirectory(AssetBundlePath);
+            IGG.FileUtil.ClearFileDirectory(assetBundlePath);
         }
         else
         {
-            IGG.FileUtil.CreateFileDirectory(AssetBundlePath);
+            IGG.FileUtil.CreateFileDirectory(assetBundlePath);
         }
 
         if (reset)

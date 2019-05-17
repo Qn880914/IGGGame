@@ -18,13 +18,13 @@ public class ConstantData
 #endif
 
     // 打AssetBundle前,清除旧的AssetBundle(全部重新打)
-    public static bool ClearAssetBundleBeforeBuild = false;
+    public static bool clearAssetBundle = false;
 
     // 打AssetBundle前,重置AssetBundle Name
-    public static bool ResetAssetBundleBeforeBuild = false;
+    public static bool resetAssetBundle = false;
 
     // 开启冗余资源检测
-    public static bool EnableAssetBundleRedundance = true;
+    public static bool enableAssetBundleRedundance = true;
 
     // 开启缓存
     public static bool EnableCache = true;

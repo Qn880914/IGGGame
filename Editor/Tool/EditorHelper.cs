@@ -140,7 +140,7 @@ namespace IGG.EditorTools
             }
         }
 
-		public static string AssetBundleDir
+		public static string assetBundleDir
 		{
 			get
 			{

@@ -17,7 +17,9 @@
         public virtual void LogEvent()
         {
             if(log)
-            { }
+            {
+                UnityEngine.Debug.Log("Event Dispathced : " + this.GetType().Name);
+            }
         }
     }
 }

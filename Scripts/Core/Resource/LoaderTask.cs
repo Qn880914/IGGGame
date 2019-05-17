@@ -1,7 +1,6 @@
 ﻿using IGG.Core.Manager;
-using System.Collections;
+using IGG.Utility;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace IGG.Core.Resource
 {
@@ -10,50 +9,34 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 加载队列数
         /// </summary>
-        private const int g_maxGroup = 10;
+        private const int kMaxGroupCount = 10;
 
         /// <summary>
         /// 回调信息列表
         /// </summary>
-        private readonly List<AsyncCallbackInfo> m_asyncCallbackInfos = new List<AsyncCallbackInfo>();
-
-        /// <summary>
-        /// 加载组池
-        /// </summary>
-        private readonly Queue<LoaderGroup> m_groupPool = new Queue<LoaderGroup>();
+        private readonly List<AsyncCallbackInfo> m_AsyncCallbackInfos = new List<AsyncCallbackInfo>();
 
         /// <summary>
         /// 进行中的加载组
         /// </summary>
-        private readonly List<LoaderGroup> m_groups = new List<LoaderGroup>();
+        private readonly List<LoaderGroup> m_ListLoaderGroups = new List<LoaderGroup>();
 
         /// <summary>
         /// 进行中的加载器列表
         /// </summary>
-        private readonly Dictionary<string, LoaderData> m_loaders = new Dictionary<string, LoaderData>();
-
-        /// <summary>
-        /// 加载器池
-        /// </summary>
-        private readonly Dictionary<LoaderType, Queue<LoaderData>> m_pools =
-            new Dictionary<LoaderType, Queue<LoaderData>>();
+        private readonly Dictionary<string, LoaderData> m_DicLoaderDatas = new Dictionary<string, LoaderData>();
 
         /// <summary>
         /// 等待中的加载组
         /// </summary>
-        private readonly Dictionary<LoadManager.LoadPriority, Queue<LoaderGroup>> m_waitGroups =
+        private readonly Dictionary<LoadManager.LoadPriority, Queue<LoaderGroup>> m_DicLoaderGroupWaits =
             new Dictionary<LoadManager.LoadPriority, Queue<LoaderGroup>>();
 
         public LoaderTask()
         {
-            for (int i = 0; i < (int)LoaderType.Quantity; ++i)
+            for (int i = 0; i < (int)LoadManager.LoadPriority.Quantity; ++i)
             {
-                m_pools.Add((LoaderType)i, new Queue<LoaderData>());
-            }
-
-            for (int i = 0; i < (int)LoadManager.LoadPriority.Count; ++i)
-            {
-                m_waitGroups.Add((LoadManager.LoadPriority)i, new Queue<LoaderGroup>());
+                m_DicLoaderGroupWaits.Add((LoadManager.LoadPriority)i, new Queue<LoaderGroup>());
             }
         }
 
@@ -71,72 +54,25 @@ namespace IGG.Core.Resource
         }
 
         /// <summary>
-        /// 创建加载器
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>加载器</returns>
-        private Loader CreateLoader(LoaderType type)
-        {
-            Loader loader = null;
-            switch (type)
-            {
-                case LoaderType.Stream:
-                    loader = new StreamLoader();
-                    break;
-
-                case LoaderType.Asset:
-                    loader = new AssetLoader();
-                    break;
-
-                case LoaderType.Scene:
-                    loader = new SceneLoader();
-                    break;
-
-                case LoaderType.Resource:
-                    loader = new ResourceLoader();
-                    break;
-
-                case LoaderType.Bundle:
-                    if (ConstantData.EnableCache)
-                    {
-                        loader = new CacheBundleLoader();
-                    }
-                    else
-                    {
-                        loader = new BundleLoader();
-                    }
-
-                    break;
-
-                case LoaderType.BundleAsset:
-                    loader = new BundleAssetLoader();
-                    break;
-            }
-
-            return loader;
-        }
-
-        /// <summary>
         /// 归还加载器
         /// </summary>
         /// <param name="loader">加载器</param>
-        public void PushLoader(Loader loader)
+        public void ReleaseLoader(Loader loader)
         {
-            LoaderData ld;
-            if (!m_loaders.TryGetValue(loader.path, out ld))
+            LoaderData loaderData;
+            if (!m_DicLoaderDatas.TryGetValue(loader.path, out loaderData))
             {
                 return;
             }
 
-            if (--ld.Reference > 0)
+            if (--loaderData.referenceCount > 0)
             {
                 return;
             }
 
-            m_loaders.Remove(loader.path);
+            m_DicLoaderDatas.Remove(loader.path);
 
-            loader.Reset();
-            m_pools[loader.type].Enqueue(ld);
+            LoaderDataPool.Release(loaderData);
         }
 
 
@@ -148,37 +84,34 @@ namespace IGG.Core.Resource
         /// <param name="param">附加参数</param>
         /// <param name="async">异步</param>
         /// <returns>加载器</returns>
-        public Loader PopLoader(LoaderType type, string path, object param, bool async)
+        public Loader GetLoader(LoaderType type, string path, object param, bool async)
         {
-            LoaderData ld;
-            if (!m_loaders.TryGetValue(path, out ld))
+            LoaderData loaderData;
+            if (!m_DicLoaderDatas.TryGetValue(path, out loaderData))
             {
-                if (m_pools[type].Count > 0)
-                {
-                    ld = m_pools[type].Dequeue();
-                }
+                loaderData = LoaderDataPool.Get(type);
 
-                if (ld == null)
+                if (loaderData == null)
                 {
-                    ld = new LoaderData
+                    loaderData = new LoaderData
                     {
-                        Reference = 0,
-                        Loader = CreateLoader(type),
-                        Callbacks = new List<LoadManager.CompleteCallback>()
+                        referenceCount = 0,
+                        loader = LoaderPool.Get(type),
+                        completeCallbacks = new List<LoadManager.CompleteCallback>()
                     };
                 }
 
-                ld.Loader.Init(path, param, null, OnLoadCompleted, async);
-                m_loaders.Add(path, ld);
+                loaderData.loader.Init(path, param, null, OnLoadCompleted, async);
+                m_DicLoaderDatas.Add(path, loaderData);
             }
 
             if (!async)
             {
-                ld.Loader.async = false;
+                loaderData.loader.async = false;
             }
 
-            ++ld.Reference;
-            return ld.Loader;
+            ++loaderData.referenceCount;
+            return loaderData.loader;
         }
 
         /// <summary>
@@ -193,7 +126,11 @@ namespace IGG.Core.Resource
                 return;
             }
 
-            m_loaders[loader.path].Callbacks.Add(completeCallback);
+            LoaderData loaderData;
+            if (m_DicLoaderDatas.TryGetValue(loader.path, out loaderData))
+            {
+                loaderData.completeCallbacks.Add(completeCallback);
+            }
         }
 
         /// <summary>
@@ -203,18 +140,18 @@ namespace IGG.Core.Resource
         /// <param name="data">结果</param>
         private void OnLoadCompleted(Loader loader, object data)
         {
-            LoaderData ld;
-            if (!m_loaders.TryGetValue(loader.path, out ld))
+            LoaderData loaderData;
+            if (!m_DicLoaderDatas.TryGetValue(loader.path, out loaderData))
             {
                 return;
             }
 
-            for (int i = 0; i < ld.Callbacks.Count; ++i)
+            for (int i = 0; i < loaderData.completeCallbacks.Count; ++i)
             {
-                ld.Callbacks[i](data);
+                loaderData.completeCallbacks[i](data);
             }
 
-            ld.Callbacks.Clear();
+            loaderData.completeCallbacks.Clear();
         }
 
         /// <summary>
@@ -223,9 +160,9 @@ namespace IGG.Core.Resource
         /// <returns></returns>
         public LoaderGroup PopGroup(LoadManager.LoadPriority priority = LoadManager.LoadPriority.Normal)
         {
-            LoaderGroup group = m_groupPool.Count > 0 ? m_groupPool.Dequeue() : new LoaderGroup(this);
-            group.Priority = priority;
-            m_waitGroups[priority].Enqueue(group);
+            LoaderGroup group = LoaderGroupPool.Get(this);
+            group.priority = priority;
+            m_DicLoaderGroupWaits[priority].Enqueue(group);
             return group;
         }
 
@@ -235,26 +172,26 @@ namespace IGG.Core.Resource
         /// <returns></returns>
         private bool StartNextGroup()
         {
-            LoaderGroup group = null;
-            for (int i = (int)LoadManager.LoadPriority.Count - 1; i >= 0; --i)
+            LoaderGroup loaderGroup = null;
+            for (int i = (int)LoadManager.LoadPriority.Quantity - 1; i >= 0; --i)
             {
-                Queue<LoaderGroup> groups = m_waitGroups[(LoadManager.LoadPriority)i];
+                Queue<LoaderGroup> groups = m_DicLoaderGroupWaits[(LoadManager.LoadPriority)i];
                 if (groups.Count == 0)
                 {
                     continue;
                 }
 
-                group = groups.Dequeue();
+                loaderGroup = groups.Dequeue();
                 break;
             }
 
-            if (group == null)
+            if (loaderGroup == null)
             {
                 return false;
             }
 
-            m_groups.Add(group);
-            group.Start();
+            m_ListLoaderGroups.Add(loaderGroup);
+            loaderGroup.Start();
 
             return true;
         }
@@ -265,16 +202,15 @@ namespace IGG.Core.Resource
         private void UpdateGroup()
         {
             int index = 0;
-            while (index < m_groups.Count)
+            while (index < m_ListLoaderGroups.Count)
             {
-                LoaderGroup group = m_groups[index];
+                LoaderGroup group = m_ListLoaderGroups[index];
                 group.Update();
 
                 if (group.isFinish)
                 {
-                    group.Reset();
-                    m_groupPool.Enqueue(group);
-                    m_groups.RemoveAt(index);
+                    LoaderGroupPool.Release(group);
+                    m_ListLoaderGroups.RemoveAt(index);
                 }
                 else
                 {
@@ -282,7 +218,7 @@ namespace IGG.Core.Resource
                 }
             }
 
-            while (m_groups.Count < g_maxGroup)
+            while (m_ListLoaderGroups.Count < kMaxGroupCount)
             {
                 if (!StartNextGroup())
                 {
@@ -309,14 +245,14 @@ namespace IGG.Core.Resource
         {
             if (!async)
             {
-                Loader loader = PopLoader(type, path, param, false);
+                Loader loader = GetLoader(type, path, param, false);
                 PushCallback(loader, (data) =>
                 {
                     completeCallback?.Invoke(group, data);
                 });
                 loader.Start();
 
-                PushLoader(loader);
+                ReleaseLoader(loader);
 
                 return;
             }
@@ -349,7 +285,7 @@ namespace IGG.Core.Resource
                 Data = data
             };
 
-            m_asyncCallbackInfos.Add(info);
+            m_AsyncCallbackInfos.Add(info);
         }
 
         /// <summary>
@@ -357,55 +293,13 @@ namespace IGG.Core.Resource
         /// </summary>
         private void UpdateAsyncCallback()
         {
-            for (int i = 0; i < m_asyncCallbackInfos.Count; ++i)
+            for (int i = 0; i < m_AsyncCallbackInfos.Count; ++i)
             {
-                AsyncCallbackInfo info = m_asyncCallbackInfos[i];
+                AsyncCallbackInfo info = m_AsyncCallbackInfos[i];
                 info.completeCallback(info.Group, info.Data);
             }
 
-            m_asyncCallbackInfos.Clear();
-        }
-
-        /// <summary>
-        /// 加载信息
-        /// </summary>
-        private class LoaderData
-        {
-            /// <summary>
-            /// 回调函数列表
-            /// </summary>
-            public List<LoadManager.CompleteCallback> Callbacks;
-
-            /// <summary>
-            /// 加载器
-            /// </summary>
-            public Loader Loader;
-
-            /// <summary>
-            /// 引用计数
-            /// </summary>
-            public int Reference;
-        }
-
-        /// <summary>
-        /// 异步加载回调信息
-        /// </summary>
-        private class AsyncCallbackInfo
-        {
-            /// <summary>
-            /// 资源对象
-            /// </summary>
-            public object Data;
-
-            /// <summary>
-            /// 加载组
-            /// </summary>
-            public LoaderGroup Group;
-
-            /// <summary>
-            /// 回调函数
-            /// </summary>
-            public LoadManager.LoaderGroupCompleteCallback completeCallback;
+            m_AsyncCallbackInfos.Clear();
         }
     }
 }

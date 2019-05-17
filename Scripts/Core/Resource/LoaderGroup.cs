@@ -1,5 +1,4 @@
 ﻿using IGG.Core.Manager;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +14,8 @@ namespace IGG.Core.Resource
         /// <summary>
         ///  加载任务
         /// </summary>
-        private readonly LoaderTask m_LoaderTask;
+        private LoaderTask m_LoaderTask;
+        public LoaderTask loaderTask { get { return m_LoaderTask; } set { m_LoaderTask = value; } }
 
         /// <summary>
         /// 当前加载器
@@ -30,12 +30,14 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 优先级
         /// </summary>
-        public LoadManager.LoadPriority Priority { get; set; }
+        public LoadManager.LoadPriority priority { get; set; }
 
         /// <summary>
         /// 加载中
         /// </summary>
         public bool isLoading { get; private set; }
+
+        public LoaderGroup() { }
 
         /// <summary>
         /// 构造
@@ -44,6 +46,11 @@ namespace IGG.Core.Resource
         public LoaderGroup(LoaderTask task)
         {
             m_LoaderTask = task;
+        }
+
+        public void Inti(LoaderTask loaderTask)
+        {
+            m_LoaderTask = loaderTask;
         }
 
         /// <summary>
@@ -77,7 +84,7 @@ namespace IGG.Core.Resource
         {
             if (null != m_LoaderInfo)
             {
-                m_LoaderTask.PushLoader(m_LoaderInfo.loader);
+                m_LoaderTask.ReleaseLoader(m_LoaderInfo.loader);
                 m_LoaderInfo = null;
             }
 
@@ -120,7 +127,7 @@ namespace IGG.Core.Resource
         {
             LoaderInfo loaderInfo = new LoaderInfo
             {
-                loader = m_LoaderTask.PopLoader(type, path, param, async),
+                loader = m_LoaderTask.GetLoader(type, path, param, async),
                 completeCallback = completeCallback
             };
 

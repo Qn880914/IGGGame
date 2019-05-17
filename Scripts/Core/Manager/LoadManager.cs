@@ -28,7 +28,7 @@ namespace IGG.Core.Manager
             Normal,
             High,
 
-            Count,
+            Quantity,
         }
 
         private readonly AssetBundleCache m_cache;
@@ -517,7 +517,7 @@ namespace IGG.Core.Manager
                     m_task.AddLoadTask(group1, LoaderType.Scene, name, additive, (group2, data2) =>
                     {
                         completeCallback?.Invoke(data2);
-                    }, async, group.Priority, true);
+                    }, async, group.priority, true);
                 }, async);
             }
             else

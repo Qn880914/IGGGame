@@ -8,13 +8,13 @@ using UnityEngine;
 public class ConstantData
 {
     // AssetBundle缓存时间
-    public static float AssetBundleCacheTime = 10;
+    public static float assetBundleCacheTime = 10;
 
     // 开启AssetBundle
 #if UNITY_EDITOR
-    public static bool EnableAssetBundle = false;
+    public static bool enableAssetBundle = false;
 #else
-    public static bool EnableAssetBundle = true;
+    public static bool enableAssetBundle = true;
 #endif
 
     // 打AssetBundle前,清除旧的AssetBundle(全部重新打)
@@ -33,10 +33,10 @@ public class ConstantData
     public static bool enableCustomCompress = false;
 
     // 开启资源解压
-    public static bool EnableUnpack = false;
+    public static bool enableUnpack = false;
 
     // 开启检测更新
-    public static bool EnablePatch
+    public static bool enablePatch
     {
         get
         {
@@ -45,67 +45,67 @@ public class ConstantData
     }
 
     // AssetBundle使用md5名
-    public static bool EnableMd5Name = true;
+    public static bool enableMd5Name = true;
 
     // AssetBundle描述文件名
-    public const string AssetbundleManifest = "data";
+    public const string assetbundleManifest = "data";
 
     // AssetBundle资源映射文件名
-    public const string AssetbundleMapping = "ab_mapping";
+    public const string assetbundleMapping = "ab_mapping";
 
     // AssetBundle后缀
-    public const string AssetBundleExt = ".ab";
+    public const string assetBundleExt = ".ab";
 
     private static bool m_openGpuSkin = true;
-    public static bool UseGpuSkin {
+    public static bool useGpuSkin {
         get { return SystemInfo.supportsInstancing && m_openGpuSkin; }
     }
 
     // 主版本,每个里程碑累加
-    public static string MainVersion = "0.16.0";
+    public static string mainVersion = "0.16.0";
     
-    private static string g_version;
-    private static string g_fullVersion;
+    private static string s_Version;
+    private static string s_FullVersion;
 
     public static void ResetFullVersion()
     {
-        g_version = "";
-        g_fullVersion = "";
+        s_Version = "";
+        s_FullVersion = "";
     }
 
     // 版本号 [主版本号].[BuildID]
-    public static string Version
+    public static string version
     {
         get
         {
-            if (string.IsNullOrEmpty(g_version))
+            if (string.IsNullOrEmpty(s_Version))
             {
-                g_version = string.Format("{0}.{1}", ConstantData.MainVersion, ConfigData.Inst.BuildId);
+                s_Version = string.Format("{0}.{1}", ConstantData.mainVersion, ConfigData.Inst.BuildId);
             }
-            return g_version;
+            return s_Version;
         }
     }
 
     // 完整版本号
     // [trunk|dev|release]_[MainVersion].[BuildId]_r[RevGame]_r[RevConfig]_r[RevProject]
-    public static string FullVersion
+    public static string fullVersion
     {
         get
         {
-            if (string.IsNullOrEmpty(g_fullVersion))
+            if (string.IsNullOrEmpty(s_FullVersion))
             {
-                g_fullVersion = string.Format("{0}_{1}.{2}_r{3}_r{4}_r{5}",
-                    ReleaseTypeName, MainVersion, ConfigData.Inst.BuildId, ConfigData.Inst.RevisionGame, ConfigData.Inst.RevisionConfig, ConfigData.Inst.RevisionProject);
+                s_FullVersion = string.Format("{0}_{1}.{2}_r{3}_r{4}_r{5}",
+                    releaseTypeName, mainVersion, ConfigData.Inst.BuildId, ConfigData.Inst.RevisionGame, ConfigData.Inst.RevisionConfig, ConfigData.Inst.RevisionProject);
             }
-            return g_fullVersion;
+            return s_FullVersion;
         }
     }
 
-    private static string ReleaseTypeName
+    private static string releaseTypeName
     {
         get
         {
-            switch (Release)
+            switch (release)
             {
                 case ReleaseType.DEV:
                     return "dev";
@@ -120,7 +120,7 @@ public class ConstantData
         }
     }
 
-    public static ReleaseType Release
+    public static ReleaseType release
     {
         get
         {
@@ -128,7 +128,7 @@ public class ConstantData
         }
     }
 
-    public static bool ChinaMainland
+    public static bool chinaMainland
     {
         get
         {
@@ -136,7 +136,7 @@ public class ConstantData
         }
     }
 
-    public static string AssetBundleSavePath
+    public static string assetBundleSavePath
     {
         get
         {
@@ -204,7 +204,7 @@ public class ConstantData
                 string platformName = "android";
 #endif
 
-                g_updateUrl = string.Format("{0}{1}/{2}/{3}/", url, ReleaseTypeName, platformName, ConstantData.MainVersion);
+                g_updateUrl = string.Format("{0}{1}/{2}/{3}/", url, releaseTypeName, platformName, ConstantData.MainVersion);
             }
 
             return g_updateUrl;

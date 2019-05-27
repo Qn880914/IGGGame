@@ -59,7 +59,7 @@ namespace IGG.Utility
                     s_BundleAssetLoaderDataPool.Release(loaderData);
                     break;
                 case LoaderType.Bundle:
-                    if (ConstantData.EnableAssetBundle)
+                    if (ConstantData.enableAssetBundle)
                         s_CacheBundleLoaderDataPool.Release(loaderData);
                     else
                         s_BundleLoaderDataPool.Release(loaderData);

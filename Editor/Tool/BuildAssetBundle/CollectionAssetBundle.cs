@@ -17,8 +17,11 @@ public class CollectionAssetBundle
 
     private static Dictionary<string, AssetBundleData> s_AssetBundleDatas = new Dictionary<string, AssetBundleData>();
 
-	// 收集所有的冗余资源
-	public static Dictionary<string, HashSet<string>> CollectionRedundance()
+    /// <summary>
+    ///     <para> 收集所有的冗余资源 </para>
+    /// </summary>
+    /// <returns></returns>
+    public static Dictionary<string, HashSet<string>> CollectionRedundance()
 	{
 		s_AssetBundleDatas.Clear();
 
@@ -36,7 +39,9 @@ public class CollectionAssetBundle
 		return assets;
 	}
 
-    // 收集所有的ab
+    /// <summary>
+    ///     <para> 收集所有的ab </para>
+    /// </summary>
     static void CollectAssetBundle()
     {
         string[] names = AssetDatabase.GetAllAssetBundleNames();
@@ -57,7 +62,11 @@ public class CollectionAssetBundle
         }
     }
 
-    // 收集AssetBundle里的所有资源
+    /// <summary>
+    ///     <para> 收集AssetBundle里的所有资源 </para>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     static HashSet<string> CollectAssetFromAssetBundle(string name)
     {
         HashSet<string> files = new HashSet<string>();
@@ -91,7 +100,9 @@ public class CollectionAssetBundle
         return files;
     }
 
-    // 收集ab的依赖关系
+    /// <summary>
+    ///     <para> 收集ab的依赖关系 </para>
+    /// </summary>
     static void CollectAssetBundleDependencies()
     {
         var iter = s_AssetBundleDatas.GetEnumerator();
@@ -108,7 +119,9 @@ public class CollectionAssetBundle
         }
     }
 
-    // 合并资源(如果一个资源在当前ab里,那么将这个资源从父ab中移除掉)
+    /// <summary>
+    ///     <para> 合并资源(如果一个资源在当前ab里,那么将这个资源从父ab中移除掉) </para>
+    /// </summary>
     static void MergeAssetBundleAsset()
     {
         var iter = s_AssetBundleDatas.GetEnumerator();
@@ -118,7 +131,10 @@ public class CollectionAssetBundle
         }
     }
 
-    // 收集冗余的资源
+    /// <summary>
+    ///     <para> 收集冗余的资源 </para>
+    /// </summary>
+    /// <returns></returns>
     static Dictionary<string, HashSet<string>> CollectRedundanceAsset()
     {
         Dictionary<string, HashSet<string>> assets = new Dictionary<string, HashSet<string>>();
@@ -152,7 +168,10 @@ public class CollectionAssetBundle
         return assets;
     }
 
-    // 合并资源(如果一个资源在当前ab里,那么将这个资源从父ab中移除掉)
+    /// <summary>
+    ///     <para> 合并资源(如果一个资源在当前ab里,那么将这个资源从父ab中移除掉) </para>
+    /// </summary>
+    /// <param name="data"></param>
     static void MergeAsset(AssetBundleData data)
     {
         foreach (string asset in data.assets)
@@ -181,7 +200,11 @@ public class CollectionAssetBundle
         }
     }
 
-    // 收集资源包含在哪些ab中
+    /// <summary>
+    ///     <para> 收集资源包含在哪些ab中 </para>
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="assets"></param>
     static void CollectAsset(AssetBundleData data, Dictionary<string, HashSet<string>> assets)
     {
         foreach (string asset in data.assets)

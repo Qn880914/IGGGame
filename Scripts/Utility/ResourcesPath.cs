@@ -155,7 +155,7 @@ public class ResourcesPath
 
     private static string GetABRunDir()
     {
-        return ConstantData.AssetBundleSavePath;
+        return ConstantData.assetBundleSavePath;
     }
 
     private static string[] GetResTypePath(string resType)

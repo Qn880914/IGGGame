@@ -282,12 +282,12 @@ namespace IGG.Core.Manager
         private void LoadVersion()
         {
             UnityEngine.Debug.Log("LoadVersion");
-            if (ConstantData.EnableMd5Name)
+            if (ConstantData.enableMd5Name)
             {
                 string pathPatch = string.Format("{0}/version", Application.persistentDataPath);
                 bool hasPatch = false;
 
-                if (ConstantData.EnablePatch)
+                if (ConstantData.enablePatch)
                 {
                     hasPatch = File.Exists(pathPatch);
                 }
@@ -315,7 +315,7 @@ namespace IGG.Core.Manager
                             return;
                         }
 
-                        if (!string.Equals(json["version"], ConstantData.MainVersion))
+                        if (!string.Equals(json["version"], ConstantData.mainVersion))
                         {
                             SetPatchData(null);
                             return;
@@ -337,7 +337,7 @@ namespace IGG.Core.Manager
             UnityEngine.Debug.Log("LoadManifest");
 
             // 加载AssetBundle依赖文件
-            LoadAssetBundle(null, ConstantData.AssetbundleManifest, (group, data) =>
+            LoadAssetBundle(null, ConstantData.assetbundleManifest, (group, data) =>
             {
                 AssetBundleInfo ab = data as AssetBundleInfo;
                 if (ab != null)
@@ -347,7 +347,7 @@ namespace IGG.Core.Manager
             }, false, false, false);
 
             // 加载资源到AssetBundle映射表
-            string name = ConstantData.AssetbundleMapping;
+            string name = ConstantData.assetbundleMapping;
             LoadAssetFromBundle(null, name, name, typeof(AssetBundleMapping), (group, data) =>
             {
                 m_mapping = data as AssetBundleMapping;
@@ -368,7 +368,7 @@ namespace IGG.Core.Manager
 
         public void WarmUpShader()
         {
-            if (!ConstantData.EnableAssetBundle)
+            if (!ConstantData.enableAssetBundle)
             {
                 return;
             }
@@ -508,7 +508,7 @@ namespace IGG.Core.Manager
                 m_task.AddLoadTask(group, LoaderType.Scene, "Empty", null, null, async);
             }
 
-            if (ConstantData.EnableAssetBundle)
+            if (ConstantData.enableAssetBundle)
             {
                 string path = string.Format("Scene/{0}", name).ToLower();
 
@@ -536,7 +536,7 @@ namespace IGG.Core.Manager
                 SceneManager.UnloadSceneAsync(name);
             }
 
-            if (ConstantData.EnableAssetBundle)
+            if (ConstantData.enableAssetBundle)
             {
                 string path = string.Format("Scene/{0}", name).ToLower();
                 UnloadBundle(path);
@@ -593,7 +593,7 @@ namespace IGG.Core.Manager
             LoadPriority priority = LoadPriority.Normal)
         {
             //Logger.Log(string.Format("LoadAsset: {0} - {1}", path, async));
-            if (ConstantData.EnableAssetBundle)
+            if (ConstantData.enableAssetBundle)
             {
                 string abName = m_mapping.GetAssetBundleNameFromAssetPath(path);
                 if (string.IsNullOrEmpty(abName))
@@ -636,7 +636,7 @@ namespace IGG.Core.Manager
 
         public void UnloadAsset(string path)
         {
-            if (ConstantData.EnableAssetBundle)
+            if (ConstantData.enableAssetBundle)
             {
                 string abName = m_mapping.GetAssetBundleNameFromAssetPath(path);
 
@@ -768,10 +768,10 @@ namespace IGG.Core.Manager
             }
 
             string[] dependencies =
-                m_manifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.AssetBundleExt));
+                m_manifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.assetBundleExt));
             for (int i = 0; i < dependencies.Length; ++i)
             {
-                LoadAssetBundle(group, dependencies[i].Replace(ConstantData.AssetBundleExt, ""), null, async,
+                LoadAssetBundle(group, dependencies[i].Replace(ConstantData.assetBundleExt, ""), null, async,
                     persistent);
             }
         }
@@ -785,10 +785,10 @@ namespace IGG.Core.Manager
             }
 
             string[] dependencies =
-                m_manifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.AssetBundleExt));
+                m_manifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.assetBundleExt));
             for (int i = 0; i < dependencies.Length; ++i)
             {
-                UnloadAssetBundle(dependencies[i].Replace(ConstantData.AssetBundleExt, ""), immediate);
+                UnloadAssetBundle(dependencies[i].Replace(ConstantData.assetBundleExt, ""), immediate);
             }
         }
 

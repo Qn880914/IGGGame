@@ -201,8 +201,8 @@ namespace IGG.Core.Resource
         /// </summary>
         public void Update()
         {
-            if (ConstantData.AssetBundleCacheTime > 0 &&
-                Time.realtimeSinceStartup - m_LastClearTime >= ConstantData.AssetBundleCacheTime)
+            if (ConstantData.assetBundleCacheTime > 0 &&
+                Time.realtimeSinceStartup - m_LastClearTime >= ConstantData.assetBundleCacheTime)
             {
                 m_LastClearTime = Time.realtimeSinceStartup;
                 Clear();

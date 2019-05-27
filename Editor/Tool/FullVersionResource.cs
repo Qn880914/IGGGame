@@ -22,26 +22,26 @@ public class FullVersionResource
 		}
 
 		List<VersionData.VersionItem> list = new List<VersionData.VersionItem>();
-		List<string> files = IGG.FileUtil.GetAllChildFiles(BuildAssetBundle.assetBundlePath, "ab");
+		List<string> files = IGG.FileUtil.GetAllChildFiles(BuildSettings.outputPath, "ab");
 
-		if (!ConstantData.EnableCache && ConstantData.EnableCustomCompress)
+		if (!ConstantData.enableCache && ConstantData.enableCustomCompress)
 		{
 			// 自定义压缩
-			string inPath = string.Format("{0}{1}", BuildAssetBundle.assetBundlePath, ConstantData.MainVersion);
+			string inPath = string.Format("{0}{1}", BuildSettings.outputPath, ConstantData.mainVersion);
 			string outPath = "";
-			if (ConstantData.EnableMd5Name)
+			if (ConstantData.enableMd5Name)
 			{
 				string md5 = IGG.FileUtil.CalcFileMd5(inPath);
-				outPath = string.Format("{0}/{1}{2}", ConstantData.StreamingAssetsPath, md5, ConstantData.AssetBundleExt);
+				outPath = string.Format("{0}/{1}{2}", ConstantData.streamingAssetsPath, md5, ConstantData.assetBundleExt);
 			}
 			else
 			{
-				outPath = string.Format("{0}/data", ConstantData.StreamingAssetsPath);
+				outPath = string.Format("{0}/data", ConstantData.streamingAssetsPath);
 			}
 
 			ThreadParam param = new ThreadParam();
-			param.pathSrc = BuildAssetBundle.assetBundlePath;
-			param.pathDst = ConstantData.StreamingAssetsPath;
+			param.pathSrc = BuildSettings.outputPath;
+			param.pathDst = ConstantData.streamingAssetsPath;
 			param.list = list;
 			param.files = files;
 			param.index = 0;
@@ -85,13 +85,13 @@ public class FullVersionResource
 		else
 		{
 			// 直接拷贝
-			if (ConstantData.EnableMd5Name)
+			if (ConstantData.enableMd5Name)
 			{
-				string pathSrc = BuildAssetBundle.assetBundlePath;
-				string pathDst = ConstantData.StreamingAssetsPath;
+				string pathSrc = BuildSettings.outputPath;
+				string pathDst = ConstantData.streamingAssetsPath;
 
 				{
-					string file = string.Format("{0}/{1}", pathSrc, ConstantData.MainVersion);
+					string file = string.Format("{0}/{1}", pathSrc, ConstantData.mainVersion);
 					CopyAsset(file, pathDst, list, "data");
 				}
 
@@ -108,16 +108,16 @@ public class FullVersionResource
 			else
 			{
 				// 把所有的ab文件拷贝进StreamAssets的ab目录下
-				IGG.FileUtil.CopyDirectory(BuildAssetBundle.assetBundlePath, Application.streamingAssetsPath + "/ab/", ConstantData.AssetBundleExt);
+				IGG.FileUtil.CopyDirectory(BuildSettings.outputPath, Application.streamingAssetsPath + "/ab/", ConstantData.assetBundleExt);
 
 				// 拷贝manifest进StreamAssets,并命名为data
-				string pathSrc = string.Format("{0}/{1}", BuildAssetBundle.assetBundlePath, ConstantData.MainVersion);
+				string pathSrc = string.Format("{0}/{1}", BuildSettings.outputPath, ConstantData.mainVersion);
 				string pathDst = string.Format("{0}/ab/data", Application.streamingAssetsPath);
 				IGG.FileUtil.CopyFile(pathSrc, pathDst);
 			}
 		}
 
-		if (ConstantData.EnableMd5Name)
+		if (ConstantData.enableMd5Name)
 		{
 			ConfigDataHelper.SaveData<VersionDataProxy>(VERSION_PATH, (data) =>
 			{
@@ -139,7 +139,7 @@ public class FullVersionResource
 			items.Add(list[i].Md5, list[i].Name);
 		}
 
-		List<string> files = IGG.FileUtil.GetAllChildFiles(ConstantData.StreamingAssetsPath, ConstantData.AssetBundleExt);
+		List<string> files = IGG.FileUtil.GetAllChildFiles(ConstantData.streamingAssetsPath, ConstantData.assetBundleExt);
 		for (int i = 0; i < files.Count; ++i)
 		{
 			string filename = Path.GetFileNameWithoutExtension(files[i]);
@@ -153,7 +153,7 @@ public class FullVersionResource
 	static void DeleteAssets()
 	{
 		IGG.FileUtil.DeleteFile(Application.streamingAssetsPath + "/" + "ab.zip");
-		IGG.FileUtil.DeleteFileDirectory(ConstantData.StreamingAssetsPath);
+		IGG.FileUtil.DeleteFileDirectory(ConstantData.streamingAssetsPath);
 
 		AssetDatabase.Refresh();
 	}
@@ -170,14 +170,14 @@ public class FullVersionResource
 			LzmaHelper.Compress(fileSrc, fileDst);
 		}
 
-		if (ConstantData.EnableMd5Name)
+		if (ConstantData.enableMd5Name)
 		{
 			string md5 = IGG.FileUtil.CalcFileMd5(fileSrc);
 
 			FileInfo fi = new FileInfo(fileDst);
 
 			VersionData.VersionItem item = new VersionData.VersionItem();
-			item.Name = name.Replace(ConstantData.AssetBundleExt, "");
+			item.Name = name.Replace(ConstantData.assetBundleExt, "");
 			item.Md5 = md5;
 			item.Size = fi.Length;
 
@@ -200,7 +200,7 @@ public class FullVersionResource
 		FileInfo fi = new FileInfo(file);
 
 		VersionData.VersionItem item = new VersionData.VersionItem();
-		item.Name = name.Replace(ConstantData.AssetBundleExt, "");
+		item.Name = name.Replace(ConstantData.assetBundleExt, "");
 		item.Md5 = md5;
 		item.Size = fi.Length;
 
@@ -241,10 +241,10 @@ public class FullVersionResource
 
 			string name = file.Replace("\\", "/").Replace(param.pathSrc, "");
 			string fileDst = "";
-			if (ConstantData.EnableMd5Name)
+			if (ConstantData.enableMd5Name)
 			{
 				string md5 = IGG.FileUtil.CalcFileMd5(file);
-				fileDst = string.Format("{0}/{1}{2}", param.pathDst, md5, ConstantData.AssetBundleExt);
+				fileDst = string.Format("{0}/{1}{2}", param.pathDst, md5, ConstantData.assetBundleExt);
 			}
 			else
 			{
@@ -257,11 +257,11 @@ public class FullVersionResource
 
 	public static void InitPatch()
 	{
-		IGG.FileUtil.DeleteFileDirectory(EditorHelper.PatchDir);
+		IGG.FileUtil.DeleteFileDirectory(BuildSettings.patchDir);
 
 		// version_orign
 		{
-			string pathDst = string.Format("{0}/version_orign", EditorHelper.PatchDir);
+			string pathDst = string.Format("{0}/version_orign", BuildSettings.patchDir);
 
 			VersionData data = ConfigDataHelper.GetData<VersionData>(VERSION_PATH);
 			if (data != null)
@@ -284,7 +284,7 @@ public class FullVersionResource
 
 		// audio_orign
 		{
-			string pathAudio = string.Format("{0}/../WwiseProject/GeneratedSoundBanks/{1}", Application.dataPath, EditorHelper.PlatformName);
+			string pathAudio = string.Format("{0}/../WwiseProject/GeneratedSoundBanks/{1}", Application.dataPath, EditorHelper.platformName);
 			pathAudio = pathAudio.Replace("\\", "/");
 
 			JSONClass jsonAudio = new JSONClass();
@@ -302,7 +302,7 @@ public class FullVersionResource
 				jsonAudio.Add(name, md5);
 			}
 
-			string path = string.Format("{0}/audio_orign", EditorHelper.PatchDir);
+			string path = string.Format("{0}/audio_orign", BuildSettings.patchDir);
 			IGG.FileUtil.SaveTextToFile(jsonAudio.ToString(""), path);
 		}
 
@@ -313,7 +313,7 @@ public class FullVersionResource
 	private static void SaveVersionFile(JSONClass list)
 	{
 		JSONClass json = new JSONClass();
-		json.Add("version", ConstantData.MainVersion);
+		json.Add("version", ConstantData.mainVersion);
 		json.Add("build", ConfigDataHelper.BuildId.ToString());
 		json.Add("game", ConfigDataHelper.RevisionGame.ToString());
 		json.Add("config", ConfigDataHelper.RevisionConfig.ToString());
@@ -322,7 +322,7 @@ public class FullVersionResource
 		JSONClass jsonList = new JSONClass();
 		json.Add("list", list);
 
-		string path = string.Format("{0}/version", EditorHelper.PatchDir);
+		string path = string.Format("{0}/version", BuildSettings.patchDir);
 		IGG.FileUtil.SaveTextToFile(json.ToString(""), path);
 	}
 
@@ -332,7 +332,7 @@ public class FullVersionResource
 
 		// ab
 		{
-			string pathOrign = string.Format("{0}/version_orign", EditorHelper.PatchDir);
+			string pathOrign = string.Format("{0}/version_orign", BuildSettings.patchDir);
 			if (!File.Exists(pathOrign))
 			{
 				return;
@@ -350,8 +350,8 @@ public class FullVersionResource
 						continue;
 					}
 
-					string pathSrc = string.Format("{0}/{1}{2}", ConstantData.StreamingAssetsPath, item.Md5, ConstantData.AssetBundleExt);
-					string pathDst = string.Format("{0}/ab/{1}{2}", EditorHelper.PatchDir, item.Md5, ConstantData.AssetBundleExt);
+					string pathSrc = string.Format("{0}/{1}{2}", ConstantData.streamingAssetsPath, item.Md5, ConstantData.assetBundleExt);
+					string pathDst = string.Format("{0}/ab/{1}{2}", BuildSettings.patchDir, item.Md5, ConstantData.assetBundleExt);
 					IGG.FileUtil.CopyFile(pathSrc, pathDst);
 
 					JSONClass itemJson = new JSONClass();
@@ -366,10 +366,10 @@ public class FullVersionResource
 
 		// audio
 		{
-			string pathOrign = string.Format("{0}/audio_orign", EditorHelper.PatchDir);
+			string pathOrign = string.Format("{0}/audio_orign", BuildSettings.patchDir);
 			JSONClass jsonOrign = JSONNode.Parse(IGG.FileUtil.ReadTextFromFile(pathOrign)) as JSONClass;
 
-			string pathAudio = string.Format("{0}/../WwiseProject/GeneratedSoundBanks/{1}", Application.dataPath, EditorHelper.PlatformName);
+			string pathAudio = string.Format("{0}/../WwiseProject/GeneratedSoundBanks/{1}", Application.dataPath, EditorHelper.platformName);
 			pathAudio = pathAudio.Replace("\\", "/");
 
 			List<string> files = IGG.FileUtil.GetAllChildFiles(pathAudio);
@@ -381,7 +381,7 @@ public class FullVersionResource
 				string filename = Path.GetFileName(file);
 				if (jsonOrign[filename] == null || !string.Equals(md5, jsonOrign[filename].Value))
 				{
-					string pathDst = string.Format("{0}/wwise/{1}", EditorHelper.PatchDir, filename);
+					string pathDst = string.Format("{0}/wwise/{1}", BuildSettings.patchDir, filename);
 					IGG.FileUtil.CopyFile(file, pathDst);
 
 					JSONClass item = new JSONClass();
@@ -447,7 +447,7 @@ public class FullVersionResource
 			case BuildTarget.StandaloneWindows:
 				if (string.IsNullOrEmpty(pathProject))
 				{
-					output = string.Format("{0}/{1}/{1}.exe", EditorHelper.OutputDir, PlayerSettings.productName);
+					output = string.Format("{0}/{1}/{1}.exe", BuildSettings.outputDir, PlayerSettings.productName);
 				}
 				else
 				{
@@ -461,7 +461,7 @@ public class FullVersionResource
 
 					if (string.IsNullOrEmpty(pathPackage))
 					{
-						output = string.Format("{0}/{1}_{2}_{3:yyyyMMdd_HHmmss}.apk", EditorHelper.PackageDir, PlayerSettings.productName, ConstantData.MainVersion, DateTime.Now);
+						output = string.Format("{0}/{1}_{2}_{3:yyyyMMdd_HHmmss}.apk", EditorHelper.packageDir, PlayerSettings.productName, ConstantData.mainVersion, DateTime.Now);
 					}
 					else
 					{
@@ -474,7 +474,7 @@ public class FullVersionResource
 					EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Gradle;
 
 					options |= BuildOptions.AcceptExternalModificationsToPlayer;
-					output = string.Format("{0}/{1}", EditorHelper.OutputDir, PlayerSettings.productName);
+					output = string.Format("{0}/{1}", BuildSettings.outputDir, PlayerSettings.productName);
 					SaveAndroidConfig(output);
 				}
 				break;
@@ -482,7 +482,7 @@ public class FullVersionResource
 				options |= BuildOptions.AcceptExternalModificationsToPlayer;
 				if (string.IsNullOrEmpty(pathProject))
 				{
-					output = EditorHelper.OutputDir;
+					output = BuildSettings.outputDir;
 				}
 				else
 				{
@@ -501,7 +501,7 @@ public class FullVersionResource
 				string pathDst = pathPackage;
 				if (string.IsNullOrEmpty(pathDst))
 				{
-					pathDst = string.Format("{0}/{1}_{2}_{3:yyyyMMdd_HHmmss}.zip", EditorHelper.PackageDir, PlayerSettings.productName, ConstantData.MainVersion, DateTime.Now);
+					pathDst = string.Format("{0}/{1}_{2}_{3:yyyyMMdd_HHmmss}.zip", EditorHelper.packageDir, PlayerSettings.productName, ConstantData.mainVersion, DateTime.Now);
 				}
 
 				ZipHelper.Pack(pathSrc, pathDst);
@@ -525,7 +525,7 @@ public class FullVersionResource
 	{
 
 		string VersionFileName = AppName + "_" + StrVersion + "_" + VersionFlag + ".rar";
-		IGG.FileUtil.CreateFileDirectory("C:/Shell");
+		IGG.FileUtil.CreateDirectory("C:/Shell"); 
 		FileStream stream = new FileStream("C:/Shell/SvnPCVersion.bat", FileMode.Create);
 		StreamWriter file = new StreamWriter(stream);
 		file.WriteLine("@echo off");
@@ -550,7 +550,7 @@ public class FullVersionResource
 	private static void WriteAndroidShellCmd(string AppPath, string strVersionUpdate)
 	{
 
-		IGG.FileUtil.CreateFileDirectory("C:/Shell");
+		IGG.FileUtil.CreateDirectory("C:/Shell");
 		FileStream stream = new FileStream("C:/Shell/Upload.sh", FileMode.Create);
 		StreamWriter file = new StreamWriter(stream);
 		file.WriteLine("#!/bin/sh");
@@ -577,7 +577,7 @@ public class FullVersionResource
 	{
 
 		string VersionFileName = AppName + "_" + StrVersion + "_" + VersionFlag + ".apk";
-		IGG.FileUtil.CreateFileDirectory("C:/Shell");
+		IGG.FileUtil.CreateDirectory("C:/Shell");
 		FileStream stream = new FileStream("C:/Shell/SvnAndroidVersion.bat", FileMode.Create);
 		StreamWriter file = new StreamWriter(stream);
 		file.WriteLine("@echo off");

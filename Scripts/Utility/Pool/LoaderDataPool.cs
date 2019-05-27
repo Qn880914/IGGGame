@@ -24,7 +24,7 @@ namespace IGG.Utility
                     loaderData = s_BundleAssetLoaderDataPool.Get();
                     break;
                 case LoaderType.Bundle:
-                    if (ConstantData.EnableAssetBundle)
+                    if (ConstantData.enableAssetBundle)
                         loaderData = s_CacheBundleLoaderDataPool.Get();
                     else
                         loaderData = s_BundleLoaderDataPool.Get();

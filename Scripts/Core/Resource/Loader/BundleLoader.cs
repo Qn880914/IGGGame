@@ -34,7 +34,7 @@ namespace IGG.Core.Resource
                 return;
             }
 
-            m_NeedDecompress = ConstantData.enableCustomCompress && path.Contains(ConstantData.StreamingAssetsPath);
+            m_NeedDecompress = ConstantData.enableCustomCompress && path.Contains(ConstantData.streamingAssetsPath);
 
             if (async)
             {

@@ -1,12 +1,56 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-public class BuildAssetBundle
+public class IGGBuildPipeline
 {
-    public static string assetBundlePath { get { return IGG.EditorTools.EditorHelper.assetBundleDir; } }
+    private static Dictionary<string, HashSet<string>> s_AssetBundleNameMapFilePaths = new Dictionary<string, HashSet<string>>();
+
+    public static void BuildAssetbundle()
+    {
+        Reset();
+
+        ReimportAll(BuildSettings.enableAssetBundleRedundance);
+
+        AssetDatabase.RemoveUnusedAssetBundleNames();
+
+        BuildAssetBundleOptions buildOptions = BuildAssetBundleOptions.DeterministicAssetBundle;
+        if (!ConstantData.enableCache && ConstantData.enableCustomCompress)
+        {
+            // assetbundle 不压缩，外部统一压缩
+            // 下载解压，提高运行解析速度。
+            buildOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
+        }
+
+        BuildPipeline.BuildAssetBundles(BuildSettings.outputPath, buildOptions, EditorUserBuildSettings.activeBuildTarget);
+        AssetDatabase.Refresh();
+    }
+
+    private static void Reset()
+    {
+        if (BuildSettings.clearAssetBundle)
+        {
+            // 清除现有ab目录
+            IGG.FileUtil.ClearDirectory(BuildSettings.outputPath);
+        }
+        else
+        {
+            IGG.FileUtil.CreateDirectory(BuildSettings.outputPath);
+        }
+
+        if (BuildSettings.resetAssetBundleName)
+        {
+            // 清除所有assetbundle名
+            var assetBundleNames = AssetDatabase.GetAllAssetBundleNames();
+            foreach (string name in assetBundleNames)
+            {
+                AssetDatabase.RemoveAssetBundleName(name, true);
+            }
+        }
+
+        AssetDatabase.Refresh();
+    }
 
     /// <summary>
     ///     <para> 获取资源存储路径 </para>
@@ -19,7 +63,7 @@ public class BuildAssetBundle
         StringBuilder stringBuilder = new StringBuilder(string.Empty);
         if (mode == ResourcesPathMode.AssetBundle)
         {
-            stringBuilder.Append(assetBundlePath);
+            stringBuilder.Append(BuildSettings.outputPath);
         }
 
         string path = ResourcesPath.GetRelativePath(type, mode);
@@ -27,36 +71,18 @@ public class BuildAssetBundle
         return stringBuilder.ToString();
     }
 
-    public static void Build()
-    {
-        ReimportAll(ConstantData.clearAssetBundle, ConstantData.resetAssetBundle, ConstantData.enableAssetBundleRedundance);
-
-        AssetDatabase.RemoveUnusedAssetBundleNames();
-
-        BuildAssetBundleOptions buildOptions = BuildAssetBundleOptions.DeterministicAssetBundle;
-        if (!ConstantData.enableCache && ConstantData.enableCustomCompress)
-        {
-            // 使用解压,AssetBundle不压缩,使用外部压缩
-            buildOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
-        }
-
-        BuildPipeline.BuildAssetBundles(assetBundlePath, buildOptions, EditorUserBuildSettings.activeBuildTarget);
-        AssetDatabase.Refresh();
-    }
-
-    static Dictionary<string, HashSet<string>> m_AssetBundleNameMapFilePaths = new Dictionary<string, HashSet<string>>();
     static void InitMapping()
     {
-        m_AssetBundleNameMapFilePaths.Clear();
+        s_AssetBundleNameMapFilePaths.Clear();
     }
 
     static void AddMapping(string assetPath, string abName)
     {
         HashSet<string> files = null;
-        if (!m_AssetBundleNameMapFilePaths.TryGetValue(abName, out files))
+        if (!s_AssetBundleNameMapFilePaths.TryGetValue(abName, out files))
         {
             files = new HashSet<string>();
-            m_AssetBundleNameMapFilePaths.Add(abName, files);
+            s_AssetBundleNameMapFilePaths.Add(abName, files);
         }
 
         if (!files.Contains(assetPath))
@@ -77,10 +103,10 @@ public class BuildAssetBundle
             assetBundleMapping = new AssetBundleMapping();
         }
 
-        assetBundleMapping.assetBundleInfos = new AssetBundleMapping.AssetBundleInfo[m_AssetBundleNameMapFilePaths.Count];
+        assetBundleMapping.assetBundleInfos = new AssetBundleMapping.AssetBundleInfo[s_AssetBundleNameMapFilePaths.Count];
 
         int i = 0;
-        foreach(var map in m_AssetBundleNameMapFilePaths)
+        foreach(var map in s_AssetBundleNameMapFilePaths)
         {
             AssetBundleMapping.AssetBundleInfo info = new AssetBundleMapping.AssetBundleInfo();
             info.assetBundleName = map.Key.ToLower();
@@ -111,7 +137,7 @@ public class BuildAssetBundle
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        m_AssetBundleNameMapFilePaths.Clear();
+        s_AssetBundleNameMapFilePaths.Clear();
 
         Reimport(path, "ab_mapping");
     }
@@ -408,31 +434,8 @@ public class BuildAssetBundle
     /// <param name="clearAssetBundle"> </param>
     /// <param name="reset"></param>
     /// <param name="redundance"></param>
-    public static void ReimportAll(bool clearAssetBundle = true, bool reset = false, bool redundance = true)
+    public static void ReimportAll(bool redundance = true)
     {
-        if (clearAssetBundle)
-        {
-            // 清除现有ab目录
-            IGG.FileUtil.ClearFileDirectory(assetBundlePath);
-        }
-        else
-        {
-            IGG.FileUtil.CreateFileDirectory(assetBundlePath);
-        }
-
-        if (reset)
-        {
-            // 重置所有的ab
-            var names = AssetDatabase.GetAllAssetBundleNames();
-            foreach (string name in names)
-            {
-                AssetDatabase.RemoveAssetBundleName(name, true);
-            }
-        }
-
-        AssetDatabase.Refresh();
-        AssetDatabase.RemoveUnusedAssetBundleNames();
-
         ReimportScene();
         ReimportLua();
 

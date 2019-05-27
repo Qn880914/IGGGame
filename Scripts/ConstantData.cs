@@ -17,14 +17,8 @@ public class ConstantData
     public static bool enableAssetBundle = true;
 #endif
 
-    // 打AssetBundle前,清除旧的AssetBundle(全部重新打)
-    public static bool clearAssetBundle = false;
 
-    // 打AssetBundle前,重置AssetBundle Name
-    public static bool resetAssetBundle = false;
 
-    // 开启冗余资源检测
-    public static bool enableAssetBundleRedundance = true;
 
     // 开启缓存
     public static bool enableCache = true;
@@ -56,13 +50,11 @@ public class ConstantData
     // AssetBundle后缀
     public const string assetBundleExt = ".ab";
 
-    private static bool m_openGpuSkin = true;
-    public static bool useGpuSkin {
-        get { return SystemInfo.supportsInstancing && m_openGpuSkin; }
-    }
+    private static bool s_UseGpuSkin = true;
+    public static bool useGpuSkin { get { return SystemInfo.supportsInstancing && s_UseGpuSkin; } }
 
     // 主版本,每个里程碑累加
-    public static string mainVersion = "0.16.0";
+    public readonly static string mainVersion = "0.16.0";
     
     private static string s_Version;
     private static string s_FullVersion;
@@ -151,48 +143,46 @@ public class ConstantData
     /// <summary>
     /// 默认分辨率
     /// </summary>
-    /// 
-    public static float DefaultResolutionWidth = 1920;
+    public const int kDefaultResolutionWidth = 1920;
 
-    public static float DefaultResolutionHeight = 1080;
+    public const int kDefaultResolutionHeight = 1080;
 
-    public static string BattleDataPath
+    public static string battleDataPath
     {
         get { return Application.persistentDataPath + "/Battle/"; }
     }
 
-    public static string BattleReplayPath
+    public static string battleReplayPath
     {
-        get { return Application.persistentDataPath + "/Replay/" + ConstantData.MainVersion + "/"; }
+        get { return Application.persistentDataPath + "/Replay/" + ConstantData.mainVersion + "/"; }
     }
 
-    public static string BattleReplayExt
+    public static string battleReplayExt
     {
         get { return ".Replay"; }
     }
 
-    public static string ServerListServerPath
+    public static string serverListServerPath
     {
         get { return "http://config.nos-eastchina1.126.net/"; }
     }
 
-    public static string ServerListSavePath
+    public static string serverListSavePath
     {
         get { return Application.persistentDataPath + "/"; }
     }
 
-    public static string ServerListFile
+    public static string serverListFile
     {
         get { return "serverlist.txt"; }
     }
 
-    private static string g_updateUrl;
-
-    public static string UpdateUrl
+    private static string s_UpdateUrl;
+    public static string updateUrl
     {
         get
         {
-            if (string.IsNullOrEmpty(g_updateUrl))
+            if (string.IsNullOrEmpty(s_UpdateUrl))
             {
                 string url = "http://static-bc.igg.com/";
 
@@ -204,18 +194,18 @@ public class ConstantData
                 string platformName = "android";
 #endif
 
-                g_updateUrl = string.Format("{0}{1}/{2}/{3}/", url, releaseTypeName, platformName, ConstantData.MainVersion);
+                s_UpdateUrl = string.Format("{0}{1}/{2}/{3}/", url, releaseTypeName, platformName, ConstantData.mainVersion);
             }
 
-            return g_updateUrl;
+            return s_UpdateUrl;
         }
     }
 
     // 服务条款
-    public const string UrlAgreement = "https://www.igg.com/about/agreement.php";
+    public const string kUrlAgreement = "https://www.igg.com/about/agreement.php";
 
     // 应用商店
-    public static string UrlAppStore
+    public static string urlAppStore
     {
         get
         {
@@ -230,100 +220,113 @@ public class ConstantData
     }
 
     // 退到后台
-    public static bool EnterBackgroundForReconnect = false; // 是否退到后台
-    public static float EnterBackgroundTime = 0f; // 退到后台的时间
-    public static float MaxReconnectTimeFromBackground = 30 * 60; // 退到后台时间小于30分钟,断线重连,否则重新登录
+    public static bool enterBackgroundForReconnect = false; // 是否退到后台
+    public static float enterBackgroundTime = 0f; // 退到后台的时间
+    public static float maxReconnectTimeFromBackground = 30 * 60; // 退到后台时间小于30分钟,断线重连,否则重新登录
 
-    public const string DataPath = "Data"; // 资源路径(Assets下的相对路径)
-    public const string AssetBundlePath = "ab"; // AssetBundle相对路径
+    public const string kDataPath = "Data"; // 资源路径(Assets下的相对路径)
+    public const string kAssetBundlePath = "ab"; // AssetBundle相对路径
 
-    private static string g_dataPath; // 资源绝对路径
-    private static string g_streamingAssetsPath; // 资源的ab包绝对路径
-    private static string g_unpackPath; // 解压绝对路径
-    private static string g_patchPath; // 补丁绝对路径
-    private static string g_wwisePatchPath; // Wwise补丁绝对路径
-    private static string g_tempPath; // 临时文件绝对路径
-
-    // 资源绝对路径
-    public static string DataFullPath
+    /// <summary>
+    ///     <para> 资源绝对路径 </para>
+    /// </summary>
+    private static string s_DataPath;
+    public static string dataFullPath
     {
         get
         {
-            if (string.IsNullOrEmpty(g_dataPath))
+            if (string.IsNullOrEmpty(s_DataPath))
             {
-                g_dataPath = string.Format("{0}/{1}", Application.dataPath, DataPath);
+                s_DataPath = string.Format("{0}/{1}", Application.dataPath, kDataPath);
             }
 
-            return g_dataPath;
+            return s_DataPath;
         }
     }
 
-    // 资源的ab包绝对路径
-    public static string StreamingAssetsPath
+    /// <summary>
+    ///     <para> 资源的ab包绝对路径 </para>
+    /// </summary>
+    private static string s_StreamingAssetsPath;
+    public static string streamingAssetsPath
     {
         get
         {
-            if (string.IsNullOrEmpty(g_streamingAssetsPath))
+            if (string.IsNullOrEmpty(s_StreamingAssetsPath))
             {
-                g_streamingAssetsPath = string.Format("{0}/{1}", Application.streamingAssetsPath, AssetBundlePath);
+                s_StreamingAssetsPath = string.Format("{0}/{1}", Application.streamingAssetsPath, kAssetBundlePath);
             }
 
-            return g_streamingAssetsPath;
+            return s_StreamingAssetsPath;
         }
     }
 
-    // 解压绝对路径
-    public static string UnpackPath
+
+    /// <summary>
+    ///     <para> 解压绝对路径 </para>
+    /// </summary>
+    private static string s_UnpackPath;
+    public static string unpackPath
     {
         get
         {
-            if (string.IsNullOrEmpty(g_unpackPath))
+            if (string.IsNullOrEmpty(s_UnpackPath))
             {
-                g_unpackPath = string.Format("{0}/{1}", Application.persistentDataPath, AssetBundlePath);
+                s_UnpackPath = string.Format("{0}/{1}", Application.persistentDataPath, kAssetBundlePath);
             }
 
-            return g_unpackPath;
+            return s_UnpackPath;
         }
     }
 
-    // 更新资源绝对路径
-    public static string PatchPath
+    /// <summary>
+    ///     <para> 补丁绝对路径 </para>
+    /// </summary>
+    private static string s_PatchPath;
+    public static string patchPath
     {
         get
         {
-            if (string.IsNullOrEmpty(g_patchPath))
+            if (string.IsNullOrEmpty(s_PatchPath))
             {
-                g_patchPath = string.Format("{0}/patch", Application.persistentDataPath);
+                s_PatchPath = string.Format("{0}/patch", Application.persistentDataPath);
             }
 
-            return g_patchPath;
+            return s_PatchPath;
         }
     }
 
-    public static string WwisePatchPath
+    /// <summary>
+    ///     <para> Wwise补丁绝对路径 </para>
+    /// </summary>
+    private static string s_WwisePatchPath;
+    public static string wwisePatchPath
     {
         get
         {
-            if (string.IsNullOrEmpty(g_wwisePatchPath))
+            if (string.IsNullOrEmpty(s_WwisePatchPath))
             {
-                g_wwisePatchPath = string.Format("{0}/wwise", Application.persistentDataPath);
+                s_WwisePatchPath = string.Format("{0}/wwise", Application.persistentDataPath);
             }
 
-            return g_wwisePatchPath;
+            return s_WwisePatchPath;
         }
     }
 
-    // 临时文件绝对路径
-    public static string TempPath
+    /// <summary>
+    ///     <para> 临时文件绝对路径 </para>
+    /// </summary>
+    private static string s_TempPath;
+    public static string tempPath
     {
         get
         {
-            if (string.IsNullOrEmpty(g_tempPath))
+            if (string.IsNullOrEmpty(s_TempPath))
             {
-                g_tempPath = string.Format("{0}/temp", Application.persistentDataPath);
+                s_TempPath = string.Format("{0}/temp", Application.persistentDataPath);
             }
 
-            return g_tempPath;
+            return s_TempPath;
         }
     }
 }

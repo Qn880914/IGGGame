@@ -7,14 +7,12 @@ using UnityEditor;
 namespace IGG.EditorTools
 {
     /// <summary>
-    /// Author  gaofan
-    /// Date    2017.12.13
-    /// Desc    编辑器工具可能会用到的各种工具
+    ///     <para> 编辑器工具可能会用到的各种工具 </para>
     /// </summary>
     public static class EditorHelper
     {
         /// <summary>
-        /// 执行批处理文件
+        ///     <para> 执行批处理文件 </para>
         /// </summary>
         /// <param name="path"></param>
         /// <param name="param"></param>
@@ -100,39 +98,31 @@ namespace IGG.EditorTools
             }).ToArray();
         }
 
-		public static string PlatformName
+		public static string platformName
 		{
 			get
 			{
-				string platformName = "";
+				string name = "";
 				switch (EditorUserBuildSettings.activeBuildTarget)
 				{
 					case BuildTarget.Android:
-						platformName = "Android";
+                        name = "Android";
 						break;
 					case BuildTarget.iOS:
-						platformName = "iOS";
+                        name = "iOS";
 						break;
 					default:
-						platformName = "Windows";
+                        name = "Windows";
 						break;
 				}
 
-				return platformName;
+				return name;
 			}
 		}
 
-        // ab及平台工程输出目录
-        public static string OutputDir
-        {
-            get
-            {
-                return "output";
-            }
-        }
 
         // 安装包输出目录
-        public static string PackageDir
+        public static string packageDir
         {
             get
             {
@@ -140,20 +130,5 @@ namespace IGG.EditorTools
             }
         }
 
-		public static string assetBundleDir
-		{
-			get
-			{
-				return string.Format("{0}/ab/{1}/", OutputDir, ConstantData.MainVersion);
-			}
-		}
-
-		public static string PatchDir
-		{
-			get
-			{
-				return string.Format("{0}/patch/{1}/", OutputDir, ConstantData.MainVersion);
-			}
-		}
 	}
 }

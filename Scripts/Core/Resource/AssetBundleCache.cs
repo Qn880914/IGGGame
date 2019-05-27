@@ -58,7 +58,7 @@ namespace IGG.Core.Resource
                 m_ReferenceCount = value;
                 if (canRemove)
                 {
-                    if (ConstantData.AssetBundleCacheTime > 0)
+                    if (ConstantData.assetBundleCacheTime > 0)
                     {
                         m_UnloadTime = Time.realtimeSinceStartup;
                     }
@@ -95,7 +95,7 @@ namespace IGG.Core.Resource
         /// </summary>
         public bool timeOut
         {
-            get { return Time.realtimeSinceStartup - m_UnloadTime >= ConstantData.AssetBundleCacheTime; }
+            get { return Time.realtimeSinceStartup - m_UnloadTime >= ConstantData.assetBundleCacheTime; }
         }
 
         /// <summary>
@@ -285,7 +285,7 @@ namespace IGG.Core.Resource
 
             --assetBundleInfo.referencedCount;
 
-            if ((ConstantData.AssetBundleCacheTime < 0.001f || immediate) && assetBundleInfo.canRemove)
+            if ((ConstantData.assetBundleCacheTime < 0.001f || immediate) && assetBundleInfo.canRemove)
             {
                 UnloadAssetBundleInfo(name, onlyRemove);
             }

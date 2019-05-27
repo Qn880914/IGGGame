@@ -230,8 +230,6 @@ public class ResourcesPath
                 return g_commonMaterialPath;
             case ResourcesType.Depend:
                 return g_dependPath;
-            case ResourcesType.UiFairy:
-                return g_uiFairyPath;
             case ResourcesType.Config:
                 return g_configPath;
             case ResourcesType.Other:

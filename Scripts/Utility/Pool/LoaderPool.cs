@@ -25,7 +25,7 @@ namespace IGG.Utility
                     loader = s_BundleAssetLoaderPool.Get();
                     break;
                 case LoaderType.Bundle:
-                    if (ConstantData.EnableAssetBundle)
+                    if (ConstantData.enableAssetBundle)
                         loader = s_CacheBundleLoaderPool.Get();
                     else
                         loader = s_BundleLoaderPool.Get();
@@ -55,7 +55,7 @@ namespace IGG.Utility
                     s_BundleAssetLoaderPool.Release(loader as BundleAssetLoader);
                     break;
                 case LoaderType.Bundle:
-                    if (ConstantData.EnableAssetBundle)
+                    if (ConstantData.enableAssetBundle)
                         s_CacheBundleLoaderPool.Release(loader as CacheBundleLoader);
                     else
                         s_BundleLoaderPool.Release(loader as BundleLoader);

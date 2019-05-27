@@ -35,7 +35,7 @@ namespace IGG
         // <summary>
         // 创建文件夹
         // </summary>
-        public static void CreateFileDirectory(string path)
+        public static void CreateDirectory(string path)
         {
             if (Directory.Exists(path) == false)
             {
@@ -43,12 +43,13 @@ namespace IGG
             }
         }
 
-        // <summary>
-        // 清空文件夹
-        // </summary>
-        public static void ClearFileDirectory(string path)
+        /// <summary>
+        ///     <para> 清空文件夹 </para>
+        /// </summary>
+        /// <param name="path">Path.</param>
+        public static void ClearDirectory(string path)
         {
-            CreateFileDirectory(path);
+            CreateDirectory(path);
             List<string> lfile = new List<string>();
 
             DirectoryInfo rootDirInfo = new DirectoryInfo(path);
@@ -324,7 +325,7 @@ namespace IGG
 
         public static string GetCacheAssetBundlePath(string filename)
         {
-            return string.Format("{0}/{1}/{2}/__data", ConstantData.UnpackPath, filename, DefaultHashString);
+            return string.Format("{0}/{1}/{2}/__data", ConstantData.unpackPath, filename, DefaultHashString);
         }
 
         public static string GetAssetBundleFullPath(string path)

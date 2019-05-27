@@ -55,12 +55,12 @@ namespace IGG.Core.Manager
 
         public LoadManager()
         {
-            if (ConstantData.EnableCache)
+            if (ConstantData.enableCache)
             {
                 Caching.compressionEnabled = false;
 
-                string path = ConstantData.UnpackPath;
-                FileUtil.CreateFileDirectory(path);
+                string path = ConstantData.unpackPath;
+                FileUtil.CreateDirectory(path);
 
                 UnityEngine.Cache cache = Caching.GetCacheByPath(path);
                 if (!cache.valid)
@@ -72,14 +72,14 @@ namespace IGG.Core.Manager
             }
             else
             {
-                if (ConstantData.EnablePatch)
+                if (ConstantData.enablePatch)
                 {
-                    AddSearchPath(ConstantData.PatchPath);
+                    AddSearchPath(ConstantData.patchPath);
                 }
 
-                if (ConstantData.EnableCustomCompress)
+                if (ConstantData.enableCustomCompress)
                 {
-                    AddSearchPath(ConstantData.UnpackPath);
+                    AddSearchPath(ConstantData.unpackPath);
                 }
             }
 
@@ -89,7 +89,7 @@ namespace IGG.Core.Manager
 
             Clear();
 
-            if (ConstantData.EnableAssetBundle)
+            if (ConstantData.enableAssetBundle)
             {
                 LoadVersion();
             }
@@ -121,8 +121,8 @@ namespace IGG.Core.Manager
             m_manifest = null;
             m_mapping = null;
 
-            UnloadAssetBundle(ConstantData.AssetbundleManifest, true);
-            UnloadAssetBundle(ConstantData.AssetbundleMapping, true);
+            UnloadAssetBundle(ConstantData.assetbundleManifest, true);
+            UnloadAssetBundle(ConstantData.assetbundleMapping, true);
 
             Clear(true);
         }
@@ -137,7 +137,7 @@ namespace IGG.Core.Manager
         {
             if (needSuffix)
             {
-                subpath = string.Format("{0}{1}", subpath, ConstantData.AssetBundleExt);
+                subpath = string.Format("{0}{1}", subpath, ConstantData.assetBundleExt);
             }
 
             // 优先从查找目录找
@@ -158,7 +158,7 @@ namespace IGG.Core.Manager
 
             if (isAssetBundle)
             {
-                return string.Format("{0}/{1}", ConstantData.StreamingAssetsPath, subpath);
+                return string.Format("{0}/{1}", ConstantData.streamingAssetsPath, subpath);
             }
             else
             {
@@ -174,7 +174,7 @@ namespace IGG.Core.Manager
 
         public string GetResourcePath(string name, ref bool isCache, bool async = false)
         {
-            if (ConstantData.EnableCache)
+            if (ConstantData.enableCache)
             {
                 string md5;
                 if (m_patchs.TryGetValue(name, out md5))
@@ -182,7 +182,7 @@ namespace IGG.Core.Manager
                     if (async)
                     {
                         // 异步加载,返回远程路径
-                        return string.Format("{0}/{1}{2}", m_urlPatch, md5, ConstantData.AssetBundleExt);
+                        return string.Format("{0}/{1}{2}", m_urlPatch, md5, ConstantData.assetBundleExt);
                     }
                     else
                     {
@@ -198,8 +198,8 @@ namespace IGG.Core.Manager
 
                 if (m_origns.TryGetValue(name, out md5))
                 {
-                    return string.Format("{0}/{1}{2}", ConstantData.StreamingAssetsPath, md5,
-                        ConstantData.AssetBundleExt);
+                    return string.Format("{0}/{1}{2}", ConstantData.streamingAssetsPath, md5,
+                        ConstantData.assetBundleExt);
                 }
 
                 UnityEngine.Debug.LogErrorFormat("Get MD5 failed: {0}", name);
@@ -208,7 +208,7 @@ namespace IGG.Core.Manager
             else
             {
                 string path = name;
-                if (ConstantData.EnableMd5Name)
+                if (ConstantData.enableMd5Name)
                 {
                     string md5;
                     if (m_patchs.TryGetValue(name, out md5))
@@ -427,7 +427,7 @@ namespace IGG.Core.Manager
             return;
 #endif
 
-            string fullpath = string.Format("{0}/{1}", inData ? ConstantData.DataFullPath : Application.dataPath, path);
+            string fullpath = string.Format("{0}/{1}", inData ? ConstantData.dataFullPath : Application.dataPath, path);
             if (!CheckFileExist(fullpath, completeCallback))
             {
                 return;
@@ -448,14 +448,14 @@ namespace IGG.Core.Manager
             return;
 #endif
 
-            string fullpath = string.Format("{0}/{1}", inData ? ConstantData.DataFullPath : Application.dataPath, path);
+            string fullpath = string.Format("{0}/{1}", inData ? ConstantData.dataFullPath : Application.dataPath, path);
             if (!CheckFileExist(fullpath, completeCallback))
             {
                 return;
             }
 
             fullpath = inData
-                ? string.Format("Assets/{0}/{1}", ConstantData.DataPath, path)
+                ? string.Format("Assets/{0}/{1}", ConstantData.kDataPath, path)
                 : string.Format("Assets/{0}", path);
             m_task.AddLoadTask(null, LoaderType.Asset, fullpath, type, (group, data) =>
             {

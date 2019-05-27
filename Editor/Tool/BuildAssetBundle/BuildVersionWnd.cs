@@ -1,17 +1,13 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Diagnostics;
-using System;
 using IGG.EditorTools;
 
 public class BuildVersionWnd : EditorWindow
 {
     [@MenuItem("版本发布/编译 GSServer.dll")]
-	public static void BuildServerDLL() {
+	public static void BuildServerDLL() 
+    {
         EditorHelper.DoBat("GenBattleDLL.bat", null, "/Tools/GameDll");
     }
 

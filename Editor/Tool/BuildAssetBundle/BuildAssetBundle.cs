@@ -8,7 +8,12 @@ public class BuildAssetBundle
 {
     public static string assetBundlePath { get { return IGG.EditorTools.EditorHelper.assetBundleDir; } }
 
-    // 获取资源存储路径
+    /// <summary>
+    ///     <para> 获取资源存储路径 </para>
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
     public static string GetAssetResourceSavePath(string type, ResourcesPathMode mode)
     {
         StringBuilder stringBuilder = new StringBuilder(string.Empty);
@@ -29,7 +34,7 @@ public class BuildAssetBundle
         AssetDatabase.RemoveUnusedAssetBundleNames();
 
         BuildAssetBundleOptions buildOptions = BuildAssetBundleOptions.DeterministicAssetBundle;
-        if (!ConstantData.EnableCache && ConstantData.EnableCustomCompress)
+        if (!ConstantData.enableCache && ConstantData.enableCustomCompress)
         {
             // 使用解压,AssetBundle不压缩,使用外部压缩
             buildOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
@@ -39,19 +44,19 @@ public class BuildAssetBundle
         AssetDatabase.Refresh();
     }
 
-    static Dictionary<string, HashSet<string>> ms_mapping = new Dictionary<string, HashSet<string>>();
+    static Dictionary<string, HashSet<string>> m_AssetBundleNameMapFilePaths = new Dictionary<string, HashSet<string>>();
     static void InitMapping()
     {
-        ms_mapping.Clear();
+        m_AssetBundleNameMapFilePaths.Clear();
     }
 
     static void AddMapping(string assetPath, string abName)
     {
         HashSet<string> files = null;
-        if (!ms_mapping.TryGetValue(abName, out files))
+        if (!m_AssetBundleNameMapFilePaths.TryGetValue(abName, out files))
         {
             files = new HashSet<string>();
-            ms_mapping.Add(abName, files);
+            m_AssetBundleNameMapFilePaths.Add(abName, files);
         }
 
         if (!files.Contains(assetPath))
@@ -65,55 +70,57 @@ public class BuildAssetBundle
         string path = "Assets/Data/ab_mapping.asset";
 
         bool exist = true;
-        AssetBundleMapping data = AssetDatabase.LoadAssetAtPath<AssetBundleMapping>(path);
-        if (data == null)
+        AssetBundleMapping assetBundleMapping = AssetDatabase.LoadAssetAtPath<AssetBundleMapping>(path);
+        if (null == assetBundleMapping)
         {
             exist = false;
-            data = new AssetBundleMapping();
+            assetBundleMapping = new AssetBundleMapping();
         }
 
-        data.assetBundleInfos = new AssetBundleMapping.AssetBundleInfo[ms_mapping.Count];
+        assetBundleMapping.assetBundleInfos = new AssetBundleMapping.AssetBundleInfo[m_AssetBundleNameMapFilePaths.Count];
 
         int i = 0;
-        var iter = ms_mapping.GetEnumerator();
-        while (iter.MoveNext())
+        foreach(var map in m_AssetBundleNameMapFilePaths)
         {
             AssetBundleMapping.AssetBundleInfo info = new AssetBundleMapping.AssetBundleInfo();
-            info.assetBundleName = iter.Current.Key.ToLower();
-            info.paths = new string[iter.Current.Value.Count];
+            info.assetBundleName = map.Key.ToLower();
+
+            HashSet<string> paths = map.Value;
+            info.paths = new string[paths.Count];
 
             int j = 0;
-            foreach (string file in iter.Current.Value)
+            foreach (string file in paths)
             {
                 info.paths[j] = file.Replace("\\", "/").Replace("Assets/Data/", "").Replace("Assets/", "").ToLower();
                 ++j;
             }
 
-            data.assetBundleInfos[i] = info;
+            assetBundleMapping.assetBundleInfos[i] = info;
             ++i;
         }
 
-        iter.Dispose();
-
         if (exist)
         {
-            EditorUtility.SetDirty(data);
-            AssetDatabase.SaveAssets();
+            EditorUtility.SetDirty(assetBundleMapping);
         }
         else
         {
-            AssetDatabase.CreateAsset(data, path);
+            AssetDatabase.CreateAsset(assetBundleMapping, path);
         }
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        ms_mapping.Clear();
+        m_AssetBundleNameMapFilePaths.Clear();
 
         Reimport(path, "ab_mapping");
     }
 
-    // 设置指定资源的ab名
+    /// <summary>
+    ///     <para> 设置指定资源的ab名 </para>
+    /// </summary>
+    /// <param name="assetPath"></param>
+    /// <param name="abName"></param>
     static void Reimport(string assetPath, string abName)
     {
         var importer = AssetImporter.GetAtPath(assetPath);
@@ -139,7 +146,12 @@ public class BuildAssetBundle
         }
     }
 
-    // 设置文件夹下所有指定后缀的资源的ab名
+    /// <summary>
+    ///     <para> 设置文件夹下所有指定后缀的资源的ab名 </para>
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="abName"></param>
+    /// <param name="ext"></param>
     static void ReimportPath(string path, string abName, string ext)
     {
         List<string> files = IGG.FileUtil.GetAllChildFiles(path, ext);
@@ -150,7 +162,12 @@ public class BuildAssetBundle
         }
     }
 
-    // 设置文件夹下指定后缀资源的ab名,每个资源独立打成一个ab
+    /// <summary>
+    ///     <para> 设置文件夹下指定后缀资源的ab名,每个资源独立打成一个ab </para>
+    /// </summary>
+    /// <param name="inPath"></param>
+    /// <param name="outPath"></param>
+    /// <param name="ext"></param>
     static void ReimportPathSingle(string inPath, string outPath, string ext)
     {
         List<string> files = IGG.FileUtil.GetAllChildFiles(inPath, ext);
@@ -164,7 +181,12 @@ public class BuildAssetBundle
         }
     }
 
-    // 遍历文件夹,一个文件夹打成一个,ab的名称用最后一层文件夹名
+    /// <summary>
+    ///     <para> 遍历文件夹,一个文件夹打成一个,ab的名称用最后一层文件夹名 </para>
+    /// </summary>
+    /// <param name="inPath"></param>
+    /// <param name="outPath"></param>
+    /// <param name="ext"></param>
     static void ReimportPathUsePathName(string inPath, string outPath, string ext)
     {
         List<string> files = IGG.FileUtil.GetAllChildFiles(inPath, ext);
@@ -193,7 +215,10 @@ public class BuildAssetBundle
         ReimportPath(inPath, outPath, ext);
     }
 
-    // 遍历文件夹,一个文件夹打成一个,ab的名称用最后一层文件夹名
+    /// <summary>
+    ///     <para> 遍历文件夹,一个文件夹打成一个,ab的名称用最后一层文件夹名 </para>
+    /// </summary>
+    /// <param name="typename"></param>
     static void ReimportPathSingleWithResourceType(string typename)
     {
         string inPath = ResourcesPath.GetAssetResourceRunPath(typename, ResourcesPathMode.Editor);
@@ -208,7 +233,10 @@ public class BuildAssetBundle
         ReimportPathSingle(inPath, outPath, ext);
     }
 
-    // 设置文件夹下指定后缀资源的ab名,每个资源独立打成一个ab
+    /// <summary>
+    ///     <para> 设置文件夹下指定后缀资源的ab名,每个资源独立打成一个ab </para>
+    /// </summary>
+    /// <param name="typename"></param>
     static void ReimportPathUsePathNameWidthResourceType(string typename)
     {
         string inPath = ResourcesPath.GetAssetResourceRunPath(typename, ResourcesPathMode.Editor);
@@ -223,7 +251,9 @@ public class BuildAssetBundle
         ReimportPathUsePathName(inPath, outPath, ext);
     }
 
-    // 场景
+    /// <summary>
+    ///     <para> 场景 </para>
+    /// </summary>
     static void ReimportScene()
     {
         EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
@@ -289,39 +319,6 @@ public class BuildAssetBundle
         }
     }
 
-    // FairyGUI
-    public static void ReimportUI()
-    {
-        string path = ResourcesPath.GetAssetResourceRunPath(ResourcesType.UiFairy, ResourcesPathMode.Editor);
-        path = path.Substring(0, path.Length - 1);
-
-        List<string> files = IGG.FileUtil.GetAllChildFiles(path, "bytes");
-        for (int i = 0; i < files.Count; ++i)
-        {
-            string filepath = files[i];
-            string filename = Path.GetFileNameWithoutExtension(filepath);
-
-            filename = filename.Replace("_fui", "");
-            Reimport(filepath, "ui/" + filename);
-        }
-
-        files = IGG.FileUtil.GetAllChildFiles(path, "png");
-        for (int i = 0; i < files.Count; ++i)
-        {
-            string filepath = files[i];
-            string filename = Path.GetFileNameWithoutExtension(filepath);
-
-            int index = filename.IndexOf("_atlas");
-            if (index != -1)
-            {
-                filename = filename.Substring(0, index);
-            }
-            Reimport(filepath, "ui/" + filename + "_atlas");
-
-            CompressTexture(filepath);
-        }
-    }
-
     // Lua
     static void ReimportLua()
     {
@@ -346,7 +343,9 @@ public class BuildAssetBundle
         ReimportPath(tempPath, "lua", "bytes");
     }
 
-    // 打包冗余资源
+    /// <summary>
+    ///     <para> 打包冗余资源 </para>
+    /// </summary>
     static void ReimportRedundance()
     {
         // 收集冗余资源
@@ -403,7 +402,12 @@ public class BuildAssetBundle
         }
     }
 
-    // 构建所有索引
+    /// <summary>
+    ///     <para> 构建所有索引 </para>
+    /// </summary>
+    /// <param name="clearAssetBundle"> </param>
+    /// <param name="reset"></param>
+    /// <param name="redundance"></param>
     public static void ReimportAll(bool clearAssetBundle = true, bool reset = false, bool redundance = true)
     {
         if (clearAssetBundle)
@@ -430,7 +434,6 @@ public class BuildAssetBundle
         AssetDatabase.RemoveUnusedAssetBundleNames();
 
         ReimportScene();
-        ReimportUI();
         ReimportLua();
 
         ReimportPathSingle("Assets/Data/wnd", "wnd", "prefab");

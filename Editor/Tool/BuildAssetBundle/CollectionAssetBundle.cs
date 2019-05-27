@@ -15,12 +15,12 @@ public class CollectionAssetBundle
         public List<string> childs;     // 子ab
     }
 
-    static Dictionary<string, AssetBundleData> m_datas = new Dictionary<string, AssetBundleData>();
+    private static Dictionary<string, AssetBundleData> s_AssetBundleDatas = new Dictionary<string, AssetBundleData>();
 
 	// 收集所有的冗余资源
 	public static Dictionary<string, HashSet<string>> CollectionRedundance()
 	{
-		m_datas.Clear();
+		s_AssetBundleDatas.Clear();
 
 		CollectAssetBundle();
 		//DumpAll("1.txt");
@@ -31,7 +31,7 @@ public class CollectionAssetBundle
 
 		Dictionary<string, HashSet<string>> assets = CollectRedundanceAsset();
 		//DumpAll("4.txt", assets);
-		m_datas.Clear();
+		s_AssetBundleDatas.Clear();
 
 		return assets;
 	}
@@ -42,16 +42,18 @@ public class CollectionAssetBundle
         string[] names = AssetDatabase.GetAllAssetBundleNames();
         foreach (string name in names)
         {
-            if (name.EndsWith(".ab"))
+            if(!name.EndsWith(".ab"))
             {
-                AssetBundleData data = new AssetBundleData();
-                data.name = name;
-                data.assets = CollectAssetFromAssetBundle(name);
-                data.parents = new List<string>();
-                data.childs = new List<string>();
-
-                m_datas.Add(name, data);
+                continue;
             }
+
+            AssetBundleData assetBundleData = new AssetBundleData();
+            assetBundleData.name = name;
+            assetBundleData.assets = CollectAssetFromAssetBundle(name);
+            assetBundleData.parents = new List<string>();
+            assetBundleData.childs = new List<string>();
+
+            s_AssetBundleDatas.Add(name, assetBundleData);
         }
     }
 
@@ -92,14 +94,14 @@ public class CollectionAssetBundle
     // 收集ab的依赖关系
     static void CollectAssetBundleDependencies()
     {
-        var iter = m_datas.GetEnumerator();
+        var iter = s_AssetBundleDatas.GetEnumerator();
         while (iter.MoveNext())
         {
             AssetBundleData current = iter.Current.Value;
             string[] depends = AssetDatabase.GetAssetBundleDependencies(iter.Current.Key, false);
             foreach (string depend in depends)
             {
-                AssetBundleData data = m_datas[depend];
+                AssetBundleData data = s_AssetBundleDatas[depend];
                 current.childs.Add(data.name);
                 data.parents.Add(current.name);
             }
@@ -109,7 +111,7 @@ public class CollectionAssetBundle
     // 合并资源(如果一个资源在当前ab里,那么将这个资源从父ab中移除掉)
     static void MergeAssetBundleAsset()
     {
-        var iter = m_datas.GetEnumerator();
+        var iter = s_AssetBundleDatas.GetEnumerator();
         while (iter.MoveNext())
         {
             MergeAsset(iter.Current.Value);
@@ -122,7 +124,7 @@ public class CollectionAssetBundle
         Dictionary<string, HashSet<string>> assets = new Dictionary<string, HashSet<string>>();
 
         {
-            var iter = m_datas.GetEnumerator();
+            var iter = s_AssetBundleDatas.GetEnumerator();
             while (iter.MoveNext())
             {
                 CollectAsset(iter.Current.Value, assets);
@@ -160,7 +162,7 @@ public class CollectionAssetBundle
 
         foreach (string childname in data.childs)
         {
-            AssetBundleData child = m_datas[childname];
+            AssetBundleData child = s_AssetBundleDatas[childname];
             MergeAsset(child);
         }
     }
@@ -169,7 +171,7 @@ public class CollectionAssetBundle
     {
         foreach (string parentname in data.parents)
         {
-            AssetBundleData parent = m_datas[parentname];
+            AssetBundleData parent = s_AssetBundleDatas[parentname];
             if (parent.assets.Contains(asset))
             {
                 parent.assets.Remove(asset);
@@ -199,7 +201,7 @@ public class CollectionAssetBundle
 
         foreach (string childname in data.childs)
         {
-            AssetBundleData child = m_datas[childname];
+            AssetBundleData child = s_AssetBundleDatas[childname];
             CollectAsset(child, assets);
         }
     }
@@ -208,7 +210,7 @@ public class CollectionAssetBundle
     {
         StringBuilder sb = new StringBuilder();
         
-        var iter = m_datas.GetEnumerator();
+        var iter = s_AssetBundleDatas.GetEnumerator();
         while (iter.MoveNext())
         {
             AssetBundleData data = iter.Current.Value;

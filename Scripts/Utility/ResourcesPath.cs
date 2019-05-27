@@ -22,7 +22,6 @@ public struct ResourcesType
     public const string UiWndItem = "UIWndItem";
     public const string UiAtlas = "UIAtlas";
     public const string UiPublicWndAtlas = "UIPublicWndAtlas";
-    public const string UiFairy = "UIFairy";
     public const string SceneItem = "SceneItem";
 
     // hero

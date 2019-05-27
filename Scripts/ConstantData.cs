@@ -27,10 +27,10 @@ public class ConstantData
     public static bool enableAssetBundleRedundance = true;
 
     // 开启缓存
-    public static bool EnableCache = true;
+    public static bool enableCache = true;
 
     // 使用自定义压缩
-    public static bool EnableCustomCompress = false;
+    public static bool enableCustomCompress = false;
 
     // 开启资源解压
     public static bool EnableUnpack = false;

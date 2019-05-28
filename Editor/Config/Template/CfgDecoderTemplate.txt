@@ -1,0 +1,35 @@
+﻿#if ServerClient || UNITY_EDITOR || USE_CSV_CONFIG
+using System.Collections.Generic;
+using IGG.Game.Core.Utils;
+
+namespace IGG.Game.Data.Config
+{
+    /// <summary>
+    /// Author  ${Author}
+    /// Date    ${CreateDate}
+    /// Desc    ${XmlName}配置文件解码器
+    /// </summary>
+    public class ${cfgDecClsName} : BaseCfgDecoder<${ConfigClsName}, ${CfgDataClsName}>
+    {
+        public override string GetName()
+        {
+            return "${XmlName}";
+        }
+
+        protected override void ProcessRow(${ConfigClsName} excel)
+        {
+${ReadValueCode}
+        }
+
+        protected override void AfterProcess(List<${ConfigClsName}> datas)
+        {
+            //整张表处理完成后执行，用于对表的后期处理，如排序
+        }
+
+        public override void AllDecodeAfterProcess()
+        {
+            //全部配置处理完后执行，用于处理有全局关系的值，可以在生成配置期间进行预处理
+        }
+    }
+}
+#endif

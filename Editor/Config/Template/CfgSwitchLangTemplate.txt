@@ -1,0 +1,9 @@
+﻿        protected override void OnChangeLang(ref ${ConfigClsName}[] cfgs, string language)
+        {
+            StringDao strDao = StringDao.Inst;
+            for (int i = 0; i < cfgs.Length; i++)
+            {
+                ${ConfigClsName} cfg = cfgs[i];
+${TrGetCode}
+            }
+        }

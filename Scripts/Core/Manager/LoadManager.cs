@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 namespace IGG.Core.Manager
 {
-    public class LoadManager : Singleton<LoadManager>, IManager
+    public class LoadManager : IGG.Utility.Singleton<LoadManager>, IManager
     {
         public void OnUpdate(float deltaTime)
         { }
@@ -911,7 +911,9 @@ namespace IGG.Core.Manager
 
         // ------------------------------------------------------------------------------------------
 
-        public override string ToString()
+
+
+        public string ToString()
         {
             return m_cache.ToString();
         }

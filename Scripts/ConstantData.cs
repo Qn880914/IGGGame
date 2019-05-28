@@ -133,7 +133,7 @@ public class ConstantData
         get
         {
 #if UNITY_STANDALONE_WIN
-            return Application.streamingAssetsPath + "/ab/" + ConstantData.MainVersion + "/";
+            return Application.streamingAssetsPath + "/ab/" + ConstantData.mainVersion + "/";
 #else
             return Application.persistentDataPath + "/ab/";
 #endif

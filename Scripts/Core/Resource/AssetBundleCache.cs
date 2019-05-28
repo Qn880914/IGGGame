@@ -60,7 +60,7 @@ namespace IGG.Core.Resource
                 {
                     if (ConstantData.assetBundleCacheTime > 0)
                     {
-                        m_UnloadTime = Time.realtimeSinceStartup;
+                        m_UnloadTime = UnityEngine.Time.realtimeSinceStartup;
                     }
                     else
                     {
@@ -95,7 +95,7 @@ namespace IGG.Core.Resource
         /// </summary>
         public bool timeOut
         {
-            get { return Time.realtimeSinceStartup - m_UnloadTime >= ConstantData.assetBundleCacheTime; }
+            get { return UnityEngine.Time.realtimeSinceStartup - m_UnloadTime >= ConstantData.assetBundleCacheTime; }
         }
 
         /// <summary>
@@ -202,9 +202,9 @@ namespace IGG.Core.Resource
         public void Update()
         {
             if (ConstantData.assetBundleCacheTime > 0 &&
-                Time.realtimeSinceStartup - m_LastClearTime >= ConstantData.assetBundleCacheTime)
+                UnityEngine.Time.realtimeSinceStartup - m_LastClearTime >= ConstantData.assetBundleCacheTime)
             {
-                m_LastClearTime = Time.realtimeSinceStartup;
+                m_LastClearTime = UnityEngine.Time.realtimeSinceStartup;
                 Clear();
             }
         }

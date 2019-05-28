@@ -145,7 +145,7 @@ namespace IGG.Editor
             _GT(typeof(CharacterController)),
             _GT(typeof(CapsuleCollider)),
 
-            _GT(typeof(Animation)),
+            _GT(typeof(Animator)),
             _GT(typeof(AnimationClip)).SetBaseType(typeof(UnityEngine.Object)),
             _GT(typeof(AnimationState)),
             _GT(typeof(AnimationBlendMode)),
@@ -176,7 +176,7 @@ namespace IGG.Editor
             typeof(CharacterController),
             typeof(CapsuleCollider),
 
-            typeof(Animation),
+            typeof(Animator),
             typeof(AnimationClip),
             typeof(AnimationState),
 

@@ -1,0 +1,11 @@
+﻿namespace IGG.Game.Data.Config
+{
+    /// <summary>
+    /// Author  ${Author}
+    /// Date    ${CreateDate}
+    /// Desc    ${XmlName}配置文件序列化类
+    /// </summary>
+    public class ${CfgDataClsName}:BaseCfgData<${ConfigClsName}>
+    {
+    }
+}

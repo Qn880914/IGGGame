@@ -1,0 +1,32 @@
+﻿using System;
+
+namespace IGG.Game.Data.Config
+{
+    /// <summary>
+    /// Author  ${Author}
+    /// Date    ${CreateDate}
+    /// Desc    ${XmlName}配置文件访问接口
+    /// </summary>
+    public class ${DaoClsName}:BaseDao<${DaoClsName},${KeyType},${ConfigClsName}>
+    {
+        public override string GetName()
+        {
+            return "${XmlName}";
+        }${languageCode}
+    }
+
+    /// <summary>
+    /// Author  ${Author}
+    /// Date    ${CreateDate}
+    /// Desc    ${XmlName}配置文件映射类型
+    /// </summary>
+    [Serializable]
+    public class ${ConfigClsName} : IConfig<${KeyType}>
+    {
+${FieldList}
+        public ${KeyType} GetKey()
+        {
+            return ${KeyFieldName};
+        }
+    }
+}

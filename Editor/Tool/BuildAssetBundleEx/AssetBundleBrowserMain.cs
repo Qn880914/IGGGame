@@ -42,7 +42,7 @@ namespace AssetBundleBrowser
 
         [SerializeField] internal bool m_MultiDataSource = false;
 
-        List<AssetBundleDataSource.ABDataSource> m_DataSourceList = null;
+        List<AssetBundleData> m_AssetBundleDatas = null;
 
         private Texture2D m_TextureRefresh;
 
@@ -89,24 +89,25 @@ namespace AssetBundleBrowser
         {
             //determine if we are "multi source" or not...
             m_MultiDataSource = false;
-            m_DataSourceList = new List<AssetBundleDataSource.ABDataSource>();
-            foreach (var info in AssetBundleDataSource.ABDataSourceProviderUtility.CustomABDataSourceTypes)
+            m_AssetBundleDatas = new List<AssetBundleData>();
+            foreach (var info in AssetBundleDataProviderUtility.customAssetBundleDataTypes)
             {
-                m_DataSourceList.AddRange(info.GetMethod("CreateDataSources").Invoke(null, null) as List<AssetBundleDataSource.ABDataSource>);
+                m_AssetBundleDatas.AddRange(info.GetMethod("CreateDataSources").Invoke(null, null) as List<AssetBundleData>);
             }
              
-            if (m_DataSourceList.Count > 1)
+            if (m_AssetBundleDatas.Count > 1)
             {
                 m_MultiDataSource = true;
-                if (m_DataSourceIndex >= m_DataSourceList.Count)
+                if (m_DataSourceIndex >= m_AssetBundleDatas.Count)
                     m_DataSourceIndex = 0;
-                AssetBundleModel.Model.DataSource = m_DataSourceList[m_DataSourceIndex];
+                AssetBundleModel.Model.assetBundleData = m_AssetBundleDatas[m_DataSourceIndex];
             }
         }
         private void OnDisable()
         {
             if (m_BuildTab != null)
                 m_BuildTab.OnDisable();
+
             if (m_InspectTab != null)
                 m_InspectTab.OnDisable();
         }
@@ -165,20 +166,17 @@ namespace AssetBundleBrowser
         {
             GUILayout.BeginHorizontal();
             GUILayout.Space(kToolbarPadding);
-            bool clicked = false;
             switch(m_Mode)
             {
                 case Mode.Browser:
-                    clicked = GUILayout.Button(m_TextureRefresh);
-                    if (clicked)
+                    if (GUILayout.Button(m_TextureRefresh))
                         m_ManageTab.ForceReloadData();
                     break;
                 case Mode.Builder:
                     GUILayout.Space(m_TextureRefresh.width + kToolbarPadding);
                     break;
                 case Mode.Inspect:
-                    clicked = GUILayout.Button(m_TextureRefresh);
-                    if (clicked)
+                    if (GUILayout.Button(m_TextureRefresh))
                         m_InspectTab.RefreshBundles();
                     break;
             }
@@ -198,27 +196,27 @@ namespace AssetBundleBrowser
                 {
                     GUILayout.Label("Bundle Data Source:");
                     GUILayout.FlexibleSpace();
-                    var c = new GUIContent(string.Format("{0} ({1})", AssetBundleModel.Model.DataSource.name, AssetBundleModel.Model.DataSource.providerName), "Select Asset Bundle Set");
+                    var c = new GUIContent(string.Format("{0} ({1})", AssetBundleModel.Model.assetBundleData.name, AssetBundleModel.Model.assetBundleData.providerName), "Select Asset Bundle Set");
                     if (GUILayout.Button(c , EditorStyles.toolbarPopup) )
                     {
                         GenericMenu menu = new GenericMenu();
 
-                        for (int index = 0; index < m_DataSourceList.Count; index++)
+                        for (int index = 0; index < m_AssetBundleDatas.Count; index++)
                         {
-                            var ds = m_DataSourceList[index];
-                            if (ds == null)
+                            var assetBundleData = m_AssetBundleDatas[index];
+                            if (assetBundleData == null)
                                 continue;
 
                             if (index > 0)
                                 menu.AddSeparator("");
                              
                             var counter = index;
-                            menu.AddItem(new GUIContent(string.Format("{0} ({1})", ds.name, ds.providerName)), false,
+                            menu.AddItem(new GUIContent(string.Format("{0} ({1})", assetBundleData.name, assetBundleData.providerName)), false,
                                 () =>
                                 {
                                     m_DataSourceIndex = counter;
-                                    var thisDataSource = ds;
-                                    AssetBundleModel.Model.DataSource = thisDataSource;
+                                    var thisDataSource = assetBundleData;
+                                    AssetBundleModel.Model.assetBundleData = thisDataSource;
                                     m_ManageTab.ForceReloadData();
                                 }
                             );
@@ -229,7 +227,7 @@ namespace AssetBundleBrowser
                     }
 
                     GUILayout.FlexibleSpace();
-                    if (AssetBundleModel.Model.DataSource.IsReadOnly())
+                    if (AssetBundleModel.Model.assetBundleData.IsReadOnly())
                     {
                         GUIStyle tbLabel = new GUIStyle(EditorStyles.toolbar);
                         tbLabel.alignment = TextAnchor.MiddleRight;

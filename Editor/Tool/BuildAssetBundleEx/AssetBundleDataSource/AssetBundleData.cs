@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using System;
 
-namespace AssetBundleBrowser.AssetBundleDataSource
+namespace AssetBundleBrowser
 {
     /// <summary>
     ///     <para> Build Info struct used by ABDataSource to pass needed build data around. </para>
@@ -56,7 +56,7 @@ namespace AssetBundleBrowser.AssetBundleDataSource
     ///   public static List<ABDataSource> CreateDataSources();
     /// 
     /// </summary>
-    public partial interface ABDataSource
+    public partial interface AssetBundleData
     {
         //// all derived classes must implement the following interface in order to be picked up by the browser.
         //public static List<ABDataSource> CreateDataSources();

@@ -336,7 +336,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             
             bool assetInBundle = false;
             bool sceneError = false;
-            var assets = AssetBundleModel.Model.DataSource.GetAssetPathsFromAssetBundle(m_Name.fullNativeName);
+            var assets = AssetBundleModel.Model.assetBundleData.GetAssetPathsFromAssetBundle(m_Name.fullNativeName);
             foreach(var assetName in assets)
             {
                 if (AssetDatabase.GetMainAssetTypeAtPath(assetName) == typeof(SceneAsset))
@@ -488,7 +488,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                 if (ai == asset || m_ConcreteAssets.Contains(ai) || m_DependentAssets.Contains(ai))
                     continue;
 
-                var bundleName = AssetBundleModel.Model.DataSource.GetImplicitAssetBundleName(ai.fullAssetName);
+                var bundleName = AssetBundleModel.Model.assetBundleData.GetImplicitAssetBundleName(ai.fullAssetName);
                 if (string.IsNullOrEmpty(bundleName))
                 {
                     m_DependentAssets.Add(ai);

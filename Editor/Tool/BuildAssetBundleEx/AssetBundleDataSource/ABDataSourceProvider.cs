@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace AssetBundleBrowser.AssetBundleDataSource
+namespace AssetBundleBrowser
 {
-    internal class ABDataSourceProviderUtility {
+    internal class AssetBundleDataProviderUtility {
 
-        private static List<Type> s_customNodes;
+        private static List<Type> s_CustomAssetBundleDataTypes;
 
-        internal static List<Type> CustomABDataSourceTypes {
+        internal static List<Type> customAssetBundleDataTypes {
             get {
-                if(s_customNodes == null) {
-                    s_customNodes = BuildCustomABDataSourceList();
+                if(s_CustomAssetBundleDataTypes == null) {
+                    s_CustomAssetBundleDataTypes = BuildCustomAssetBundleDataList();
                 }
-                return s_customNodes;
+                return s_CustomAssetBundleDataTypes;
             }
         }
 
-        private static List<Type> BuildCustomABDataSourceList()
+        private static List<Type> BuildCustomAssetBundleDataList()
         {
             var properList = new List<Type>();
             properList.Add(null); //empty spot for "default" 
@@ -30,13 +30,13 @@ namespace AssetBundleBrowser.AssetBundleDataSource
                     var list = new List<Type>(
                         assembly
                         .GetTypes()
-                        .Where(t => t != typeof(ABDataSource))
-                        .Where(t => typeof(ABDataSource).IsAssignableFrom(t)));
+                        .Where(t => t != typeof(AssetBundleData))
+                        .Where(t => typeof(AssetBundleData).IsAssignableFrom(t)));
 
 
                     for (int count = 0; count < list.Count; count++)
                     {
-                        if (list[count].Name == "AssetDatabaseABDataSource")
+                        if (list[count].Name == "AssetDatabaseAssetBundleData")
                             properList[0] = list[count];
                         else if (list[count] != null)
                             properList.Add(list[count]);

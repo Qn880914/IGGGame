@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace AssetBundleBrowser.AssetBundleDataSource
 {
-    internal class AssetDatabaseABDataSource : ABDataSource
+    internal class AssetDatabaseAssetBundleData : AssetBundleData
     {
-        public static List<ABDataSource> CreateDataSources()
+        public static List<AssetBundleData> CreateDataSources()
         {
-            var op = new AssetDatabaseABDataSource();
-            var retList = new List<ABDataSource>();
+            var op = new AssetDatabaseAssetBundleData();
+            var retList = new List<AssetBundleData>();
             retList.Add(op);
             return retList;
         }

@@ -280,7 +280,7 @@ namespace AssetBundleBrowser
         protected bool IsValidDragDrop()
         {
             //can't do drag & drop if data source is read only
-            if (AssetBundleModel.Model.DataSource.IsReadOnly ())
+            if (AssetBundleModel.Model.assetBundleData.IsReadOnly ())
                 return false;
 
             //can't drag onto none or >1 bundles
@@ -332,7 +332,7 @@ namespace AssetBundleBrowser
 
         protected override void ContextClickedItem(int id)
         {
-            if (AssetBundleModel.Model.DataSource.IsReadOnly ()) {
+            if (AssetBundleModel.Model.assetBundleData.IsReadOnly ()) {
                 return;
             }
 

@@ -24,7 +24,6 @@ namespace AssetBundleBrowser.AssetBundleModel
         const string k_NewVariantBaseName = "newvariant";
         internal static /*const*/ Color k_LightGrey = Color.grey * 1.5f;
 
-        private static ABDataSource s_DataSource;
         private static BundleFolderConcreteInfo s_RootLevelBundles = new BundleFolderConcreteInfo("", null);
         private static List<ABMoveData> s_MoveData = new List<ABMoveData>();
         private static List<BundleInfo> s_BundlesToUpdate = new List<BundleInfo>();
@@ -48,17 +47,18 @@ namespace AssetBundleBrowser.AssetBundleModel
         ///  AssetDatabase.
         ///  
         /// </summary>
-        public static ABDataSource DataSource
+        private static AssetBundleData s_AssetBundleData;
+        public static AssetBundleData assetBundleData
         {
             get
             {
-                if (s_DataSource == null)
+                if (s_AssetBundleData == null)
                 {
-                    s_DataSource = new AssetDatabaseABDataSource ();
+                    s_AssetBundleData = new AssetDatabaseAssetBundleData ();
                 }
-                return s_DataSource;
+                return s_AssetBundleData;
             }
-            set { s_DataSource = value; }
+            set { s_AssetBundleData = value; }
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         internal static string[] ValidateBundleList()
         {
-            var bundleList = DataSource.GetAllAssetBundleNames();
+            var bundleList = assetBundleData.GetAllAssetBundleNames();
             bool valid = true;
             HashSet<string> bundleSet = new HashSet<string>();
             int index = 0;
@@ -186,13 +186,13 @@ namespace AssetBundleBrowser.AssetBundleModel
                         }
                         else
                         {
-                            if (!DataSource.IsReadOnly ())
+                            if (!assetBundleData.IsReadOnly ())
                             {
-                                DataSource.RemoveUnusedAssetBundleNames();
+                                assetBundleData.RemoveUnusedAssetBundleNames();
                             }
                             index = 0;
                             bundleSet.Clear();
-                            bundleList = DataSource.GetAllAssetBundleNames();
+                            bundleList = assetBundleData.GetAllAssetBundleNames();
                             attemptedBundleReset = true;
                             continue;
                         }
@@ -211,13 +211,13 @@ namespace AssetBundleBrowser.AssetBundleModel
                         }
                         else
                         {
-                            if (!DataSource.IsReadOnly ())
+                            if (!assetBundleData.IsReadOnly ())
                             {
-                                DataSource.RemoveUnusedAssetBundleNames();
+                                assetBundleData.RemoveUnusedAssetBundleNames();
                             }
                             index = 0;
                             bundleSet.Clear();
-                            bundleList = DataSource.GetAllAssetBundleNames();
+                            bundleList = assetBundleData.GetAllAssetBundleNames();
                             attemptedBundleReset = true;
                             continue;
                         }
@@ -580,9 +580,9 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
             internal void Apply()
             {
-                if (!DataSource.IsReadOnly ())
+                if (!assetBundleData.IsReadOnly ())
                 {
-                    DataSource.SetAssetBundleNameAndVariant(assetName, bundleName, variantName);
+                    assetBundleData.SetAssetBundleNameAndVariant(assetName, bundleName, variantName);
                 }
             }
         }
@@ -626,9 +626,9 @@ namespace AssetBundleBrowser.AssetBundleModel
                     EditorPrefs.SetBool("kAutoRefresh", autoRefresh);
                     s_MoveData.Clear();
                 }
-                if (!DataSource.IsReadOnly ())
+                if (!assetBundleData.IsReadOnly ())
                 {
-                    DataSource.RemoveUnusedAssetBundleNames();
+                    assetBundleData.RemoveUnusedAssetBundleNames();
                 }
                 Refresh();
             }
@@ -687,7 +687,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         internal static string GetBundleName(string asset)
         {
-            return DataSource.GetAssetBundleName (asset);
+            return assetBundleData.GetAssetBundleName (asset);
         }
 
         internal static int RegisterAsset(AssetInfo asset, string bundle)

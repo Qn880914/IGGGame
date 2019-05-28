@@ -22,12 +22,12 @@ public class FullVersionResource
 		}
 
 		List<VersionData.VersionItem> list = new List<VersionData.VersionItem>();
-		List<string> files = IGG.FileUtil.GetAllChildFiles(BuildSettings.outputPath, "ab");
+		List<string> files = IGG.FileUtil.GetAllChildFiles(BuildSettings.assetBundleOutputPath, "ab");
 
 		if (!ConstantData.enableCache && ConstantData.enableCustomCompress)
 		{
 			// 自定义压缩
-			string inPath = string.Format("{0}{1}", BuildSettings.outputPath, ConstantData.mainVersion);
+			string inPath = string.Format("{0}{1}", BuildSettings.assetBundleOutputPath, ConstantData.mainVersion);
 			string outPath = "";
 			if (ConstantData.enableMd5Name)
 			{
@@ -40,7 +40,7 @@ public class FullVersionResource
 			}
 
 			ThreadParam param = new ThreadParam();
-			param.pathSrc = BuildSettings.outputPath;
+			param.pathSrc = BuildSettings.assetBundleOutputPath;
 			param.pathDst = ConstantData.streamingAssetsPath;
 			param.list = list;
 			param.files = files;
@@ -87,7 +87,7 @@ public class FullVersionResource
 			// 直接拷贝
 			if (ConstantData.enableMd5Name)
 			{
-				string pathSrc = BuildSettings.outputPath;
+				string pathSrc = BuildSettings.assetBundleOutputPath;
 				string pathDst = ConstantData.streamingAssetsPath;
 
 				{
@@ -108,10 +108,10 @@ public class FullVersionResource
 			else
 			{
 				// 把所有的ab文件拷贝进StreamAssets的ab目录下
-				IGG.FileUtil.CopyDirectory(BuildSettings.outputPath, Application.streamingAssetsPath + "/ab/", ConstantData.assetBundleExt);
+				IGG.FileUtil.CopyDirectory(BuildSettings.assetBundleOutputPath, Application.streamingAssetsPath + "/ab/", ConstantData.assetBundleExt);
 
 				// 拷贝manifest进StreamAssets,并命名为data
-				string pathSrc = string.Format("{0}/{1}", BuildSettings.outputPath, ConstantData.mainVersion);
+				string pathSrc = string.Format("{0}/{1}", BuildSettings.assetBundleOutputPath, ConstantData.mainVersion);
 				string pathDst = string.Format("{0}/ab/data", Application.streamingAssetsPath);
 				IGG.FileUtil.CopyFile(pathSrc, pathDst);
 			}

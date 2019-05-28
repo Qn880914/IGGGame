@@ -10,7 +10,7 @@
     ///     <para> assetbundle 输出路径 </para>
     /// </summary>
     /// <value>The output path.</value>
-    public static string outputPath
+    public static string assetBundleOutputPath
     {
         get
         {

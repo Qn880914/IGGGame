@@ -7,6 +7,9 @@ public class IGGBuildPipeline
 {
     private static Dictionary<string, HashSet<string>> s_AssetBundleNameMapFilePaths = new Dictionary<string, HashSet<string>>();
 
+    /// <summary>
+    ///     <para> Build all AssetBundles specified in the editor</para>
+    /// </summary>
     public static void BuildAssetbundle()
     {
         Reset();
@@ -23,7 +26,7 @@ public class IGGBuildPipeline
             buildOptions |= BuildAssetBundleOptions.UncompressedAssetBundle;
         }
 
-        BuildPipeline.BuildAssetBundles(BuildSettings.outputPath, buildOptions, EditorUserBuildSettings.activeBuildTarget);
+        BuildPipeline.BuildAssetBundles(BuildSettings.assetBundleOutputPath, buildOptions, EditorUserBuildSettings.activeBuildTarget);
         AssetDatabase.Refresh();
     }
 
@@ -32,11 +35,11 @@ public class IGGBuildPipeline
         if (BuildSettings.clearAssetBundle)
         {
             // 清除现有ab目录
-            IGG.FileUtil.ClearDirectory(BuildSettings.outputPath);
+            IGG.FileUtil.ClearDirectory(BuildSettings.assetBundleOutputPath);
         }
         else
         {
-            IGG.FileUtil.CreateDirectory(BuildSettings.outputPath);
+            IGG.FileUtil.CreateDirectory(BuildSettings.assetBundleOutputPath);
         }
 
         if (BuildSettings.resetAssetBundleName)
@@ -63,7 +66,7 @@ public class IGGBuildPipeline
         StringBuilder stringBuilder = new StringBuilder(string.Empty);
         if (mode == ResourcesPathMode.AssetBundle)
         {
-            stringBuilder.Append(BuildSettings.outputPath);
+            stringBuilder.Append(BuildSettings.assetBundleOutputPath);
         }
 
         string path = ResourcesPath.GetRelativePath(type, mode);

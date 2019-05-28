@@ -4,46 +4,46 @@ using System;
 namespace AssetBundleBrowser.AssetBundleDataSource
 {
     /// <summary>
-    /// Build Info struct used by ABDataSource to pass needed build data around.
+    ///     <para> Build Info struct used by ABDataSource to pass needed build data around. </para>
     /// </summary>
-    public partial class ABBuildInfo
+    public partial class BuildAssetBundleSettings
     {
         /// <summary>
-        /// Directory to place build result
+        ///     <para> Directory to place build result </para>
         /// </summary>
+        private string m_OutputDirectory;
         public string outputDirectory
         {
-            get { return m_outputDirectory; }
-            set { m_outputDirectory = value; }
+            get { return m_OutputDirectory; }
+            set { m_OutputDirectory = value; }
         }
-        private string m_outputDirectory;
         /// <summary>
-        /// Standard asset bundle build options.
+        ///     <para> Standard asset bundle build options. </para>
         /// </summary>
+        private BuildAssetBundleOptions m_Options;
         public BuildAssetBundleOptions options
         {
-            get { return m_options; }
-            set { m_options = value; }
+            get { return m_Options; }
+            set { m_Options = value; }
         }
-        private BuildAssetBundleOptions m_options;
         /// <summary>
-        /// Target platform for build.
+        ///     <para> Target platform for build. </para>
         /// </summary>
+        private BuildTarget m_buildTarget;
         public BuildTarget buildTarget
         {
             get { return m_buildTarget; }
             set { m_buildTarget = value; }
         }
-        private BuildTarget m_buildTarget;
         /// <summary>
-        /// Callback for build event.
+        ///     <para> Callback for build event. </para>
         /// </summary>
-        public Action<string> onBuild
+        private Action<string> m_BuildCallback;
+        public Action<string> buildCallback
         {
-            get { return m_onBuild; }
-            set { m_onBuild = value; }
+            get { return m_BuildCallback; }
+            set { m_BuildCallback = value; }
         }
-        private Action<string> m_onBuild;
     }
 
     /// <summary>
@@ -64,20 +64,23 @@ namespace AssetBundleBrowser.AssetBundleDataSource
         /// <summary>
         /// Name of DataSource. Displayed in menu as "Name (ProvidorName)"
         /// </summary>
-        string Name { get; }
+        string name { get; }
+
         /// <summary>
         /// Name of provider for DataSource. Displayed in menu as "Name (ProvidorName)"
         /// </summary>
-        string ProviderName { get; }
+        string providerName { get; }
 
         /// <summary>
         /// Array of paths in bundle.
         /// </summary>
         string[] GetAssetPathsFromAssetBundle (string assetBundleName);
+
         /// <summary>
         /// Name of bundle explicitly associated with asset at path.  
         /// </summary>
         string GetAssetBundleName(string assetPath);
+
         /// <summary>
         /// Name of bundle associated with asset at path.  
         ///  The difference between this and GetAssetBundleName() is for assets unassigned to a bundle, but
@@ -85,10 +88,12 @@ namespace AssetBundleBrowser.AssetBundleDataSource
         ///  with the bundle associated with the parent folder.
         /// </summary>
         string GetImplicitAssetBundleName(string assetPath);
+
         /// <summary>
         /// Array of asset bundle names in project
         /// </summary>
         string[] GetAllAssetBundleNames();
+
         /// <summary>
         /// If this data source is read only. 
         ///  If this returns true, much of the Browsers's interface will be diabled (drag&drop, etc.)
@@ -99,6 +104,7 @@ namespace AssetBundleBrowser.AssetBundleDataSource
         /// Sets the asset bundle name (and variant) on a given asset
         /// </summary>
         void SetAssetBundleNameAndVariant (string assetPath, string bundleName, string variantName);
+
         /// <summary>
         /// Clears out any asset bundle names that do not have assets associated with them.
         /// </summary>
@@ -107,20 +113,22 @@ namespace AssetBundleBrowser.AssetBundleDataSource
         /// <summary>
         /// Signals if this data source can have build target set by tool
         /// </summary>
-        bool CanSpecifyBuildTarget { get; }
+        bool canSpecifyBuildTarget { get; }
+
         /// <summary>
         /// Signals if this data source can have output directory set by tool
         /// </summary>
-        bool CanSpecifyBuildOutputDirectory { get; }
+        bool canSpecifyBuildOutputDirectory { get; }
+
         /// <summary>
         /// Signals if this data source can have build options set by tool
         /// </summary>
-        bool CanSpecifyBuildOptions { get; }
+        bool canSpecifyBuildOptions { get; }
 
         /// <summary>
         /// Executes data source's implementation of asset bundle building.
         ///   Called by "build" button in build tab of tool.
         /// </summary>
-        bool BuildAssetBundles (ABBuildInfo info);
+        bool BuildAssetBundles (BuildAssetBundleSettings info);
     }
 }

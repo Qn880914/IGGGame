@@ -1,10 +1,8 @@
-﻿using UnityEditor;
-using UnityEngine;
-using System.Collections.Generic;
-using UnityEditor.IMGUI.Controls;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System;
-
+using UnityEditor;
+using UnityEditor.IMGUI.Controls;
+using UnityEngine;
 
 namespace AssetBundleBrowser
 {

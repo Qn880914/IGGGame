@@ -40,8 +40,11 @@ namespace AssetBundleBrowser
 
         [SerializeField] internal AssetBundleInspectTab m_InspectTab;
 
-        private Texture2D m_RefreshTexture;
+        [SerializeField] internal bool m_MultiDataSource = false;
 
+        List<AssetBundleDataSource.ABDataSource> m_DataSourceList = null;
+
+        private Texture2D m_TextureRefresh;
 
         [MenuItem("Window/AssetBundle Browser", priority = 2050)]
         static void ShowWindow()
@@ -51,41 +54,41 @@ namespace AssetBundleBrowser
             instance.Show();
         }
 
-        [SerializeField]
-        internal bool multiDataSource = false;
-        List<AssetBundleDataSource.ABDataSource> m_DataSourceList = null;
         public virtual void AddItemsToMenu(GenericMenu menu)
         {
             if(menu != null)
-               menu.AddItem(new GUIContent("Custom Sources"), multiDataSource, FlipDataSource);
+               menu.AddItem(new GUIContent("Custom Sources"), m_MultiDataSource, FlipDataSource);
         }
+
         internal void FlipDataSource()
         {
-            multiDataSource = !multiDataSource;
+            m_MultiDataSource = !m_MultiDataSource;
         }
 
         private void OnEnable()
         {
-
             Rect subPos = GetSubWindowArea();
             if(m_ManageTab == null)
                 m_ManageTab = new AssetBundleManageTab();
             m_ManageTab.OnEnable(subPos, this);
+
             if(m_BuildTab == null)
                 m_BuildTab = new AssetBundleBuildTab();
             m_BuildTab.OnEnable(this);
+
             if (m_InspectTab == null)
                 m_InspectTab = new AssetBundleInspectTab();
             m_InspectTab.OnEnable(subPos);
 
-            m_RefreshTexture = EditorGUIUtility.FindTexture("Refresh");
+            m_TextureRefresh = EditorGUIUtility.FindTexture("Refresh");
 
             InitDataSources();
         } 
+
         private void InitDataSources()
         {
             //determine if we are "multi source" or not...
-            multiDataSource = false;
+            m_MultiDataSource = false;
             m_DataSourceList = new List<AssetBundleDataSource.ABDataSource>();
             foreach (var info in AssetBundleDataSource.ABDataSourceProviderUtility.CustomABDataSourceTypes)
             {
@@ -94,7 +97,7 @@ namespace AssetBundleBrowser
              
             if (m_DataSourceList.Count > 1)
             {
-                multiDataSource = true;
+                m_MultiDataSource = true;
                 if (m_DataSourceIndex >= m_DataSourceList.Count)
                     m_DataSourceIndex = 0;
                 AssetBundleModel.Model.DataSource = m_DataSourceList[m_DataSourceIndex];
@@ -118,10 +121,10 @@ namespace AssetBundleBrowser
         private Rect GetSubWindowArea()
         {
             float padding = kMenubarPadding;
-            if (multiDataSource)
+            if (m_MultiDataSource)
                 padding += kMenubarPadding * 0.5f;
-            Rect subPos = new Rect(0, padding, position.width, position.height - padding);
-            return subPos;
+            Rect subRect = new Rect(0, padding, position.width, position.height - padding);
+            return subRect;
         }
 
         private void Update()
@@ -166,27 +169,27 @@ namespace AssetBundleBrowser
             switch(m_Mode)
             {
                 case Mode.Browser:
-                    clicked = GUILayout.Button(m_RefreshTexture);
+                    clicked = GUILayout.Button(m_TextureRefresh);
                     if (clicked)
                         m_ManageTab.ForceReloadData();
                     break;
                 case Mode.Builder:
-                    GUILayout.Space(m_RefreshTexture.width + kToolbarPadding);
+                    GUILayout.Space(m_TextureRefresh.width + kToolbarPadding);
                     break;
                 case Mode.Inspect:
-                    clicked = GUILayout.Button(m_RefreshTexture);
+                    clicked = GUILayout.Button(m_TextureRefresh);
                     if (clicked)
                         m_InspectTab.RefreshBundles();
                     break;
             }
 
-            float toolbarWidth = position.width - kToolbarPadding * 4 - m_RefreshTexture.width;
+            float toolbarWidth = position.width - kToolbarPadding * 4 - m_TextureRefresh.width;
             //string[] labels = new string[2] { "Configure", "Build"};
             string[] labels = new string[3] { "Configure", "Build", "Inspect" };
             m_Mode = (Mode)GUILayout.Toolbar((int)m_Mode, labels, "LargeButton", GUILayout.Width(toolbarWidth) );
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            if(multiDataSource)
+            if(m_MultiDataSource)
             {
                 //GUILayout.BeginArea(r);
                 GUILayout.BeginHorizontal();
@@ -195,7 +198,7 @@ namespace AssetBundleBrowser
                 {
                     GUILayout.Label("Bundle Data Source:");
                     GUILayout.FlexibleSpace();
-                    var c = new GUIContent(string.Format("{0} ({1})", AssetBundleModel.Model.DataSource.Name, AssetBundleModel.Model.DataSource.ProviderName), "Select Asset Bundle Set");
+                    var c = new GUIContent(string.Format("{0} ({1})", AssetBundleModel.Model.DataSource.name, AssetBundleModel.Model.DataSource.providerName), "Select Asset Bundle Set");
                     if (GUILayout.Button(c , EditorStyles.toolbarPopup) )
                     {
                         GenericMenu menu = new GenericMenu();
@@ -210,7 +213,7 @@ namespace AssetBundleBrowser
                                 menu.AddSeparator("");
                              
                             var counter = index;
-                            menu.AddItem(new GUIContent(string.Format("{0} ({1})", ds.Name, ds.ProviderName)), false,
+                            menu.AddItem(new GUIContent(string.Format("{0} ({1})", ds.name, ds.providerName)), false,
                                 () =>
                                 {
                                     m_DataSourceIndex = counter;

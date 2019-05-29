@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 public class CollectionAssetBundle
 {
@@ -40,7 +39,7 @@ public class CollectionAssetBundle
 	}
 
     /// <summary>
-    ///     <para> 收集所有的ab </para>
+    ///     <para> 收集所有的 AssetBundle </para>
     /// </summary>
     static void CollectAssetBundle()
     {
@@ -105,16 +104,14 @@ public class CollectionAssetBundle
     /// </summary>
     static void CollectAssetBundleDependencies()
     {
-        var iter = s_AssetBundleDatas.GetEnumerator();
-        while (iter.MoveNext())
+        foreach(var assetBundleData in s_AssetBundleDatas)
         {
-            AssetBundleData current = iter.Current.Value;
-            string[] depends = AssetDatabase.GetAssetBundleDependencies(iter.Current.Key, false);
+            string[] depends = AssetDatabase.GetAssetBundleDependencies(assetBundleData.Key, false);
             foreach (string depend in depends)
             {
                 AssetBundleData data = s_AssetBundleDatas[depend];
-                current.childs.Add(data.name);
-                data.parents.Add(current.name);
+                assetBundleData.Value.childs.Add(data.name);
+                data.parents.Add(assetBundleData.Value.name);
             }
         }
     }

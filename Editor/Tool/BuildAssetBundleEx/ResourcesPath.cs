@@ -1,8 +1,4 @@
-﻿#region Namespace
-
-using System.Text;
-
-#endregion
+﻿using System.Text;
 
 // <summary>
 // 资源路径管理

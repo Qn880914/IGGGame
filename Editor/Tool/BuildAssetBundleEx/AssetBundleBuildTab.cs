@@ -48,10 +48,19 @@ namespace AssetBundleBrowser
         private AssetBundleInspectTab m_InspectTab;
 
         private List<ToggleData> m_ToggleData;
+
         private ToggleData m_ForceRebuild;
+
+        private ToggleData m_ResetAssetBundleName;
+
+        private ToggleData m_CheckRedundant;
+
         private ToggleData m_CopyToStreaming;
+
         private GUIContent m_TargetContent;
+
         private GUIContent m_CompressionContent;
+
         internal enum CompressOptions
         {
             Uncompressed = 0,
@@ -151,6 +160,19 @@ namespace AssetBundleBrowser
                 "Clear Folders",
                 "Will wipe out all contents of build directory as well as StreamingAssets/AssetBundles if you are choosing to copy build there.",
                 m_UserData.m_OnToggles);
+
+            m_ResetAssetBundleName = new ToggleData(
+                false,
+                "Reset All AssetBundle Name",
+                "Will Reset All resource AssetBundle Name",
+                m_UserData.m_OnToggles);
+
+            m_CheckRedundant = new ToggleData(
+                false,
+                "Check Redundant",
+                "",
+                m_UserData.m_OnToggles);
+
             m_CopyToStreaming = new ToggleData(
                 false,
                 "Copy to StreamingAssets",
@@ -193,7 +215,6 @@ namespace AssetBundleBrowser
                 }
             }
 
-
             ////output path
             using (new EditorGUI.DisabledScope(!AssetBundleModel.Model.assetBundleData.canSpecifyBuildOutputDirectory))
             {
@@ -229,6 +250,32 @@ namespace AssetBundleBrowser
                         m_UserData.m_OnToggles.Remove(m_ForceRebuild.content.text);
                     m_ForceRebuild.state = newState;
                 }
+
+                newState = GUILayout.Toggle(
+                    m_ResetAssetBundleName.state,
+                    m_ResetAssetBundleName.content);
+                if(newState != m_ResetAssetBundleName.state)
+                {
+                    if (newState)
+                        m_UserData.m_OnToggles.Add(m_ResetAssetBundleName.content.text);
+                    else
+                        m_UserData.m_OnToggles.Remove(m_ResetAssetBundleName.content.text);
+                    m_ResetAssetBundleName.state = newState;
+                }
+
+                newState = GUILayout.Toggle(
+                    m_CheckRedundant.state,
+                    m_CheckRedundant.content
+                    );
+                if(newState != m_CheckRedundant.state)
+                {
+                    if (newState)
+                        m_UserData.m_OnToggles.Add(m_CheckRedundant.content.text);
+                    else
+                        m_UserData.m_OnToggles.Remove(m_CheckRedundant.content.text);
+                    m_CheckRedundant.state = newState;
+                }
+
                 newState = GUILayout.Toggle(
                     m_CopyToStreaming.state,
                     m_CopyToStreaming.content);
@@ -327,6 +374,22 @@ namespace AssetBundleBrowser
                         }
                     }
                 }
+
+                // 清除所有assetbundle名
+                if (m_ResetAssetBundleName.state)
+                {
+                    var assetBundleNames = AssetDatabase.GetAllAssetBundleNames();
+                    foreach (string name in assetBundleNames)
+                    {
+                        AssetDatabase.RemoveAssetBundleName(name, true);
+                    }
+                }
+
+                if(m_CheckRedundant.state)
+                { }
+
+                AssetDatabase.Refresh();
+
                 if (!Directory.Exists(m_UserData.m_OutputPath))
                     Directory.CreateDirectory(m_UserData.m_OutputPath);
             }

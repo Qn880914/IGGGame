@@ -1,10 +1,6 @@
-﻿#region Namespace
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-
-#endregion
 
 public class AssetBundleMapping : ScriptableObject
 {
@@ -19,9 +15,7 @@ public class AssetBundleMapping : ScriptableObject
         foreach(var assetBundleInfo in assetBundleInfos)
         {
             for (int i = 0; i < assetBundleInfo.paths.Length; ++i)
-            {
                 m_PathMapAssetBundleName[assetBundleInfo.paths[i]] = assetBundleInfo.assetBundleName;
-            }
         }
     }
 
@@ -29,9 +23,7 @@ public class AssetBundleMapping : ScriptableObject
     {
         path = path.ToLower();
         if (path.StartsWith("data/"))
-        {
             path = path.Substring(path.IndexOf('/') + 1);
-        }
 
         string name;
         m_PathMapAssetBundleName.TryGetValue(path, out name);

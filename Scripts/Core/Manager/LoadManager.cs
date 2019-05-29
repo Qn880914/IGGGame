@@ -12,9 +12,6 @@ namespace IGG.Core.Manager
 {
     public class LoadManager : IGG.Utility.Singleton<LoadManager>, IManager
     {
-        public void OnUpdate(float deltaTime)
-        { }
-
         public delegate void LoaderGroupCompleteCallback(LoaderGroup group, object data);
 
         public delegate void CompleteCallback(object data);
@@ -47,13 +44,15 @@ namespace IGG.Core.Manager
         // ------------------------------------------------------------------------------------------
         private bool m_hasWarm;
 
-        private AssetBundleManifest m_manifest;
+        private AssetBundleManifest m_AssetBundleManifest;
         private AssetBundleMapping m_mapping;
 
         // ------------------------------------------------------------------------------------------
-        private DownloadOrCache m_unpacker;
+        private DownloadOrCache m_Unpacker;
 
-        private string m_urlPatch;
+        private string m_UrlPatch;
+
+        public bool enabled { get; set; }
 
         public LoadManager()
         {
@@ -97,11 +96,9 @@ namespace IGG.Core.Manager
             }
         }
 
-        public bool Enabled { get; set; }
-
         public void Initialize(MonoBehaviour mb) { }
 
-        public void Update()
+        public void OnUpdate(float deltaTime)
         {
             m_task.Update();
             m_cache.Update();
@@ -120,7 +117,7 @@ namespace IGG.Core.Manager
 
         private void ClearAfterPatch()
         {
-            m_manifest = null;
+            m_AssetBundleManifest = null;
             m_mapping = null;
 
             UnloadAssetBundle(ConstantData.assetbundleManifest, true);
@@ -184,7 +181,7 @@ namespace IGG.Core.Manager
                     if (async)
                     {
                         // 异步加载,返回远程路径
-                        return string.Format("{0}/{1}{2}", m_urlPatch, md5, ConstantData.assetBundleExt);
+                        return string.Format("{0}/{1}{2}", m_UrlPatch, md5, ConstantData.assetBundleExt);
                     }
                     else
                     {
@@ -262,7 +259,7 @@ namespace IGG.Core.Manager
             m_patchs.Clear();
             if (json != null)
             {
-                m_urlPatch = json["url"];
+                m_UrlPatch = json["url"];
                 ConfigData.Inst.InitFromJson(json);
 
                 JSONClass list = json["list"] as JSONClass;
@@ -344,7 +341,7 @@ namespace IGG.Core.Manager
                 AssetBundleInfo ab = data as AssetBundleInfo;
                 if (ab != null)
                 {
-                    m_manifest = ab.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+                    m_AssetBundleManifest = ab.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                 }
             }, false, false, false);
 
@@ -764,13 +761,13 @@ namespace IGG.Core.Manager
         // 加载依赖
         private void LoadDependencies(LoaderGroup group, string name, bool async, bool persistent)
         {
-            if (m_manifest == null)
+            if (m_AssetBundleManifest == null)
             {
                 return;
             }
 
             string[] dependencies =
-                m_manifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.assetBundleExt));
+                m_AssetBundleManifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.assetBundleExt));
             for (int i = 0; i < dependencies.Length; ++i)
             {
                 LoadAssetBundle(group, dependencies[i].Replace(ConstantData.assetBundleExt, ""), null, async,
@@ -781,13 +778,13 @@ namespace IGG.Core.Manager
         // 卸载依赖
         private void UnloadDependencies(string name, bool immediate = false)
         {
-            if (m_manifest == null)
+            if (m_AssetBundleManifest == null)
             {
                 return;
             }
 
             string[] dependencies =
-                m_manifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.assetBundleExt));
+                m_AssetBundleManifest.GetDirectDependencies(string.Format("{0}{1}", name, ConstantData.assetBundleExt));
             for (int i = 0; i < dependencies.Length; ++i)
             {
                 UnloadAssetBundle(dependencies[i].Replace(ConstantData.assetBundleExt, ""), immediate);
@@ -834,9 +831,9 @@ namespace IGG.Core.Manager
         // 更新解压
         private void UpdateUnpacker()
         {
-            if (m_unpacker != null)
+            if (m_Unpacker != null)
             {
-                m_unpacker.Update();
+                m_Unpacker.Update();
             }
         }
 
@@ -872,9 +869,9 @@ namespace IGG.Core.Manager
 
             int thread = Mathf.Clamp(SystemInfo.processorCount - 1, 1, 20);
 
-            m_unpacker = new DownloadOrCache(thread, files, onProgress, () =>
+            m_Unpacker = new DownloadOrCache(thread, files, onProgress, () =>
             {
-                m_unpacker = null;
+                m_Unpacker = null;
                 if (onCompleted != null)
                 {
                     onCompleted();

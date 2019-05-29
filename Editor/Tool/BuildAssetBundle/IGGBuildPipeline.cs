@@ -436,8 +436,8 @@ public class IGGBuildPipeline
     /// </summary>
     /// <param name="clearAssetBundle"> </param>
     /// <param name="reset"></param>
-    /// <param name="redundance"></param>
-    public static void ReimportAll(bool redundance = true)
+    /// <param name="checkRedundance"></param>
+    public static void ReimportAll(bool checkRedundance = true)
     {
         ReimportScene();
         ReimportLua();
@@ -487,7 +487,7 @@ public class IGGBuildPipeline
 
         Reimport("Assets/Data/server_pm.txt", "server_pm");
 
-        if (redundance)
+        if (checkRedundance)
         {
             ReimportRedundance();
         }

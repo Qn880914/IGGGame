@@ -1,4 +1,4 @@
-﻿public class BuildSettings
+﻿public static class BuildSettings
 {
     /// <summary>
     ///    <para> assetbundle 输出目录 </para>
@@ -29,12 +29,12 @@
     /// <summary>
     ///     <para> 是否清除旧的AssetBundle (全部重新打包)</para>
     /// </summary>
-    public static bool clearAssetBundle = false;
+    public static bool clearAssetBundle;
 
     /// <summary>
     ///     <para> 是否重置 AssetBundle Name </para>
     /// </summary>
-    public static bool resetAssetBundleName = false;
+    public static bool resetAssetBundleName;
 
     /// <summary>
     ///     <para> 开启冗余资源检测 </para>

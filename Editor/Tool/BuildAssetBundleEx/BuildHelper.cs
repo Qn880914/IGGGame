@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 
-public class BuildHelper
+public static class BuildHelper
 {
     private static Dictionary<string, HashSet<string>> s_AssetBundleNameMapFilePaths = new Dictionary<string, HashSet<string>>();
 
     /// <summary>
     ///     <para> 构建所有索引 </para>
     /// </summary>
-    /// <param name="clearAssetBundle"> </param>
-    /// <param name="reset"></param>
     /// <param name="checkRedundance"></param>
     public static void ReimportAll(bool checkRedundance = true)
     {
@@ -82,8 +80,8 @@ public class BuildHelper
             if (string.IsNullOrEmpty(scene.path))
                 continue;
 
-            string name = scene.path.Substring(scene.path.LastIndexOf("/") + 1);
-            name = name.Substring(0, name.IndexOf(".")).ToLower();
+            string name = scene.path.Substring(scene.path.LastIndexOf("/", System.StringComparison.Ordinal) + 1);
+            name = name.Substring(0, name.IndexOf(".", System.StringComparison.Ordinal)).ToLower();
 
             if (string.Equals(name, "lauch") || string.Equals(name, "empty"))
                 continue;
@@ -139,8 +137,8 @@ public class BuildHelper
     ///     <para> Go through folders, making each folder into one, and assetbundlename with the last folder name </para>
     /// </summary>
     /// <param name="inPath"></param>
-    /// <param name="outPath"></param>
-    /// <param name="ext"></param>
+    /// <param name="prefix"></param>
+    /// <param name="suffix"></param>
     static void ReimportPathUsePathName(string inPath, string prefix, string suffix)
     {
         List<string> files = FileHelper.GetAllChildFiles(inPath, suffix);
@@ -167,6 +165,88 @@ public class BuildHelper
         suffix = suffix.Substring(1);
 
         ReimportPath(path, assetBundleName, suffix);
+    }
+
+    /// <summary>
+    ///     <para> 遍历文件夹,一个文件夹打成一个,ab的名称用最后一层文件夹名 </para>
+    /// </summary>
+    /// <param name="typename"></param>
+    static void ReimportPathSingleWithResourceType(string typename)
+    {
+        string path = ResourcesPath.GetAssetResourceRunPath(typename, ResourcesPathMode.Editor);
+        path = path.Substring(0, path.Length - 1);
+
+        string prefix = ResourcesPath.GetRelativePath(typename, ResourcesPathMode.AssetBundle);
+        prefix = prefix.Substring(0, prefix.Length - 1);
+
+        string suffix = ResourcesPath.GetFileExt(typename);
+        suffix = suffix.Substring(1);
+
+        ReimportPathSingle(path, prefix, suffix);
+    }
+
+    /// <summary>
+    ///     <para> 设置文件夹下指定后缀资源的ab名,每个资源独立打成一个ab </para>
+    /// </summary>
+    /// <param name="typename"></param>
+    static void ReimportPathUsePathNameWidthResourceType(string typename)
+    {
+        string inPath = ResourcesPath.GetAssetResourceRunPath(typename, ResourcesPathMode.Editor);
+        inPath = inPath.Substring(0, inPath.Length - 1);
+
+        string prefix = ResourcesPath.GetRelativePath(typename, ResourcesPathMode.AssetBundle);
+        prefix = prefix.Substring(0, prefix.Length - 1);
+
+        string suffix = ResourcesPath.GetFileExt(typename);
+        suffix = suffix.Substring(1);
+
+        ReimportPathUsePathName(inPath, prefix, suffix);
+    }
+
+    /// <summary>
+    ///     <para> Package redundant resources </para>
+    /// </summary>
+    static void ReimportRedundance()
+    {
+        // 收集冗余资源
+        Dictionary<string, HashSet<string>> redundantAssets = CollectionAssetBundle.CollectionRedundance();
+
+        Dictionary<string, List<string>> paths = new Dictionary<string, List<string>>();
+
+        foreach(var redundantAsset in redundantAssets)
+        {
+            string name = redundantAsset.Key;
+            if (name.EndsWith(".shader", System.StringComparison.Ordinal))
+                continue;
+
+            string path = name.Substring(0, name.LastIndexOf("/", System.StringComparison.Ordinal));
+            if(!paths.TryGetValue(path, out List<string> files))
+            {
+                files = new List<string>();
+                paths.Add(path, files);
+            }
+
+            files.Add(name);
+        }
+
+        foreach(var map in paths)
+        {
+            foreach(var file in map.Value)
+            {
+                string assetBundleName = map.Key.Replace("Assets/", "");
+                if (file.EndsWith(".mat", System.StringComparison.Ordinal) &&
+                    !file.EndsWith("_Material.mat", System.StringComparison.Ordinal))
+                    assetBundleName += "_mat";
+                else if (file.EndsWith("FBX", System.StringComparison.Ordinal))
+                    assetBundleName += "_model";
+
+                // 动作只能打到角色对应的ab包,测试中发现,有些特效也依赖动作,暂时先不处理动作相关的
+                if (assetBundleName.ToLower().StartsWith("data/units/hero", System.StringComparison.Ordinal))
+                    continue;
+
+                Reimport(file, assetBundleName);
+            }
+        }
     }
 
     /// <summary>
@@ -214,8 +294,7 @@ public class BuildHelper
 
     private static void AddMapping(string assetPath, string assetBundleName)
     {
-        HashSet<string> files = null;
-        if (!s_AssetBundleNameMapFilePaths.TryGetValue(assetBundleName, out files))
+        if (!s_AssetBundleNameMapFilePaths.TryGetValue(assetBundleName, out HashSet<string> files))
         {
             files = new HashSet<string>();
             s_AssetBundleNameMapFilePaths.Add(assetBundleName, files);
@@ -225,6 +304,59 @@ public class BuildHelper
         {
             files.Add(assetPath);
         }
+    }
+
+    static void SaveMapping()
+    {
+        string path = "Assets/Data/ab_mapping.asset";
+
+        bool exist = true;
+        AssetBundleMapping assetBundleMapping = AssetDatabase.LoadAssetAtPath<AssetBundleMapping>(path);
+        if (null == assetBundleMapping)
+        {
+            exist = false;
+            assetBundleMapping = new AssetBundleMapping();
+        }
+
+        assetBundleMapping.assetBundleInfos = new AssetBundleMapping.AssetBundleInfo[s_AssetBundleNameMapFilePaths.Count];
+
+        int i = 0;
+        foreach (var map in s_AssetBundleNameMapFilePaths)
+        {
+            AssetBundleMapping.AssetBundleInfo info = new AssetBundleMapping.AssetBundleInfo
+            {
+                assetBundleName = map.Key.ToLower()
+            };
+
+            HashSet<string> paths = map.Value;
+            info.paths = new string[paths.Count];
+
+            int j = 0;
+            foreach (string file in paths)
+            {
+                info.paths[j] = file.Replace("\\", "/").Replace("Assets/Data/", "").Replace("Assets/", "").ToLower();
+                ++j;
+            }
+
+            assetBundleMapping.assetBundleInfos[i] = info;
+            ++i;
+        }
+
+        if (exist)
+        {
+            EditorUtility.SetDirty(assetBundleMapping);
+        }
+        else
+        {
+            AssetDatabase.CreateAsset(assetBundleMapping, path);
+        }
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        s_AssetBundleNameMapFilePaths.Clear();
+
+        Reimport(path, "ab_mapping");
     }
 
 }

@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using IGG.EditorTools;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-public class ExportProject
+public static class ExportProject
 {
 	// 导出类型
 	public enum ExportType
@@ -96,7 +95,7 @@ public class ExportProject
 
 		string LaunchSceneName = "Lauch";
 
-		UnityEngine.SceneManagement.Scene scene = EditorSceneManager.GetActiveScene();
+		UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 		if (!string.Equals(scene.name, LaunchSceneName))
 		{
 			string pathScene = string.Format("Assets/Scene/{0}.unity", LaunchSceneName);
@@ -108,7 +107,7 @@ public class ExportProject
 		GameObject go = GameObject.Find(UWAName);
 		if (go != null)
 		{
-			GameObject.DestroyImmediate(go);
+            Object.DestroyImmediate(go);
 			go = null;
 		}
 

@@ -18,12 +18,12 @@ namespace AssetBundleBrowser
 
     internal class TogglePathTreeViewItem : TreeViewItem
     {
-        private static bool m_DisplayAlt = false;
+        private static bool m_DisplayAlt;
 
-        private string m_DisplayNamePrefix;
+        private readonly string m_DisplayNamePrefix;
         public string DisplayNamePrefix { get { return m_DisplayNamePrefix; } }
 
-        private string m_Path;
+        private readonly string m_Path;
         public string Path { get { return m_Path; } }
 
         public TogglePathTreeViewItem(int id, int depth, string displayName, string path)
@@ -104,8 +104,10 @@ namespace AssetBundleBrowser
 
         protected override TreeViewItem BuildRoot()
         {
-            var root = new TreeViewItem(-1, -1);
-            root.children = new List<TreeViewItem>();
+            var root = new TreeViewItem(-1, -1)
+            {
+                children = new List<TreeViewItem>()
+            };
             if (m_Selecteditems != null)
             {
                 foreach (var bundle in m_Selecteditems)
@@ -171,8 +173,7 @@ namespace AssetBundleBrowser
 
         void AddDependentAssetsRecursive(TreeViewItem item, List<string> pathList)
         {
-            TogglePathTreeViewItem pathItem = item as TogglePathTreeViewItem;
-            if (pathItem != null)
+            if (item is TogglePathTreeViewItem pathItem)
             {
                 if (string.IsNullOrEmpty(pathItem.DisplayNamePrefix) == false && pathList.Contains(pathItem.Path) == false)
                 {
@@ -193,8 +194,7 @@ namespace AssetBundleBrowser
             TreeViewItem item = this.FindItem(id, rootItem);
             if (item != null)
             {
-                TogglePathTreeViewItem pathItem = item as TogglePathTreeViewItem;
-                if (pathItem != null)
+                if (item is TogglePathTreeViewItem pathItem)
                 {
                     Object o = AssetDatabase.LoadAssetAtPath<Object>(pathItem.Path);
                     if (o != null)
@@ -223,29 +223,33 @@ namespace AssetBundleBrowser
                 foreach (var dep in bundle.GetBundleDependencies())
                 {
                     str = itemName + dep.m_BundleName;
-                    TreeViewItem newItem = new TreeViewItem(str.GetHashCode(), 2, dep.m_BundleName);
-                    newItem.icon = Model.GetBundleIcon();
+                    TreeViewItem newItem = new TreeViewItem(str.GetHashCode(), 2, dep.m_BundleName)
+                    {
+                        icon = Model.GetBundleIcon()
+                    };
                     dependency.AddChild(newItem);
 
                     Dictionary<string, TogglePathTreeViewItem> toAssetItems = new Dictionary<string, TogglePathTreeViewItem>();
 
                     for (int i = 0; i < dep.m_FromAssets.Count; ++i)
                     {
-                        TogglePathTreeViewItem item = null;
-
-                        if (!toAssetItems.TryGetValue(dep.m_ToAssets[i].fullAssetName, out item))
+                        if (!toAssetItems.TryGetValue(dep.m_ToAssets[i].fullAssetName, out TogglePathTreeViewItem item))
                         {
                             str = itemName + dep.m_BundleName + dep.m_ToAssets[i].displayName;
-                            item = new TogglePathTreeViewItem(str.GetHashCode(), 3, "/" + dep.m_ToAssets[i].displayName, "/" + dep.m_ToAssets[i].fullAssetName);
-                            item.icon = AssetDatabase.GetCachedIcon(dep.m_ToAssets[i].fullAssetName) as Texture2D;
+                            item = new TogglePathTreeViewItem(str.GetHashCode(), 3, "/" + dep.m_ToAssets[i].displayName, "/" + dep.m_ToAssets[i].fullAssetName)
+                            {
+                                icon = AssetDatabase.GetCachedIcon(dep.m_ToAssets[i].fullAssetName) as Texture2D
+                            };
                             newItem.AddChild(item);
                             toAssetItems.Add(dep.m_ToAssets[i].fullAssetName, item);
                         }
 
                         str = str + dep.m_FromAssets[i].displayName;
                         TreeViewItem refItem = new TogglePathTreeViewItem(str.GetHashCode(), 4, kReferencedPrefix,
-                            dep.m_FromAssets[i].displayName, dep.m_FromAssets[i].fullAssetName);
-                        refItem.icon = AssetDatabase.GetCachedIcon(dep.m_FromAssets[i].fullAssetName) as Texture2D;
+                            dep.m_FromAssets[i].displayName, dep.m_FromAssets[i].fullAssetName)
+                        {
+                            icon = AssetDatabase.GetCachedIcon(dep.m_FromAssets[i].fullAssetName) as Texture2D
+                        };
                         item.AddChild(refItem);
                     }
                 }
@@ -286,8 +290,7 @@ namespace AssetBundleBrowser
 
         internal void CollectBundles(AssetBundleModel.BundleInfo bundle)
         {
-            var bunData = bundle as AssetBundleModel.BundleDataInfo;
-            if (bunData != null)
+            if (bundle is AssetBundleModel.BundleDataInfo bunData)
                 m_Selecteditems.Add(bunData);
             else
             {

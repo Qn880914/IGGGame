@@ -175,8 +175,7 @@ namespace IGG.Core.Manager
         {
             if (ConstantData.enableCache)
             {
-                string md5;
-                if (m_patchs.TryGetValue(name, out md5))
+                if (m_patchs.TryGetValue(name, out string md5))
                 {
                     if (async)
                     {
@@ -209,8 +208,7 @@ namespace IGG.Core.Manager
                 string path = name;
                 if (ConstantData.enableMd5Name)
                 {
-                    string md5;
-                    if (m_patchs.TryGetValue(name, out md5))
+                    if (m_patchs.TryGetValue(name, out string md5))
                     {
                         path = SearchPath(md5, true, true);
                         if (!string.IsNullOrEmpty(path))
@@ -297,8 +295,7 @@ namespace IGG.Core.Manager
                 {
                     LoadStream(pathPatch, (data) =>
                     {
-                        byte[] bytes = data as byte[];
-                        if (bytes == null)
+                        if (!(data is byte[] bytes))
                         {
                             UnityEngine.Debug.LogError("Load patch version Failed!");
                             SetPatchData(null);
@@ -338,8 +335,7 @@ namespace IGG.Core.Manager
             // 加载AssetBundle依赖文件
             LoadAssetBundle(null, ConstantData.assetbundleManifest, (group, data) =>
             {
-                AssetBundleInfo ab = data as AssetBundleInfo;
-                if (ab != null)
+                if (data is AssetBundleInfo ab)
                 {
                     m_AssetBundleManifest = ab.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
                 }
@@ -552,7 +548,7 @@ namespace IGG.Core.Manager
             {
                 AssetBundleInfo assetBundleInfo = data as AssetBundleInfo;
 
-                completeCallback?.Invoke(null != assetBundleInfo ? assetBundleInfo.assetBundle : null);
+                completeCallback?.Invoke(assetBundleInfo?.assetBundle);
             }, async, persistent, manifest, priority);
         }
 
@@ -598,24 +594,19 @@ namespace IGG.Core.Manager
                 if (string.IsNullOrEmpty(abName))
                 {
                     //建筑的disappear有些有，有些没有，不算bug
-                    if (!path.EndsWith("_disappear.prefab"))
+                    if (!path.EndsWith("_disappear.prefab", System.StringComparison.Ordinal))
                     {
                         UnityEngine.Debug.LogErrorFormat("找不到资源所对应的ab文件:{0}", path);
                     }
-                    if (onLoaded != null)
-                    {
-                        onLoaded(null);
-                    }
+
+                    onLoaded?.Invoke(null);
                 }
                 else
                 {
                     string assetName = Path.GetFileName(path);
                     LoadAssetFromBundle(null, abName, assetName, type, (group, data) =>
                     {
-                        if (onLoaded != null)
-                        {
-                            onLoaded(data);
-                        }
+                        onLoaded?.Invoke(data);
                     }, async, persistent, priority);
                 }
             }
@@ -854,28 +845,20 @@ namespace IGG.Core.Manager
 
             if (files.Count == 0)
             {
-                if (onCompleted != null)
-                {
-                    onCompleted();
-                }
+                onCompleted?.Invoke();
 
                 return;
             }
 
-            if (onStart != null)
-            {
-                onStart();
-            }
+            onStart?.Invoke();
 
             int thread = Mathf.Clamp(SystemInfo.processorCount - 1, 1, 20);
 
             m_Unpacker = new DownloadOrCache(thread, files, onProgress, () =>
             {
                 m_Unpacker = null;
-                if (onCompleted != null)
-                {
-                    onCompleted();
-                }
+
+                onCompleted?.Invoke();
             });
         }
 

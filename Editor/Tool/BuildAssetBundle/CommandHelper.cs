@@ -2,7 +2,7 @@
 using SimpleJSON;
 using UnityEngine;
 
-public class CommandHelper
+public static class CommandHelper
 {
     static string GetValue(string key, string defaultValue)
     {

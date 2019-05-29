@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IGGEditorBuildSettings
+public static class IGGEditorBuildSettings
 {
     public static bool configBuild { get; set; }
 

@@ -80,7 +80,7 @@ namespace AssetBundleBrowser
             Message
         }
 
-        SortOption[] m_SortOptions =
+        readonly SortOption[] m_SortOptions =
         {
             SortOption.Asset,
             SortOption.Bundle,
@@ -184,8 +184,7 @@ namespace AssetBundleBrowser
 
         protected override void DoubleClickedItem(int id)
         {
-            var assetItem = FindItem(id, rootItem) as AssetBundleModel.AssetTreeItem;
-            if (assetItem != null)
+            if (FindItem(id, rootItem) is AssetBundleModel.AssetTreeItem assetItem)
             {
                 Object o = AssetDatabase.LoadAssetAtPath<Object>(assetItem.assetInfo.fullAssetName);
                 EditorGUIUtility.PingObject(o);
@@ -202,17 +201,16 @@ namespace AssetBundleBrowser
 
         void AddIfInPaths( List<string> paths, List<int> selected, TreeViewItem me )
         {
-            var assetItem = me as AssetBundleModel.AssetTreeItem;
-            if( assetItem != null && assetItem.assetInfo != null )
+            if (me is AssetBundleModel.AssetTreeItem assetItem && assetItem.assetInfo != null)
             {
-                if( paths.Contains( assetItem.assetInfo.fullAssetName ) )
+                if (paths.Contains(assetItem.assetInfo.fullAssetName))
                 {
-                    if( selected.Contains( me.id ) == false )
-                        selected.Add( me.id );
+                    if (selected.Contains(me.id) == false)
+                        selected.Add(me.id);
                 }
             }
 
-            if( me.hasChildren )
+            if (me.hasChildren )
             {
                 foreach( TreeViewItem item in me.children )
                 {
@@ -230,8 +228,7 @@ namespace AssetBundleBrowser
             List<AssetBundleModel.AssetInfo> selectedAssets = new List<AssetBundleModel.AssetInfo>();
             foreach (var id in selectedIds)
             {
-                var assetItem = FindItem(id, rootItem) as AssetBundleModel.AssetTreeItem;
-                if (assetItem != null)
+                if (FindItem(id, rootItem) is AssetBundleModel.AssetTreeItem assetItem)
                 {
                     Object o = AssetDatabase.LoadAssetAtPath<Object>(assetItem.assetInfo.fullAssetName);
                     selectedObjects.Add(o);
@@ -300,19 +297,16 @@ namespace AssetBundleBrowser
                 return false;
 
             //can't drag into a folder
-            var folder = m_BundleInfos[0] as AssetBundleModel.BundleFolderInfo;
-            if (folder != null)
+            if (m_BundleInfos[0] is AssetBundleModel.BundleFolderInfo folder)
                 return false;
 
-            var data = m_BundleInfos[0] as AssetBundleModel.BundleDataInfo;
-            if(data == null)
+            if (!(m_BundleInfos[0] is AssetBundleModel.BundleDataInfo data))
                 return false; // this should never happen.
 
-            var thing = DragAndDrop.GetGenericData("AssetListTreeSource") as AssetListTree;
-            if (thing != null)
+            if (DragAndDrop.GetGenericData("AssetListTreeSource") is AssetListTree thing)
                 return false;
-            
-            if(data.IsEmpty())
+
+            if (data.IsEmpty())
                 return true;
 
 
@@ -391,7 +385,7 @@ namespace AssetBundleBrowser
             }
         }
 
-        void OnSortingChanged(MultiColumnHeader multiColumnHeader)
+        void OnSortingChanged(MultiColumnHeader header)
         {
             SortIfNeeded(rootItem, GetRows());
         }

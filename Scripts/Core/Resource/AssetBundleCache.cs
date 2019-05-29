@@ -102,9 +102,9 @@ namespace IGG.Core.Resource
         /// 
         /// </summary>
         /// <param name="name">AssetBundle名</param>
-        /// <param name="ab">AssetBundle对象</param>
+        /// <param name="assetbundle">AssetBundle对象</param>
         /// <param name="persistent">是否常驻</param>
-        /// <param name="reference">初始引用计数</param>
+        /// <param name="referenceCount">初始引用计数</param>
         public AssetBundleInfo(string name, AssetBundle assetbundle, bool persistent, int referenceCount = 0)
         {
             m_Name = name;
@@ -118,7 +118,7 @@ namespace IGG.Core.Resource
         /// </summary>
         /// <param name="name">AssetBundle名</param>
         /// <param name="persistent">是否常驻</param>
-        /// <param name="reference">初始引用计数</param>
+        /// <param name="referenceCount">初始引用计数</param>
         public AssetBundleInfo(string name, bool persistent, int referenceCount = 0)
         {
             m_Name = name;
@@ -228,17 +228,12 @@ namespace IGG.Core.Resource
                 if (onlyRefZero)
                 {
                     // 只清除引用计数为0的
-                    if (assetBundleInfo.canRemove && (!onlyTimeout || assetBundleInfo.timeOut))
-                    {
-                        needUnload = true;
-                    }
+                    needUnload |= (assetBundleInfo.canRemove && (!onlyTimeout || assetBundleInfo.timeOut));
                 }
-                else if (includePersistent || assetBundleInfo.canRemove)
-                {
-                    needUnload = true;
-                }
+                else 
+                    needUnload |= (includePersistent || assetBundleInfo.canRemove);
 
-                if(needUnload)
+                if (needUnload)
                     UnloadAssetBundleInfo(key);
             }
         }
@@ -251,8 +246,7 @@ namespace IGG.Core.Resource
         /// <returns></returns>
         private AssetBundleInfo AddAssetBundleInfo(string name, bool persistent)
         {
-            AssetBundleInfo assetBundleInfo;
-            if (!m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
+            if (!m_dicAssetBundleInfos.TryGetValue(name, out AssetBundleInfo assetBundleInfo))
             {
                 assetBundleInfo = new AssetBundleInfo(name, persistent);
                 m_dicAssetBundleInfos.Add(name, assetBundleInfo);
@@ -271,8 +265,7 @@ namespace IGG.Core.Resource
         /// <returns>是否移除</returns>
         public bool RemoveAssetBundleInfo(string name, bool immediate = false, bool onlyRemove = false)
         {
-            AssetBundleInfo assetBundleInfo;
-            if (!m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
+            if (!m_dicAssetBundleInfos.TryGetValue(name, out AssetBundleInfo assetBundleInfo))
             {
                 return false;
             }
@@ -301,8 +294,7 @@ namespace IGG.Core.Resource
         /// <returns>缓存对象</returns>
         private AssetBundleInfo GetAssetBundleInfo(string name, bool persistent)
         {
-            AssetBundleInfo assetBundleInfo;
-            if(m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
+            if (m_dicAssetBundleInfos.TryGetValue(name, out AssetBundleInfo assetBundleInfo))
             {
                 ++assetBundleInfo.referencedCount;
                 if (persistent)
@@ -321,8 +313,7 @@ namespace IGG.Core.Resource
         /// <returns></returns>
         private AssetBundleInfo GetAssetBundleInfo(string name)
         {
-            AssetBundleInfo assetBundleInfo;
-            m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo);
+            m_dicAssetBundleInfos.TryGetValue(name, out AssetBundleInfo assetBundleInfo);
             return assetBundleInfo;
         }
 
@@ -330,12 +321,11 @@ namespace IGG.Core.Resource
         /// 设置AssetBundle
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="ab"></param>
+        /// <param name="assetBundle"></param>
         /// <returns></returns>
         public AssetBundleInfo SetAssetBundle(string name, AssetBundle assetBundle)
         {
-            AssetBundleInfo assetBundleInfo;
-            if (!m_dicAssetBundleInfos.TryGetValue(name, out assetBundleInfo))
+            if (!m_dicAssetBundleInfos.TryGetValue(name, out AssetBundleInfo assetBundleInfo))
             {
                 assetBundleInfo = AddAssetBundleInfo(name, false);
             }
@@ -365,7 +355,7 @@ namespace IGG.Core.Resource
         /// </summary>
         /// <param name="group">加载组</param>
         /// <param name="name">AssetBundle名称</param>
-        /// <param name="onLoaded">完成回调</param>
+        /// <param name="callback">完成回调</param>
         /// <param name="persistent">是否常驻</param>
         /// <param name="async">是否异步</param>
         /// <returns>已缓存(是-引用计数+1,并返回true, 否-返回false)</returns>

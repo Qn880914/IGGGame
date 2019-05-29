@@ -28,20 +28,20 @@ namespace IGG.Core.Resource
             base.Start();
 
 #if UNITY_EDITOR
-            Type type = param as Type;
-            if (type == null)
+            Type assetType = param as Type;
+            if (assetType == null)
             {
-                type = typeof(Object);
+                assetType = typeof(Object);
             }
 
             if (async)
             {
-                m_Data = AssetDatabase.LoadAssetAtPath(path, type);
+                m_Data = AssetDatabase.LoadAssetAtPath(path, assetType);
             }
             else
             {
-                Object data = AssetDatabase.LoadAssetAtPath(path, type);
-                OnComplete(data);
+                Object asset = AssetDatabase.LoadAssetAtPath(path, assetType);
+                OnComplete(asset);
             }
 #else
 			if(!async)

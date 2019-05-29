@@ -12,8 +12,7 @@ namespace IGG.Event
 
         public void AddListener<T>(EventDelegate<T> del) where T : GameEvent
         {
-            System.Delegate tempDel;
-            if (m_DicDelegates.TryGetValue(typeof(T), out tempDel))
+            if (m_DicDelegates.TryGetValue(typeof(T), out Delegate tempDel))
                 tempDel = System.Delegate.Combine(tempDel, del);
             else
                 tempDel = del;
@@ -23,8 +22,7 @@ namespace IGG.Event
 
         public void RemoveListener<T>(EventDelegate<T> del) where T : GameEvent
         {
-            System.Delegate currentDel;
-            if (m_DicDelegates.TryGetValue(typeof(T), out currentDel))
+            if (m_DicDelegates.TryGetValue(typeof(T), out Delegate currentDel))
             {
                 currentDel = System.Delegate.Remove(currentDel, del);
                 if (null == currentDel)
@@ -41,8 +39,7 @@ namespace IGG.Event
 
         public void DispatchEvent<T>(T evt) where T : GameEvent
         {
-            System.Delegate del;
-            if (m_DicDelegates.TryGetValue(typeof(T), out del))
+            if (m_DicDelegates.TryGetValue(typeof(T), out Delegate del))
             {
                 evt.LogEvent();
                 del.DynamicInvoke(evt);

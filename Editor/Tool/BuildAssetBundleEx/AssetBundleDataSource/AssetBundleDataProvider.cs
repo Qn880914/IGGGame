@@ -23,8 +23,10 @@ namespace AssetBundleBrowser
 
         private static List<Type> BuildCustomAssetBundleDataTypes()
         {
-            var properList = new List<Type>();
-            properList.Add(null); //empty spot for "default" 
+            var properList = new List<Type>
+            {
+                null //empty spot for "default" 
+            };
             var x = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in x)
             {
@@ -35,7 +37,6 @@ namespace AssetBundleBrowser
                         .GetTypes()
                         .Where(t => t != typeof(AssetBundleData))
                         .Where(t => typeof(AssetBundleData).IsAssignableFrom(t)));
-
 
                     for (int count = 0; count < list.Count; count++)
                     {

@@ -59,8 +59,7 @@ namespace IGG.Core.Resource
         /// <param name="loader">加载器</param>
         public void ReleaseLoader(Loader loader)
         {
-            LoaderData loaderData;
-            if (!m_DicLoaderDatas.TryGetValue(loader.path, out loaderData))
+            if (!m_DicLoaderDatas.TryGetValue(loader.path, out LoaderData loaderData))
             {
                 return;
             }
@@ -86,8 +85,7 @@ namespace IGG.Core.Resource
         /// <returns>加载器</returns>
         public Loader GetLoader(LoaderType type, string path, object param, bool async)
         {
-            LoaderData loaderData;
-            if (!m_DicLoaderDatas.TryGetValue(path, out loaderData))
+            if (!m_DicLoaderDatas.TryGetValue(path, out LoaderData loaderData))
             {
                 loaderData = LoaderDataPool.Get(type);
 
@@ -118,7 +116,7 @@ namespace IGG.Core.Resource
         /// 增加回调函数
         /// </summary>
         /// <param name="loader">加载器</param>
-        /// <param name="onLoaded">回调</param>
+        /// <param name="completeCallback">回调</param>
         public void PushCallback(Loader loader, LoadManager.CompleteCallback completeCallback)
         {
             if (null == completeCallback)
@@ -126,8 +124,7 @@ namespace IGG.Core.Resource
                 return;
             }
 
-            LoaderData loaderData;
-            if (m_DicLoaderDatas.TryGetValue(loader.path, out loaderData))
+            if (m_DicLoaderDatas.TryGetValue(loader.path, out LoaderData loaderData))
             {
                 loaderData.completeCallbacks.Add(completeCallback);
             }
@@ -140,8 +137,7 @@ namespace IGG.Core.Resource
         /// <param name="data">结果</param>
         private void OnLoadCompleted(Loader loader, object data)
         {
-            LoaderData loaderData;
-            if (!m_DicLoaderDatas.TryGetValue(loader.path, out loaderData))
+            if (!m_DicLoaderDatas.TryGetValue(loader.path, out LoaderData loaderData))
             {
                 return;
             }
@@ -234,7 +230,7 @@ namespace IGG.Core.Resource
         /// <param name="type">类型</param>
         /// <param name="path">路径</param>
         /// <param name="param">附加参数</param>
-        /// <param name="onLoaded">回调</param>
+        /// <param name="completeCallback">回调</param>
         /// <param name="async">异步</param>
         /// <param name="priority">优先级</param>
         /// <param name="insert">插入</param>
@@ -268,7 +264,7 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 增加异步回调
         /// </summary>
-        /// <param name="onLoaded">回调</param>
+        /// <param name="callback">回调</param>
         /// <param name="group">加载组</param>
         /// <param name="data">资源对象</param>
         public void AddAsyncCallback(LoadManager.LoaderGroupCompleteCallback callback, LoaderGroup group, object data)

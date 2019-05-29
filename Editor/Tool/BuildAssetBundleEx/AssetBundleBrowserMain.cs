@@ -38,13 +38,13 @@ namespace AssetBundleBrowser
         /// </summary>
         [SerializeField] internal AssetBundleInspectTab m_InspectTab;
 
-        [SerializeField] internal bool m_MultiDataSource = false;
+        [SerializeField] internal bool m_MultiDataSource;
 
-        List<AssetBundleData> m_AssetBundleDatas = null;
+        List<AssetBundleData> m_AssetBundleDatas;
 
         private Texture2D m_TextureRefresh;
 
-        private static AssetBundleBrowserMain s_Instance = null;
+        private static AssetBundleBrowserMain s_Instance;
         internal static AssetBundleBrowserMain instance
         {
             get
@@ -193,7 +193,7 @@ namespace AssetBundleBrowser
 
             float toolbarWidth = position.width - kToolbarPadding * 4 - m_TextureRefresh.width;
             //string[] labels = new string[2] { "Configure", "Build"};
-            string[] labels = new string[3] { "Configure", "Build", "Inspect" };
+            string[] labels = { "Configure", "Build", "Inspect" };
             m_Mode = (Mode)GUILayout.Toolbar((int)m_Mode, labels, "LargeButton", GUILayout.Width(toolbarWidth) );
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -238,8 +238,10 @@ namespace AssetBundleBrowser
                     GUILayout.FlexibleSpace();
                     if (AssetBundleModel.Model.assetBundleData.IsReadOnly())
                     {
-                        GUIStyle tbLabel = new GUIStyle(EditorStyles.toolbar);
-                        tbLabel.alignment = TextAnchor.MiddleRight;
+                        GUIStyle tbLabel = new GUIStyle(EditorStyles.toolbar)
+                        {
+                            alignment = TextAnchor.MiddleRight
+                        };
 
                         GUILayout.Label("Read Only", tbLabel);
                     }

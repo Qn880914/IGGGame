@@ -119,7 +119,7 @@ namespace IGG.Core.Resource
         /// <param name="type">类型</param>
         /// <param name="path">路径</param>
         /// <param name="param">附加参数</param>
-        /// <param name="onLoaded">回调</param>
+        /// <param name="completeCallback">回调</param>
         /// <param name="async">异步</param>
         /// <param name="insert">插队</param>
         public void Add(LoaderType type, string path, object param, LoadManager.LoaderGroupCompleteCallback completeCallback,

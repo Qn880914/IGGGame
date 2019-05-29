@@ -22,11 +22,10 @@ public class AssetBundleMapping : ScriptableObject
     public string GetAssetBundleNameFromAssetPath(string path)
     {
         path = path.ToLower();
-        if (path.StartsWith("data/"))
+        if (path.StartsWith("data/", System.StringComparison.Ordinal))
             path = path.Substring(path.IndexOf('/') + 1);
 
-        string name;
-        m_PathMapAssetBundleName.TryGetValue(path, out name);
+        m_PathMapAssetBundleName.TryGetValue(path, out string name);
 
         return name;
     }

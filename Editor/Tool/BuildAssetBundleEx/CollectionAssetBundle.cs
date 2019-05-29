@@ -39,14 +39,14 @@ public class CollectionAssetBundle
 	}
 
     /// <summary>
-    ///     <para> 收集所有的 AssetBundle </para>
+    ///     <para> collect all AssetBundle </para>
     /// </summary>
     static void CollectAssetBundle()
     {
         string[] names = AssetDatabase.GetAllAssetBundleNames();
         foreach (string name in names)
         {
-            if(!name.EndsWith(".ab"))
+            if(!name.EndsWith(".ab", System.StringComparison.Ordinal))
             {
                 continue;
             }
@@ -84,7 +84,10 @@ public class CollectionAssetBundle
                 }
 
                 string pathDep = AssetDatabase.GetAssetPath(dep);
-                if (string.IsNullOrEmpty(pathDep) || pathDep.StartsWith("Library/") || pathDep.StartsWith("Resources/") || pathDep.Contains("/Resources/"))
+                if (string.IsNullOrEmpty(pathDep) || 
+                    pathDep.StartsWith("Library/", System.StringComparison.Ordinal) ||
+                    pathDep.StartsWith("Resources/", System.StringComparison.Ordinal) || 
+                    pathDep.Contains("/Resources/"))
                 {
                     continue;
                 }
@@ -121,11 +124,8 @@ public class CollectionAssetBundle
     /// </summary>
     static void MergeAssetBundleAsset()
     {
-        var iter = s_AssetBundleDatas.GetEnumerator();
-        while (iter.MoveNext())
-        {
-            MergeAsset(iter.Current.Value);
-        }
+        foreach(var assetBundleData in s_AssetBundleDatas)
+            MergeAsset(assetBundleData.Value);
     }
 
     /// <summary>

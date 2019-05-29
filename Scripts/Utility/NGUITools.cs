@@ -58,7 +58,6 @@ static public class NGUITools
 		}
 	}
 
-	static float mLastTimestamp = 0f;
 	static AudioClip mLastClip;
 
 

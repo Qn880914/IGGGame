@@ -6,7 +6,7 @@ using UnityEngine;
 
 #endregion
 
-namespace IGG.Animation.Model
+namespace IGG.MeshAnimation.Model
 {
     [ProtoContract]
     public class MeshAnimationSerializable

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class GpuInstancingMgr : IGG.Utility.Singleton<GpuInstancingMgr>
     {

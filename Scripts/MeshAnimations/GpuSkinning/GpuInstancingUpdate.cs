@@ -1,8 +1,6 @@
 ﻿using IGG.Game.Core;
-using IGG.Utility;
-using System.Collections.Generic;
-using UnityEngine;
-namespace IGG.Animation
+
+namespace IGG.MeshAnimation
 {
     [ExternalComponent]
     public class GpuInstancingUpdate : IGG.Utility.Singleton<GpuInstancingUpdate>

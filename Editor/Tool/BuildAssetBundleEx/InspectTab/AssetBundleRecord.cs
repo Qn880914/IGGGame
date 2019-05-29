@@ -32,29 +32,29 @@ namespace AssetBundleBrowser
     internal class AssetBundleRecord
     {
         /// <summary>
-        /// Full path of the asset bundle.
+        ///     <para> Full path of the asset bundle. </para>
         /// </summary>
         internal string path { get; private set; }
 
         /// <summary>
-        /// Reference to the loaded asset bundle associated with the path.
+        ///     <para> Reference to the loaded asset bundle associated with the path. </para>
         /// </summary>
-        internal AssetBundle bundle { get; private set; }
+        internal AssetBundle assetBundle { get; private set; }
 
-        internal AssetBundleRecord(string path, AssetBundle bundle)
+        internal AssetBundleRecord(string path, AssetBundle assetBundle)
         {
             if (string.IsNullOrEmpty(path) ||
-                null == bundle)
+                null == assetBundle)
             {
                 string msg = string.Format("AssetBundleRecord encountered invalid parameters path={0}, bundle={1}",
                     path,
-                    bundle);
+                    assetBundle);
                 
                 throw new System.ArgumentException(msg);
             }
 
             this.path = path;
-            this.bundle = bundle;
+            this.assetBundle = assetBundle;
         }
     }
 }

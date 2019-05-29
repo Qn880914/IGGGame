@@ -1,5 +1,5 @@
 ﻿
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public interface IAnimationGroup
     {

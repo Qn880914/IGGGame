@@ -93,7 +93,7 @@ static class MeshAnimationExporter
 	{		
 		Transform[] transforms = pObjectRoot.GetComponentsInChildren<Transform>(); 
 		// the transforms in the object tree not in the prefab are the emitter anchors
-		var emitterAnchorsQuery = transforms.Where(transform => PrefabUtility.GetPrefabParent(transform.gameObject) == null);  
+		var emitterAnchorsQuery = transforms.Where(transform => PrefabUtility.GetCorrespondingObjectFromSource(transform.gameObject) == null);  
 		Transform[] emitterAnchors = emitterAnchorsQuery.ToArray();
 		string[] emitterAnchorNames = emitterAnchorsQuery.Select(transform => transform.gameObject.name).ToArray();
 		int anchorCount = emitterAnchors.Length;
@@ -107,14 +107,14 @@ static class MeshAnimationExporter
 
 	public static void PredictSettings(GameObject pObjectRoot, ref ExportParameters pSettings)
 	{
-		string prefabPath = pObjectRoot == null? "" : AssetDatabase.GetAssetPath(PrefabUtility.GetPrefabParent(pObjectRoot));
+		string prefabPath = pObjectRoot == null? "" : AssetDatabase.GetAssetPath(PrefabUtility.GetCorrespondingObjectFromSource(pObjectRoot));
 		if (prefabPath.Length == 0)
 		{
 			Debug.LogWarning("Please use this tool with an instance of the prefab");
 			return;
 			// they drag/dropped the prefab itself. that's not supposed to be how you use this.
 		}
-		if (PrefabUtility.GetPrefabParent(pObjectRoot.transform.parent) != null)
+		if (PrefabUtility.GetCorrespondingObjectFromSource(pObjectRoot.transform.parent) != null)
 		{
 			Debug.LogWarning("Export settings prediction only works when given the root of the prefab instance");
 			return;
@@ -921,7 +921,7 @@ public class MeshAnimationExportToolEditorWindow : EditorWindow
 			if (newFbx != null && newFbx != fbx)
 			{
 				// error if they drag the prefab itself, since it won't have any transform data
-				if (PrefabUtility.GetPrefabParent(newFbx) != null)
+				if (PrefabUtility.GetCorrespondingObjectFromSource(newFbx) != null)
 				{
 					fbx = newFbx;
 					exportSettings = MeshAnimationExporter.GenerateDefaultSettings(newFbx, DEFAULT_OUTPUT_FOLDER);

@@ -8,6 +8,42 @@ namespace AssetBundleBrowser
 {
     public class AssetBundleBrowserMain : EditorWindow, IHasCustomMenu, ISerializationCallbackReceiver
     {
+        enum Mode
+        {
+            Browser,
+            Builder,
+            Inspect,
+        }
+
+        internal const float kButtonWidth = 150;
+        internal const float kToolbarPadding = 15;
+        internal const float kMenubarPadding = 32;
+
+        [SerializeField] Mode m_Mode;
+
+        [SerializeField] int m_DataSourceIndex;
+
+        /// <summary>
+        ///     <para> Configure AssetBundle Tab </para>
+        /// </summary>
+        [SerializeField] internal AssetBundleManageTab m_ManageTab;
+
+        /// <summary>
+        ///     <para> Build AssetBundle Setting Tab </para>
+        /// </summary>
+        [SerializeField] internal AssetBundleBuildTab m_BuildTab;
+
+        /// <summary>
+        ///     <para> Inspect AssetBundle Tab</para>
+        /// </summary>
+        [SerializeField] internal AssetBundleInspectTab m_InspectTab;
+
+        [SerializeField] internal bool m_MultiDataSource = false;
+
+        List<AssetBundleData> m_AssetBundleDatas = null;
+
+        private Texture2D m_TextureRefresh;
+
         private static AssetBundleBrowserMain s_Instance = null;
         internal static AssetBundleBrowserMain instance
         {
@@ -18,33 +54,6 @@ namespace AssetBundleBrowser
                 return s_Instance;
             }
         }
-
-        internal const float kButtonWidth = 150;
-        internal const float kToolbarPadding = 15;
-        internal const float kMenubarPadding = 32;
-
-        enum Mode
-        {
-            Browser,
-            Builder,
-            Inspect,
-        }
-
-        [SerializeField] Mode m_Mode;
-
-        [SerializeField] int m_DataSourceIndex;
-
-        [SerializeField] internal AssetBundleManageTab m_ManageTab;
-
-        [SerializeField] internal AssetBundleBuildTab m_BuildTab;
-
-        [SerializeField] internal AssetBundleInspectTab m_InspectTab;
-
-        [SerializeField] internal bool m_MultiDataSource = false;
-
-        List<AssetBundleData> m_AssetBundleDatas = null;
-
-        private Texture2D m_TextureRefresh;
 
         [MenuItem("Window/AssetBundle Browser", priority = 2050)]
         static void ShowWindow()
@@ -90,7 +99,7 @@ namespace AssetBundleBrowser
             //determine if we are "multi source" or not...
             m_MultiDataSource = false;
             m_AssetBundleDatas = new List<AssetBundleData>();
-            foreach (var info in AssetBundleDataProviderUtility.customAssetBundleDataTypes)
+            foreach (var info in AssetBundleDataProvider.customAssetBundleDataTypes)
             {
                 m_AssetBundleDatas.AddRange(info.GetMethod("CreateDataSources").Invoke(null, null) as List<AssetBundleData>);
             }
@@ -125,6 +134,7 @@ namespace AssetBundleBrowser
             if (m_MultiDataSource)
                 padding += kMenubarPadding * 0.5f;
             Rect subRect = new Rect(0, padding, position.width, position.height - padding);
+
             return subRect;
         }
 
@@ -215,8 +225,7 @@ namespace AssetBundleBrowser
                                 () =>
                                 {
                                     m_DataSourceIndex = counter;
-                                    var thisDataSource = assetBundleData;
-                                    AssetBundleModel.Model.assetBundleData = thisDataSource;
+                                    AssetBundleModel.Model.assetBundleData = assetBundleData;
                                     m_ManageTab.ForceReloadData();
                                 }
                             );
@@ -240,7 +249,5 @@ namespace AssetBundleBrowser
                 //GUILayout.EndArea();
             }
         }
-
-
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using BindType = ToLuaMenu.BindType;
 
 namespace IGG.Editor
@@ -113,19 +114,19 @@ namespace IGG.Editor
             _GT(typeof(Texture2D)),
             _GT(typeof(Shader)),
             _GT(typeof(Renderer)),
-            _GT(typeof(WWW)),
+            _GT(typeof(UnityWebRequest)),
             _GT(typeof(Screen)),
             _GT(typeof(CameraClearFlags)),
             _GT(typeof(AudioClip)),
             _GT(typeof(AssetBundle)),
-            _GT(typeof(ParticleSystem)),
+            //_GT(typeof(ParticleSystem)),
             _GT(typeof(AsyncOperation)).SetBaseType(typeof(System.Object)),
             _GT(typeof(LightType)),
             _GT(typeof(SleepTimeout)),
     #if UNITY_5_3_OR_NEWER && !UNITY_5_6_OR_NEWER
             _GT(typeof(UnityEngine.Experimental.Director.DirectorPlayer)),
     #endif
-            _GT(typeof(Animator)),
+            //_GT(typeof(Animation)),
             _GT(typeof(Input)),
             _GT(typeof(KeyCode)),
             _GT(typeof(SkinnedMeshRenderer)),
@@ -145,7 +146,7 @@ namespace IGG.Editor
             _GT(typeof(CharacterController)),
             _GT(typeof(CapsuleCollider)),
 
-            _GT(typeof(Animator)),
+            _GT(typeof(Animation)),
             _GT(typeof(AnimationClip)).SetBaseType(typeof(UnityEngine.Object)),
             _GT(typeof(AnimationState)),
             _GT(typeof(AnimationBlendMode)),
@@ -176,7 +177,7 @@ namespace IGG.Editor
             typeof(CharacterController),
             typeof(CapsuleCollider),
 
-            typeof(Animator),
+            typeof(Animation),
             typeof(AnimationClip),
             typeof(AnimationState),
 

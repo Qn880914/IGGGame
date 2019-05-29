@@ -157,8 +157,6 @@ namespace IGG.Validation
 					case TextureImporterFormat.ETC_RGB4:
 					//case TextureImporterFormat.ATF_RGB_DXT1:
 					//case TextureImporterFormat.ATF_RGB_JPG:
-					case TextureImporterFormat.AutomaticCompressed:
-					case TextureImporterFormat.Automatic16bit:
 					case TextureImporterFormat.DXT1:
 					case TextureImporterFormat.ETC2_RGB4:
 					case TextureImporterFormat.PVRTC_RGB2:

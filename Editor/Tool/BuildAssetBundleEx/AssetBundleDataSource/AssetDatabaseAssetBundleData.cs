@@ -6,14 +6,6 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 {
     internal class AssetDatabaseAssetBundleData : AssetBundleData
     {
-        public static List<AssetBundleData> CreateDataSources()
-        {
-            var op = new AssetDatabaseAssetBundleData();
-            var retList = new List<AssetBundleData>();
-            retList.Add(op);
-            return retList;
-        }
-
         public string name { get { return "Default"; } }
 
         public string providerName { get { return "Built-in"; } }
@@ -23,6 +15,15 @@ namespace AssetBundleBrowser.AssetBundleDataSource
         public bool canSpecifyBuildOutputDirectory { get { return true; } }
 
         public bool canSpecifyBuildOptions { get { return true; } }
+
+        public static List<AssetBundleData> CreateDataSources()
+        {
+            var op = new AssetDatabaseAssetBundleData();
+            var assetBundleDatas = new List<AssetBundleData>();
+            assetBundleDatas.Add(op);
+
+            return assetBundleDatas;
+        }
 
         public string[] GetAssetPathsFromAssetBundle(string assetBundleName)
         {

@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IGG.Animation {
+namespace IGG.MeshAnimation {
 
     [DisallowMultipleComponent]
     public class MeshAnimatorEvent : MonoBehaviour, IUpdatableIggBehaviour {

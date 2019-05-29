@@ -1,6 +1,5 @@
-﻿using IGG.Animation;
+﻿using IGG.MeshAnimation;
 
-public class GpuSkinDataProxy : GpuSkinData {
-
-
+public class GpuSkinDataProxy : GpuSkinData
+{
 }

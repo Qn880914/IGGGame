@@ -117,7 +117,7 @@ namespace IGG.StateMachine
 
             Assert(isResearched);
         }
-
-        public class StateMachineMono<KT> : StateMachine<KT, MonoBehaviour> { }
     }
+
+    public class StateMachineMono<KT> : StateMachine<KT, MonoBehaviour> { }
 }

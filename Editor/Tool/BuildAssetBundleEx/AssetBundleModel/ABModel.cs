@@ -11,18 +11,19 @@ using AssetBundleBrowser.AssetBundleDataSource;
 namespace AssetBundleBrowser.AssetBundleModel
 {
     /// <summary>
-    /// Static class holding model data for Asset Bundle Browser tool. Data in Model is read from DataSource, but is not pushed.  
-    /// 
-    /// If not using a custom DataSource, then the data comes from the AssetDatabase.  If you wish to alter the data from code, 
-    ///  you should just push changes to the AssetDatabase then tell the Model to Rebuild(). If needed, you can also loop over
-    ///  Update() until it returns true to force all sub-items to refresh.
+    ///     <para> Static class holding model data for Asset Bundle Browser tool. Data in Model is read from DataSource, but is not pushed.  </para>
     ///  
+    ///     <para> If not using a custom DataSource, then the data comes from the AssetDatabase.  If you wish to alter the data from code,</para> 
+    ///     <para> you should just push changes to the AssetDatabase then tell the Model to Rebuild(). If needed, you can also loop over </para>
+    ///     <para> Update() until it returns true to force all sub-items to refresh. </para>
     /// </summary>
     public static class Model
     {
-        const string k_NewBundleBaseName = "newbundle";
-        const string k_NewVariantBaseName = "newvariant";
-        internal static /*const*/ Color k_LightGrey = Color.grey * 1.5f;
+        private const string kNewBundleBaseName = "newbundle";
+        private const string kNewVariantBaseName = "newvariant";
+        internal static /*const*/ Color kLightGrey = Color.grey * 1.5f;
+        const string k_DefaultEmptyMessage = "Drag assets here or right-click to begin creating bundles.";
+        const string k_ProblemEmptyMessage = "There was a problem parsing the list of bundles. See console.";
 
         private static BundleFolderConcreteInfo s_RootLevelBundles = new BundleFolderConcreteInfo("", null);
         private static List<ABMoveData> s_MoveData = new List<ABMoveData>();
@@ -31,21 +32,18 @@ namespace AssetBundleBrowser.AssetBundleModel
         private static Dictionary<string, HashSet<string>> s_DependencyTracker = new Dictionary<string, HashSet<string>>();
 
         private static bool s_InErrorState = false;
-        const string k_DefaultEmptyMessage = "Drag assets here or right-click to begin creating bundles.";
-        const string k_ProblemEmptyMessage = "There was a problem parsing the list of bundles. See console.";
         private static string s_EmptyMessageString;
 
-        static private Texture2D s_folderIcon = null;
-        static private Texture2D s_bundleIcon = null;
-        static private Texture2D s_sceneIcon = null;
+        private static Texture2D s_folderIcon = null;
+        private static Texture2D s_bundleIcon = null;
+        private static Texture2D s_sceneIcon = null;
 
         /// <summary>
-        /// If using a custom source of asset bundles, you can implement your own ABDataSource and set it here as the active
-        ///  DataSource.  This will allow you to use the Browser with data that you provide.
+        ///     <para> If using a custom source of asset bundles, you can implement your own ABDataSource and set it here as the active </para>
+        ///     <para> DataSource.  This will allow you to use the Browser with data that you provide. </para>
         ///  
-        /// If no custom DataSource is provided, then the Browser will create one that feeds off of and into the 
-        ///  AssetDatabase.
-        ///  
+        ///     <para> If no custom DataSource is provided, then the Browser will create one that feeds off of and into the  </para>
+        ///     <para> AssetDatabase. </para>
         /// </summary>
         private static AssetBundleData s_AssetBundleData;
         public static AssetBundleData assetBundleData
@@ -53,18 +51,18 @@ namespace AssetBundleBrowser.AssetBundleModel
             get
             {
                 if (s_AssetBundleData == null)
-                {
                     s_AssetBundleData = new AssetDatabaseAssetBundleData ();
-                }
+
                 return s_AssetBundleData;
             }
+
             set { s_AssetBundleData = value; }
         }
 
         /// <summary>
-        /// Update will loop over bundles that need updating and update them. It will only update one bundle
-        ///  per frame and will continue on the same bundle next frame until that bundle is marked as doneUpdating.
-        ///  By default, this will cause a very slow collection of dependency data as it will only update one bundle per
+        ///     <para> Update will loop over bundles that need updating and update them. It will only update one bundle </para>
+        ///     <para> per frame and will continue on the same bundle next frame until that bundle is marked as doneUpdating. </para>
+        ///     <para> By default, this will cause a very slow collection of dependency data as it will only update one bundle per </para>
         /// </summary>
         public static bool Update()
         {
@@ -107,9 +105,9 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
             EditorUtility.ClearProgressBar();
         }
-        
+
         /// <summary>
-        /// Clears and rebuilds model data.  
+        ///     <para> Clears and rebuilds model data. </para>
         /// </summary>
         public static void Rebuild()
         {
@@ -257,7 +255,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         internal static BundleInfo CreateEmptyVariant(BundleVariantFolderInfo folder)
         {
-            string name = GetUniqueName(folder, k_NewVariantBaseName);
+            string name = GetUniqueName(folder, kNewVariantBaseName);
             string variantName = folder.m_Name.bundleName + "." + name;
             BundleNameData nameData = new BundleNameData(variantName);
             return AddBundleToFolder(folder.parent, nameData);
@@ -375,7 +373,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         private static string GetUniqueName(BundleFolderInfo folder, string suggestedName = null)
         {
-            suggestedName = (suggestedName == null) ? k_NewBundleBaseName : suggestedName;
+            suggestedName = (suggestedName == null) ? kNewBundleBaseName : suggestedName;
             string name = suggestedName;
             int index = 1;
             bool foundExisting = (folder.GetChild(name) != null);
@@ -550,17 +548,17 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         internal static BundleInfo HandleConvertToVariant(BundleDataInfo bundle)
         {
-            bundle.HandleDelete(true, bundle.m_Name.bundleName, k_NewVariantBaseName);
+            bundle.HandleDelete(true, bundle.m_Name.bundleName, kNewVariantBaseName);
             ExecuteAssetMove();
             var root = bundle.parent.GetChild(bundle.m_Name.shortName) as BundleVariantFolderInfo;
 
             if (root != null)
-                return root.GetChild(k_NewVariantBaseName);
+                return root.GetChild(kNewVariantBaseName);
             else
             {
                 //we got here because the converted bundle was empty.
                 var vfolder = new BundleVariantFolderInfo(bundle.m_Name.bundleName, bundle.parent);
-                var vdata = new BundleVariantDataInfo(bundle.m_Name.bundleName + "." + k_NewVariantBaseName, vfolder);
+                var vdata = new BundleVariantDataInfo(bundle.m_Name.bundleName + "." + kNewVariantBaseName, vfolder);
                 bundle.parent.AddChild(vfolder);
                 vfolder.AddChild(vdata);
                 return vdata;

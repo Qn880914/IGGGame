@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class UIRayCasterEnable {
 
-    [MenuItem("GameObject/UI/Image", false, 10)]
+    [MenuItem("GameObject/UI/IGGImage", false, 10)]
     static void CreateImage(MenuCommand menuCommand)
     {
         if (Selection.activeTransform)
@@ -22,7 +22,7 @@ public class UIRayCasterEnable {
         }
     }
 
-    [MenuItem("GameObject/UI/Text", false, 10)]
+    [MenuItem("GameObject/UI/IGGText", false, 10)]
     static void CreateText(MenuCommand menuCommand)
     {
         if (Selection.activeTransform)

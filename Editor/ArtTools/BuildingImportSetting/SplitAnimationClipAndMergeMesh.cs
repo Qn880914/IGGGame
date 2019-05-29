@@ -140,8 +140,8 @@ public class SplitAnimationClipAndMergeMesh
         {
             GameObject lockGo = Object.Instantiate(go);
             GameObject idleGo = Object.Instantiate(go);
-            PrefabUtility.CreatePrefab(g_prefabDir + go.name + "_lock" + ".prefab", lockGo);
-            PrefabUtility.CreatePrefab(g_prefabDir + go.name + "_idle" + ".prefab", idleGo);
+            PrefabUtility.SaveAsPrefabAsset(lockGo, g_prefabDir + go.name + "_lock" + ".prefab");
+            PrefabUtility.SaveAsPrefabAsset(idleGo, g_prefabDir + go.name + "_idle" + ".prefab");
             Object.DestroyImmediate(lockGo);
             Object.DestroyImmediate(idleGo);
             return true;
@@ -195,7 +195,7 @@ public class SplitAnimationClipAndMergeMesh
                 ani = aniGo.AddComponent<Animation>();
                 ani.clip = aniClip;
                 //AnimationUtility.SetAnimationClips(ani, new AnimationClip[] { aniClip });
-                PrefabUtility.CreatePrefab(g_prefabDir + go.name + "_"+clips[i].name+".prefab", aniGo);
+                PrefabUtility.SaveAsPrefabAsset(aniGo, g_prefabDir + go.name + "_"+clips[i].name+".prefab");
 
                 Object.DestroyImmediate(aniGo);
             }
@@ -494,7 +494,7 @@ public class SplitAnimationClipAndMergeMesh
             }
         }
 
-        PrefabUtility.CreatePrefab(g_prefabDir + go.name+"_"+ clip.name + ".prefab", copyGo);
+        PrefabUtility.SaveAsPrefabAsset(copyGo, g_prefabDir + go.name+"_"+ clip.name + ".prefab");
         AssetDatabase.SaveAssets();
         Object.DestroyImmediate(copyGo);
     }

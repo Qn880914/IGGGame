@@ -10,7 +10,7 @@
 
 #region Namespace
 
-using IGG.Animation.Model;
+using IGG.MeshAnimation.Model;
 using System.Collections.Generic;
 
 #endregion

@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using System.IO;
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class AnimationBakeInfo
     {

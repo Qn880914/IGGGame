@@ -1,15 +1,14 @@
 #region Namespace
 
+using IGG.Game;
+using IGG.MeshAnimation.Data;
+using IGG.Utility;
 using System;
 using System.Collections.Generic;
-using IGG.Animation.Data;
-using IGG.Game;
-using IGG.Game.Core;
-using IGG.Utility;
 
 #endregion
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class MeshAnimationLoader : Singleton<MeshAnimationLoader>
     {

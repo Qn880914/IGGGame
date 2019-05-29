@@ -1,7 +1,7 @@
 ﻿#region Namespace
 
 using IGG;
-using IGG.Animation;
+using IGG.MeshAnimation;
 
 #endregion
 

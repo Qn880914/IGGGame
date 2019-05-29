@@ -11,8 +11,11 @@ namespace AssetBundleBrowser
     internal class MessageSystem
     {
         private static Texture2D s_ErrorIcon = null;
+
         private static Texture2D s_WarningIcon = null;
+
         private static Texture2D s_InfoIcon = null;
+
         private static Dictionary<MessageFlag, Message> s_MessageLookup = null;
 
         [Flags]
@@ -41,8 +44,8 @@ namespace AssetBundleBrowser
             // The enum has masks for Error/Warning/Info that won't ever be in the set
             // this allows for easy checking of IsSet for error rather than specific errors. 
             private MessageFlag m_MessageFlags;
-            private HashSet<MessageFlag> m_MessageSet;
 
+            private HashSet<MessageFlag> m_MessageSet;
 
             internal MessageState()
             {
@@ -72,10 +75,12 @@ namespace AssetBundleBrowser
                     m_MessageSet.Remove(flag);
                 }
             }
+
             internal bool IsSet(MessageFlag flag)
             {
                 return (m_MessageFlags & flag) == flag;
             }
+
             internal bool HasMessages()
             {
                 return (m_MessageFlags != MessageFlag.None);
@@ -91,6 +96,7 @@ namespace AssetBundleBrowser
                     return MessageType.Info;
                 return MessageType.None;
             }
+
             internal MessageFlag HighestMessageFlag()
             {
                 MessageFlag high = MessageFlag.None;
@@ -112,6 +118,7 @@ namespace AssetBundleBrowser
                 return msgs;
             }
         }
+
         internal static Texture2D GetIcon(MessageType sev)
         {
             if (sev == MessageType.Error)
@@ -123,18 +130,21 @@ namespace AssetBundleBrowser
             else
                 return null;
         }
+
         private static Texture2D GetErrorIcon()
         {
             if (s_ErrorIcon == null)
                 FindMessageIcons();
             return s_ErrorIcon;
         }
+
         private static Texture2D GetWarningIcon()
         {
             if (s_WarningIcon == null)
                 FindMessageIcons();
             return s_WarningIcon;
         }
+
         private static Texture2D GetInfoIcon()
         {
             if (s_InfoIcon == null)
@@ -148,22 +158,19 @@ namespace AssetBundleBrowser
             s_WarningIcon = EditorGUIUtility.FindTexture("console.warnicon");
             s_InfoIcon = EditorGUIUtility.FindTexture("console.infoIcon");
         }
+
         internal class Message
         {
+            internal MessageType severity;
+
+            internal string message;
+
+            internal Texture2D icon { get { return GetIcon(severity); } }
+
             internal Message(string msg, MessageType sev)
             {
                 message = msg;
                 severity = sev;
-            }
-
-            internal MessageType severity;
-            internal string message;
-            internal Texture2D icon
-            {
-                get
-                {
-                    return GetIcon(severity);
-                }
             }
         }
 

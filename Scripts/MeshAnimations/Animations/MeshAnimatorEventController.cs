@@ -18,7 +18,7 @@ using UnityEngine;
 
 //using IGG.GameContext;
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class MeshAnimatorEventController : MonoBehaviour
     {

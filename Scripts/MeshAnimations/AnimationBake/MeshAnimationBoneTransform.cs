@@ -15,7 +15,7 @@ using UnityEngine;
 
 #endregion
 
-namespace IGG.Animation.Model
+namespace IGG.MeshAnimation.Model
 {
     public class MeshAnimationBoneTransform
     {

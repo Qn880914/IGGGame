@@ -14,7 +14,7 @@ using System.IO;
 
 #endregion
 
-namespace IGG.Animation.Serializer
+namespace IGG.MeshAnimation.Serializer
 {
     /// <summary>
     /// Helper class to serialize/deserialize into and from protobuf byte array.

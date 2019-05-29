@@ -16,7 +16,7 @@ using UnityEngine;
 
 #endregion
 
-namespace IGG.Animation.Data
+namespace IGG.MeshAnimation.Data
 {
     public class MeshAnimationGroupData
     {

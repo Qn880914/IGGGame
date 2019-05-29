@@ -7,7 +7,7 @@ using System;
 public class LzmaCompressRequest
 {
     private byte[] m_Bytes;
-    public byte[] bytes{ get { return m_Bytes; } }
+    public byte[] bytes { get { return m_Bytes; } }
 
     public bool isDone { get; private set; }
 
@@ -26,7 +26,7 @@ public class LzmaCompressRequest
 
     public void Compress(byte[] data)
     {
-        Loom.RunAsync(new LoomBase(), delegate(LoomBase param)
+        Loom.RunAsync(new LoomBase(), delegate (LoomBase param)
         {
             try
             {
@@ -50,7 +50,7 @@ public class LzmaCompressRequest
 
     public void Decompress(byte[] data)
     {
-        Loom.RunAsync(new LoomBase(), delegate(LoomBase param)
+        Loom.RunAsync(new LoomBase(), delegate (LoomBase param)
         {
             try
             {

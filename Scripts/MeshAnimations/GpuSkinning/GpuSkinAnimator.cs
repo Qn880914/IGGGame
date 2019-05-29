@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 
 #endregion
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     [RequireComponent(typeof(RuntimeBaseUnitSm))]
     [DisallowMultipleComponent]

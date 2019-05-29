@@ -5,20 +5,23 @@ using System.Reflection;
 
 namespace AssetBundleBrowser
 {
-    internal class AssetBundleDataProviderUtility {
-
+    internal class AssetBundleDataProvider
+    {
         private static List<Type> s_CustomAssetBundleDataTypes;
 
-        internal static List<Type> customAssetBundleDataTypes {
-            get {
-                if(s_CustomAssetBundleDataTypes == null) {
-                    s_CustomAssetBundleDataTypes = BuildCustomAssetBundleDataList();
+        internal static List<Type> customAssetBundleDataTypes
+        {
+            get
+            {
+                if (s_CustomAssetBundleDataTypes == null)
+                {
+                    s_CustomAssetBundleDataTypes = BuildCustomAssetBundleDataTypes();
                 }
                 return s_CustomAssetBundleDataTypes;
             }
         }
 
-        private static List<Type> BuildCustomAssetBundleDataList()
+        private static List<Type> BuildCustomAssetBundleDataTypes()
         {
             var properList = new List<Type>();
             properList.Add(null); //empty spot for "default" 

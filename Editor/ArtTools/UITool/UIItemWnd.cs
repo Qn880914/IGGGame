@@ -1,19 +1,21 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System.IO;
+using UnityEngine.SceneManagement;
+using UnityEditor.SceneManagement;
 
 public class UIItemWnd : EditorWindow
 {
-
     private string m_ItemName = "";
 
 	//[@MenuItem("辅助工具/UI制作/制作UI Item")]
     static void Apply()
     {
-		if (EditorApplication.currentScene != "Assets/Editor/ArtTools/UITool/UiEditor.unity")
+        Scene activityScene = EditorSceneManager.GetActiveScene();
+		if (activityScene.name != "Assets/Editor/ArtTools/UITool/UiEditor.unity")
         {
-            EditorApplication.SaveScene(EditorApplication.currentScene);
-            EditorApplication.OpenScene("Assets/Editor/ArtTools/UITool/UiEditor.unity");
+            EditorSceneManager.SaveScene(activityScene);
+            EditorSceneManager.OpenScene("Assets/Editor/ArtTools/UITool/UiEditor.unity");
         }
         EditorWindow.GetWindow(typeof(UIItemWnd));
     }
@@ -21,7 +23,7 @@ public class UIItemWnd : EditorWindow
 
     void OnGUI()
     {
-        this.title = "UI Wnd Make";
+        this.titleContent = new GUIContent("UI Wnd Make");
         this.minSize = new Vector2(480, 500);
 
         GUI.Label(new Rect(0, 50, 100, 20), "Item名称:");
@@ -32,8 +34,6 @@ public class UIItemWnd : EditorWindow
             CreateItem(m_ItemName, "WndItem");
         }
     }
-
-
 
     private void CreateItem(string ItemName, string BaseItem)
     {
@@ -64,8 +64,6 @@ public class UIItemWnd : EditorWindow
 
     public void DidReloadScripts()
     {
-
-
     }
 
     private void MakeItemCode(string ItemName, string BaseItemName)
@@ -94,7 +92,6 @@ public class UIItemWnd : EditorWindow
         stream.Close();
         Debug.Log(filename + "脚本生成完成");
     }
-
 
     private void MakeItem_HCode(string ItemName)
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class GpuSkinAnimationGroup : IAnimationGroup
     {

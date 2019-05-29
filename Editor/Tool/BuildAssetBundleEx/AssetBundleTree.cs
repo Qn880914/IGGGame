@@ -8,9 +8,15 @@ namespace AssetBundleBrowser
 {
     internal class AssetBundleTree : TreeView
     { 
-        AssetBundleManageTab m_Controller;
+        private AssetBundleManageTab m_Controller;
+
         private bool m_ContextOnItem = false;
-        List<UnityEngine.Object> m_EmptyObjectList = new List<UnityEngine.Object>();
+
+        private List<UnityEngine.Object> m_EmptyObjectList = new List<UnityEngine.Object>();
+
+        private string[] dragToNewSpacePaths = null;
+
+        private AssetBundleModel.BundleFolderInfo dragToNewSpaceRoot = null;
 
         internal AssetBundleTree(TreeViewState state, AssetBundleManageTab ctrl) : base(state)
         {
@@ -45,7 +51,7 @@ namespace AssetBundleBrowser
 
             Color old = GUI.color;
             if ((bundleItem.bundle as AssetBundleModel.BundleVariantFolderInfo) != null)
-                GUI.color = AssetBundleModel.Model.k_LightGrey; //new Color(0.3f, 0.5f, 0.85f);
+                GUI.color = AssetBundleModel.Model.kLightGrey; //new Color(0.3f, 0.5f, 0.85f);
             base.RowGUI(args);
             GUI.color = old;
 
@@ -113,7 +119,6 @@ namespace AssetBundleBrowser
             }
         }
 
-
         protected override void ContextClicked()
         {
             if (m_ContextOnItem)
@@ -178,8 +183,10 @@ namespace AssetBundleBrowser
                         menu.AddItem(new GUIContent("Add Sibling/New Variant"), false, CreateNewSiblingVariant, selectedNodes);
                     }
                 }
+
                 if(selectedNodes[0].bundle.IsMessageSet(MessageSystem.MessageFlag.AssetsDuplicatedInMultBundles))
                     menu.AddItem(new GUIContent("Move duplicates to new bundle"), false, DedupeAllBundles, selectedNodes);
+
                 menu.AddItem(new GUIContent("Rename"), false, RenameBundle, selectedNodes);
                 menu.AddItem(new GUIContent("Delete " + selectedNodes[0].displayName), false, DeleteBundles, selectedNodes);
                 
@@ -192,6 +199,7 @@ namespace AssetBundleBrowser
             }
             menu.ShowAsContext();
         }
+
         void ForceReloadData(object context)
         {
             AssetBundleModel.Model.ForceReloadData(this);
@@ -209,6 +217,7 @@ namespace AssetBundleBrowser
             else
                 Debug.LogError("could not add 'sibling' with no bundles selected");
         }
+
         void CreateFolder(object context)
         {
             AssetBundleModel.BundleFolderConcreteInfo folder = null;
@@ -219,11 +228,13 @@ namespace AssetBundleBrowser
             }
             CreateFolderUnderParent(folder);
         }
+
         void CreateFolderUnderParent(AssetBundleModel.BundleFolderConcreteInfo folder)
         {
             var newBundle = AssetBundleModel.Model.CreateEmptyBundleFolder(folder);
             ReloadAndSelect(newBundle.nameHashCode, true);
         }
+
         void RenameBundle(object context)
         {
             var selectedNodes = context as List<AssetBundleModel.BundleTreeItem>;
@@ -245,6 +256,7 @@ namespace AssetBundleBrowser
             else
                 Debug.LogError("could not add 'sibling' with no bundles selected");
         }
+
         void CreateNewBundle(object context)
         {
             AssetBundleModel.BundleFolderConcreteInfo folder = null;
@@ -275,6 +287,7 @@ namespace AssetBundleBrowser
             else
                 Debug.LogError("could not add 'sibling' with no bundles selected");
         }
+
         void CreateNewVariant(object context)
         {
             AssetBundleModel.BundleVariantFolderInfo folder = null;
@@ -285,6 +298,7 @@ namespace AssetBundleBrowser
                 CreateVariantUnderParent(folder);
             }
         }
+
         void CreateVariantUnderParent(AssetBundleModel.BundleVariantFolderInfo folder)
         {
             if (folder != null)
@@ -312,10 +326,12 @@ namespace AssetBundleBrowser
         {
             DedupeBundles(context, true);
         }
+
         void DedupeAllBundles(object context)
         {
             DedupeBundles(context, false);
         }
+
         void DedupeBundles(object context, bool onlyOverlappedAssets)
         {
             var selectedNodes = context as List<AssetBundleModel.BundleTreeItem>;
@@ -343,6 +359,7 @@ namespace AssetBundleBrowser
 
 
         }
+
         protected override void KeyEvent()
         {
             if (Event.current.keyCode == KeyCode.Delete && GetSelection().Count > 0)
@@ -411,6 +428,7 @@ namespace AssetBundleBrowser
             }
 
         }
+
         protected override DragAndDropVisualMode HandleDragAndDrop(DragAndDropArgs args)
         {
             DragAndDropVisualMode visualMode = DragAndDropVisualMode.None;
@@ -478,7 +496,6 @@ namespace AssetBundleBrowser
                     }
 
                 }
-
                
                 if (data.args.performDrop)
                 {
@@ -520,6 +537,7 @@ namespace AssetBundleBrowser
             }
             return visualMode;
         }
+
         private DragAndDropVisualMode HandleDragDropBetween(DragAndDropData data)
         {
             DragAndDropVisualMode visualMode = DragAndDropVisualMode.Copy;//Move;
@@ -553,8 +571,6 @@ namespace AssetBundleBrowser
             return visualMode;
         }
 
-        private string[] dragToNewSpacePaths = null;
-        private AssetBundleModel.BundleFolderInfo dragToNewSpaceRoot = null;
         private void DragPathsAsOneBundle()
         {
             var newBundle = AssetBundleModel.Model.CreateEmptyBundle(dragToNewSpaceRoot);
@@ -562,6 +578,7 @@ namespace AssetBundleBrowser
             AssetBundleModel.Model.ExecuteAssetMove();
             ReloadAndSelect(newBundle.nameHashCode, true);
         }
+
         private void DragPathsAsManyBundles()
         {
             List<int> hashCodes = new List<int>();
@@ -635,6 +652,7 @@ namespace AssetBundleBrowser
                 BeginRename(FindItem(hashCode, rootItem), 0.25f);
             }
         }
+
         private void ReloadAndSelect(IList<int> hashCodes)
         {
             Reload();

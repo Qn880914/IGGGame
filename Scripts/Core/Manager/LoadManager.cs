@@ -1,6 +1,5 @@
 ﻿using IGG.Core.Resource;
 using IGG.Game;
-using IGG.Utility;
 using SimpleJSON;
 using System;
 using System.Collections.Generic;
@@ -32,8 +31,11 @@ namespace IGG.Core.Manager
         }
 
         private readonly AssetBundleCache m_cache;
+
         private readonly DownloadOrCache m_downloadOrCache;
+
         private readonly Dictionary<string, string> m_origns = new Dictionary<string, string>();
+
         private readonly Dictionary<string, string> m_patchs = new Dictionary<string, string>();
 
         private readonly List<string> m_searchPaths = new List<string>();
@@ -912,8 +914,7 @@ namespace IGG.Core.Manager
         // ------------------------------------------------------------------------------------------
 
 
-
-        public string ToString()
+        public override string ToString()
         {
             return m_cache.ToString();
         }

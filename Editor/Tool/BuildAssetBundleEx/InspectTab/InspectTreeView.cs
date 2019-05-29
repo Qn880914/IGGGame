@@ -13,10 +13,12 @@ namespace AssetBundleBrowser
 		{
             bundlePath = path;
         }
+
         internal InspectTreeItem(string path, int depth, string prettyName) : base(path.GetHashCode(), depth, prettyName)
         {
             bundlePath = path;
         }
+
 		internal InspectTreeItem(string path, string parentPath, int depth, string prettyName) : base((path+parentPath).GetHashCode(), depth, prettyName)
 		{
 			bundlePath = path;
@@ -25,7 +27,8 @@ namespace AssetBundleBrowser
 
 	class InspectBundleTree : TreeView
 	{
-		AssetBundleInspectTab m_InspectTab;
+		private AssetBundleInspectTab m_InspectTab;
+
 		internal InspectBundleTree(TreeViewState s, AssetBundleInspectTab parent) : base(s)
 		{
 			m_InspectTab = parent;
@@ -102,6 +105,7 @@ namespace AssetBundleBrowser
                 }
             }
         }
+
         private void RemoveItem(TreeViewItem item)
         {
             var inspectItem = item as InspectTreeItem;
@@ -110,6 +114,7 @@ namespace AssetBundleBrowser
             else
                 m_InspectTab.RemoveBundleFolder(item.displayName);
         }
+
         protected override void SelectionChanged(IList<int> selectedIds)
 		{
 			base.SelectionChanged(selectedIds);

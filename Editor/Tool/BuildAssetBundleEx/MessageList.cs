@@ -1,6 +1,6 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace AssetBundleBrowser
 {
@@ -10,18 +10,21 @@ namespace AssetBundleBrowser
 
         private GUIStyle[] m_Style = new GUIStyle[2];
 
-        IEnumerable<AssetBundleModel.AssetInfo> m_Selecteditems;
-        List<MessageSystem.Message> m_Messages;
+        private IEnumerable<AssetBundleModel.AssetInfo> m_Selecteditems;
 
-        Vector2 m_Dimensions = new Vector2(0, 0);
-        const float k_ScrollbarPadding = 16f;
-        const float k_BorderSize = 1f;
+        private List<MessageSystem.Message> m_Messages;
 
+        private Vector2 m_Dimensions = new Vector2(0, 0);
+
+        private const float kScrollbarPadding = 16f;
+
+        private const float kBorderSize = 1f;
 
         internal MessageList()
         {
             Init();
         }
+
         private void Init()
         {
             m_Style[0] = "OL EntryBackOdd";
@@ -31,19 +34,19 @@ namespace AssetBundleBrowser
             m_Style[0].padding = new RectOffset(32, 0, 1, 4);
             m_Style[1].padding = new RectOffset(32, 0, 1, 4);
             m_Messages = new List<MessageSystem.Message>();
-
         }
+
         internal void OnGUI(Rect fullPos)
         {
             DrawOutline(fullPos, 1f);
 
-            Rect pos = new Rect(fullPos.x + k_BorderSize, fullPos.y + k_BorderSize, fullPos.width - 2 * k_BorderSize, fullPos.height - 2 * k_BorderSize);
+            Rect pos = new Rect(fullPos.x + kBorderSize, fullPos.y + kBorderSize, fullPos.width - 2 * kBorderSize, fullPos.height - 2 * kBorderSize);
             
 
-            if (m_Dimensions.y == 0 || m_Dimensions.x != pos.width - k_ScrollbarPadding)
+            if (m_Dimensions.y == 0 || m_Dimensions.x != pos.width - kScrollbarPadding)
             {
                 //recalculate height.
-                m_Dimensions.x = pos.width - k_ScrollbarPadding;
+                m_Dimensions.x = pos.width - kScrollbarPadding;
                 m_Dimensions.y = 0;
                 foreach (var message in m_Messages)
                 {

@@ -16,7 +16,7 @@ using UnityEngine;
 
 #endregion
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     [RequireComponent(typeof(MeshRenderer))]
     [RequireComponent(typeof(RuntimeBaseUnitSm))]

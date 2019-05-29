@@ -38,7 +38,7 @@ public class TerrainLightMapEditor : EditorWindow
         for (int i = 0; i < m_target.transform.childCount; i++)
         {
             Transform child = m_target.transform.GetChild(i);
-            PrefabUtility.CreatePrefab("Assets/"+m_savePath+child.name+".prefab", child.gameObject);
+            PrefabUtility.SaveAsPrefabAsset(child.gameObject, "Assets/" +m_savePath+child.name+".prefab");
         }
 
         TerrainController terrainCtr = m_target.GetComponent<TerrainController>();

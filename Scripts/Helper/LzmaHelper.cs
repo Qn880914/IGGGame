@@ -40,7 +40,7 @@ public class LzmaHelper
 #endif
 
     private static readonly byte[] g_outBuffer = new byte[1024];
-    private static readonly int[] g_props = new int [7];
+    private static readonly int[] g_props = new int[7];
     private static bool g_defaultsSet;
 
     private static void SetProps(int level = 5, int dictSize = 16777216, int lc = 3, int lp = 0, int pb = 2,
@@ -95,7 +95,7 @@ public class LzmaHelper
     // 返回解压后大小
     public static int Decompress(byte[] inBuffer, ref byte[] outBuffer)
     {
-        int uncompressedSize = (int) BitConverter.ToUInt64(inBuffer, 5);
+        int uncompressedSize = (int)BitConverter.ToUInt64(inBuffer, 5);
 
         if (outBuffer.Length < uncompressedSize)
         {

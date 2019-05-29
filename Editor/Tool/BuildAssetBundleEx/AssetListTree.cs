@@ -10,14 +10,17 @@ namespace AssetBundleBrowser
 {
     internal class AssetListTree : TreeView
     {
-        List<AssetBundleModel.BundleInfo> m_SourceBundles = new List<AssetBundleModel.BundleInfo>();
-        AssetBundleManageTab m_Controller;
-        List<UnityEngine.Object> m_EmptyObjectList = new List<UnityEngine.Object>();
+        private List<AssetBundleModel.BundleInfo> m_BundleInfos = new List<AssetBundleModel.BundleInfo>();
+
+        private AssetBundleManageTab m_Controller;
+
+        private List<UnityEngine.Object> m_EmptyObjectList = new List<UnityEngine.Object>();
 
         internal static MultiColumnHeaderState CreateDefaultMultiColumnHeaderState()
         {
             return new MultiColumnHeaderState(GetColumns());
         }
+
         private static MultiColumnHeaderState.Column[] GetColumns()
         {
             var retVal = new MultiColumnHeaderState.Column[] {
@@ -60,6 +63,7 @@ namespace AssetBundleBrowser
 
             return retVal;
         }
+
         enum MyColumns
         {
             Asset,
@@ -67,6 +71,7 @@ namespace AssetBundleBrowser
             Size,
             Message
         }
+
         internal enum SortOption
         {
             Asset,
@@ -74,6 +79,7 @@ namespace AssetBundleBrowser
             Size,
             Message
         }
+
         SortOption[] m_SortOptions =
         {
             SortOption.Asset,
@@ -90,17 +96,17 @@ namespace AssetBundleBrowser
             multiColumnHeader.sortingChanged += OnSortingChanged;
         }
 
-
         internal void Update()
         {
             bool dirty = false;
-            foreach (var bundle in m_SourceBundles)
+            foreach (var bundle in m_BundleInfos)
             {
                 dirty |= bundle.dirty;
             }
             if (dirty)
                 Reload();
         }
+
         public override void OnGUI(Rect rect)
         {
             base.OnGUI(rect);
@@ -109,7 +115,6 @@ namespace AssetBundleBrowser
                 SetSelection(new int[0], TreeViewSelectionOptions.FireSelectionChanged);
             }
         }
-
 
         protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
         {
@@ -121,13 +126,14 @@ namespace AssetBundleBrowser
         internal void SetSelectedBundles(IEnumerable<AssetBundleModel.BundleInfo> bundles)
         {
             m_Controller.SetSelectedItems(null);
-            m_SourceBundles = bundles.ToList();
+            m_BundleInfos = bundles.ToList();
             SetSelection(new List<int>());
             Reload();
         }
+
         protected override TreeViewItem BuildRoot()
         {
-            var root = AssetBundleModel.Model.CreateAssetListTreeView(m_SourceBundles);
+            var root = AssetBundleModel.Model.CreateAssetListTreeView(m_BundleInfos);
             return root;
         }
 
@@ -159,10 +165,10 @@ namespace AssetBundleBrowser
                     }
                     break;
                 case 1:
-                    DefaultGUI.Label(cellRect, item.asset.bundleName, args.selected, args.focused);
+                    DefaultGUI.Label(cellRect, item.assetInfo.bundleName, args.selected, args.focused);
                     break;
                 case 2:
-                    DefaultGUI.Label(cellRect, item.asset.GetSizeString(), args.selected, args.focused);
+                    DefaultGUI.Label(cellRect, item.assetInfo.GetSizeString(), args.selected, args.focused);
                     break;
                 case 3:
                     var icon = item.MessageIcon();
@@ -181,7 +187,7 @@ namespace AssetBundleBrowser
             var assetItem = FindItem(id, rootItem) as AssetBundleModel.AssetTreeItem;
             if (assetItem != null)
             {
-                Object o = AssetDatabase.LoadAssetAtPath<Object>(assetItem.asset.fullAssetName);
+                Object o = AssetDatabase.LoadAssetAtPath<Object>(assetItem.assetInfo.fullAssetName);
                 EditorGUIUtility.PingObject(o);
                 Selection.activeObject = o;
             }
@@ -197,9 +203,9 @@ namespace AssetBundleBrowser
         void AddIfInPaths( List<string> paths, List<int> selected, TreeViewItem me )
         {
             var assetItem = me as AssetBundleModel.AssetTreeItem;
-            if( assetItem != null && assetItem.asset != null )
+            if( assetItem != null && assetItem.assetInfo != null )
             {
-                if( paths.Contains( assetItem.asset.fullAssetName ) )
+                if( paths.Contains( assetItem.assetInfo.fullAssetName ) )
                 {
                     if( selected.Contains( me.id ) == false )
                         selected.Add( me.id );
@@ -227,15 +233,16 @@ namespace AssetBundleBrowser
                 var assetItem = FindItem(id, rootItem) as AssetBundleModel.AssetTreeItem;
                 if (assetItem != null)
                 {
-                    Object o = AssetDatabase.LoadAssetAtPath<Object>(assetItem.asset.fullAssetName);
+                    Object o = AssetDatabase.LoadAssetAtPath<Object>(assetItem.assetInfo.fullAssetName);
                     selectedObjects.Add(o);
                     Selection.activeObject = o;
-                    selectedAssets.Add(assetItem.asset);
+                    selectedAssets.Add(assetItem.assetInfo);
                 }
             }
             m_Controller.SetSelectedItems(selectedAssets);
             Selection.objects = selectedObjects.ToArray();
         }
+
         protected override bool CanBeParent(TreeViewItem item)
         {
             return false;
@@ -253,7 +260,7 @@ namespace AssetBundleBrowser
             DragAndDrop.objectReferences = m_EmptyObjectList.ToArray();
             List<AssetBundleModel.AssetTreeItem> items = 
                 new List<AssetBundleModel.AssetTreeItem>(args.draggedItemIDs.Select(id => FindItem(id, rootItem) as AssetBundleModel.AssetTreeItem));
-            DragAndDrop.paths = items.Select(a => a.asset.fullAssetName).ToArray();
+            DragAndDrop.paths = items.Select(a => a.assetInfo.fullAssetName).ToArray();
             DragAndDrop.SetGenericData("AssetListTreeSource", this);
             DragAndDrop.StartDrag("AssetListTree");
         }
@@ -264,19 +271,20 @@ namespace AssetBundleBrowser
             {
                 if (args.performDrop)
                 {
-                    AssetBundleModel.Model.MoveAssetToBundle(DragAndDrop.paths, m_SourceBundles[0].m_Name.bundleName, m_SourceBundles[0].m_Name.variant);
+                    AssetBundleModel.Model.MoveAssetToBundle(DragAndDrop.paths, m_BundleInfos[0].m_Name.bundleName, m_BundleInfos[0].m_Name.variant);
                     AssetBundleModel.Model.ExecuteAssetMove();
-                    foreach (var bundle in m_SourceBundles)
+                    foreach (var bundle in m_BundleInfos)
                     {
                         bundle.RefreshAssetList();
                     }
-                    m_Controller.UpdateSelectedBundles(m_SourceBundles);
+                    m_Controller.UpdateSelectedBundles(m_BundleInfos);
                 }
                 return DragAndDropVisualMode.Copy;//Move;
             }
 
             return DragAndDropVisualMode.Rejected;
         }
+
         protected bool IsValidDragDrop()
         {
             //can't do drag & drop if data source is read only
@@ -284,7 +292,7 @@ namespace AssetBundleBrowser
                 return false;
 
             //can't drag onto none or >1 bundles
-            if (m_SourceBundles.Count == 0 || m_SourceBundles.Count > 1)
+            if (m_BundleInfos.Count == 0 || m_BundleInfos.Count > 1)
                 return false;
             
             //can't drag nothing
@@ -292,11 +300,11 @@ namespace AssetBundleBrowser
                 return false;
 
             //can't drag into a folder
-            var folder = m_SourceBundles[0] as AssetBundleModel.BundleFolderInfo;
+            var folder = m_BundleInfos[0] as AssetBundleModel.BundleFolderInfo;
             if (folder != null)
                 return false;
 
-            var data = m_SourceBundles[0] as AssetBundleModel.BundleDataInfo;
+            var data = m_BundleInfos[0] as AssetBundleModel.BundleDataInfo;
             if(data == null)
                 return false; // this should never happen.
 
@@ -327,7 +335,6 @@ namespace AssetBundleBrowser
             }
 
             return true;
-
         }
 
         protected override void ContextClickedItem(int id)
@@ -348,8 +355,8 @@ namespace AssetBundleBrowser
                 menu.AddItem(new GUIContent("Remove asset(s) from bundle."), false, RemoveAssets, selectedNodes);
                 menu.ShowAsContext();
             }
-
         }
+
         void RemoveAssets(object obj)
         {
             var selectedNodes = obj as List<AssetBundleModel.AssetTreeItem>;
@@ -357,22 +364,22 @@ namespace AssetBundleBrowser
             //var bundles = new List<AssetBundleModel.BundleInfo>();
             foreach (var node in selectedNodes)
             {
-                if (!System.String.IsNullOrEmpty(node.asset.bundleName))
-                    assets.Add(node.asset);
+                if (!System.String.IsNullOrEmpty(node.assetInfo.bundleName))
+                    assets.Add(node.assetInfo);
             }
             AssetBundleModel.Model.MoveAssetToBundle(assets, string.Empty, string.Empty);
             AssetBundleModel.Model.ExecuteAssetMove();
-            foreach (var bundle in m_SourceBundles)
+            foreach (var bundle in m_BundleInfos)
             {
                 bundle.RefreshAssetList();
             }
-            m_Controller.UpdateSelectedBundles(m_SourceBundles);
+            m_Controller.UpdateSelectedBundles(m_BundleInfos);
             //ReloadAndSelect(new List<int>());
         }
 
         protected override void KeyEvent()
         {
-            if (m_SourceBundles.Count > 0 && Event.current.keyCode == KeyCode.Delete && GetSelection().Count > 0)
+            if (m_BundleInfos.Count > 0 && Event.current.keyCode == KeyCode.Delete && GetSelection().Count > 0)
             {
                 List<AssetBundleModel.AssetTreeItem> selectedNodes = new List<AssetBundleModel.AssetTreeItem>();
                 foreach (var nodeID in GetSelection())
@@ -383,10 +390,12 @@ namespace AssetBundleBrowser
                 RemoveAssets(selectedNodes);
             }
         }
+
         void OnSortingChanged(MultiColumnHeader multiColumnHeader)
         {
             SortIfNeeded(rootItem, GetRows());
         }
+
         void SortIfNeeded(TreeViewItem root, IList<TreeViewItem> rows)
         {
             if (rows.Count <= 1)
@@ -403,6 +412,7 @@ namespace AssetBundleBrowser
 
             Repaint();
         }
+
         void SortByColumn()
         {
             var sortedColumns = multiColumnHeader.state.sortedColumns;
@@ -429,12 +439,12 @@ namespace AssetBundleBrowser
                 case SortOption.Asset:
                     return myTypes.Order(l => l.displayName, ascending);
                 case SortOption.Size:
-                    return myTypes.Order(l => l.asset.fileSize, ascending);
+                    return myTypes.Order(l => l.assetInfo.fileSize, ascending);
                 case SortOption.Message:
                     return myTypes.Order(l => l.HighestMessageLevel(), ascending);
                 case SortOption.Bundle:
                 default:
-                    return myTypes.Order(l => l.asset.bundleName, ascending);
+                    return myTypes.Order(l => l.assetInfo.bundleName, ascending);
             }
             
         }
@@ -446,6 +456,7 @@ namespace AssetBundleBrowser
             SelectionChanged(hashCodes);
         }
     }
+
     static class MyExtensionMethods
     {
         internal static IOrderedEnumerable<T> Order<T, TKey>(this IEnumerable<T> source, System.Func<T, TKey> selector, bool ascending)

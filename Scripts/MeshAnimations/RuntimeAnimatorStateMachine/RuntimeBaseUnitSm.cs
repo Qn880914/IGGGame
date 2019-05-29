@@ -8,7 +8,7 @@ using Random = System.Random;
 /**
 Author: Aoicocoon
 **/
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class
         RuntimeBaseUnitSm : MonoBehaviour

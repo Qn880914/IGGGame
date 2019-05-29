@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     /// <summary>
     /// 每个需要渲染的实例对象的数据

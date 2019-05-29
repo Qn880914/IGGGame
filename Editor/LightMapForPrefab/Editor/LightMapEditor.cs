@@ -28,7 +28,7 @@ public sealed class LightMapEditor
                 var target = data.gameObject;
                 GameObject.DestroyImmediate(data);
                
-                GameObject targetPrefab = PrefabUtility.GetPrefabParent(target) as GameObject;
+                GameObject targetPrefab = PrefabUtility.GetCorrespondingObjectFromSource(target);
                 PrefabUtility.ReplacePrefab(target, targetPrefab);
             }
         }
@@ -40,10 +40,6 @@ public sealed class LightMapEditor
         UpdateSceneLightmap();
     }
 
-    static string HEAD_POINT_NAME = "head_point";
-    static string CHEST_POINT_NAME = "chest_point";
-
-    static string MODEL_PATH_HERO = "Assets/Data/Prefabs/Actor/Hero";
     static string MODEL_PATH_SOLDIER = "Assets/Data/Prefabs/Actor/Soldier";
 
 
@@ -280,7 +276,6 @@ public sealed class LightMapEditor
 
     }
 
-    static string BUILDING_ITEM_PATH = "Assets/Data/Prefabs/BuildingModel";
     static string BUILDING_LAYER_NAME = "BigMapBuilding";
 
     static string[] EXCLUDE_TRANS_NAMES = new string[] { "con_castle_1" };
@@ -302,15 +297,6 @@ public sealed class LightMapEditor
     static string sceneName = null;
     static string scenePath = null;
     static string scenePlatFormPath = null;
-
-    static string scenePath_PC = null;
-    static string resourcePath_PC = null;
-
-    static string scenePath_ANDROID = null;
-    static string resourcePath_ANDROID = null;
-
-    static string scenePath_IOS = null;
-    static string resourcePath_IOS = null;
 
     static string afterFix = "_All";
 

@@ -18,7 +18,7 @@ using UnityEngine;
 
 //using IGG.GameContext;
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class MeshAnimatorController : MonoBehaviour
     {
@@ -28,9 +28,6 @@ namespace IGG.Animation
             new FrameRateBasedUpdateGroup<IUpdatableIggBehaviour>(0.04f);
 
         private static GameObject singleton;
-
-        private bool m_isListenUpdate = false;
-        private bool m_realUpdated = false;
 
         /*public static void PushAnimatorsGroup()
 		{
@@ -120,7 +117,6 @@ namespace IGG.Animation
 
         private void BattleUpdateHandler(int eventSend, object param)
         {
-            m_realUpdated = true;
             animatorGroup.Update(Time.Default);
         }
 

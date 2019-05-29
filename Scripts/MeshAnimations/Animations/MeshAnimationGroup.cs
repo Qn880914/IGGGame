@@ -11,12 +11,12 @@
 #region Namespace
 
 using System.Collections.Generic;
-using IGG.Animation.Data;
+using IGG.MeshAnimation.Data;
 using UnityEngine;
 
 #endregion
 
-namespace IGG.Animation
+namespace IGG.MeshAnimation
 {
     public class MeshAnimationGroup : IAnimationGroup
     {

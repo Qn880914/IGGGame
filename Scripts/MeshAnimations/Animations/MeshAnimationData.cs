@@ -10,13 +10,13 @@
 
 #region Namespace
 
-using IGG.Animation.Model;
+using IGG.MeshAnimation.Model;
 using System.Collections.Generic;
 using UnityEngine;
 
 #endregion
 
-namespace IGG.Animation.Data
+namespace IGG.MeshAnimation.Data
 {
     public class MeshAnimationData
     {

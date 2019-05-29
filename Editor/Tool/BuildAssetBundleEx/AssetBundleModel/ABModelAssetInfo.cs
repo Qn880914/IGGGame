@@ -1,47 +1,47 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using UnityEngine;
 
 namespace AssetBundleBrowser.AssetBundleModel
 {
     internal sealed class AssetTreeItem : TreeViewItem
     {
-        private AssetInfo m_asset;
-        internal AssetInfo asset
-        {
-            get { return m_asset; }
-        }
-        internal AssetTreeItem() : base(-1, -1) { }
-        internal AssetTreeItem(AssetInfo a) : base(a != null ? a.fullAssetName.GetHashCode() : Random.Range(int.MinValue, int.MaxValue), 0, a != null ? a.displayName : "failed")
-        {
-            m_asset = a;
-            if (a != null)
-                icon = AssetDatabase.GetCachedIcon(a.fullAssetName) as Texture2D;
-        }
+        private AssetInfo m_AssetInfo;
+        internal AssetInfo assetInfo { get { return m_AssetInfo; } }
 
-        private Color m_color = new Color(0, 0, 0, 0);
+        private Color m_Color = new Color(0, 0, 0, 0);
         internal Color itemColor
         {
             get
             {
-                if (m_color.a == 0.0f && m_asset != null)
+                if (m_Color.a == 0.0f && m_AssetInfo != null)
                 {
-                    m_color = m_asset.GetColor();
+                    m_Color = m_AssetInfo.GetColor();
                 }
-                return m_color;
+                return m_Color;
             }
-            set { m_color = value; }
+
+            set { m_Color = value; }
         }
+
+        internal AssetTreeItem() : base(-1, -1) { }
+        internal AssetTreeItem(AssetInfo a) : base(a != null ? a.fullAssetName.GetHashCode() : Random.Range(int.MinValue, int.MaxValue), 0, a != null ? a.displayName : "failed")
+        {
+            m_AssetInfo = a;
+            if (a != null)
+                icon = AssetDatabase.GetCachedIcon(a.fullAssetName) as Texture2D;
+        }
+
         internal Texture2D MessageIcon()
         {
             return MessageSystem.GetIcon(HighestMessageLevel());
         }
         internal MessageType HighestMessageLevel()
         {
-            return m_asset != null ?
-                m_asset.HighestMessageLevel() : MessageType.Error;
+            return m_AssetInfo != null ?
+                m_AssetInfo.HighestMessageLevel() : MessageType.Error;
         }
 
         internal bool ContainsChild(AssetInfo asset)
@@ -55,7 +55,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             foreach (var child in children)
             {
                 var c = child as AssetTreeItem;
-                if (c != null && c.asset != null && c.asset.fullAssetName == asset.fullAssetName)
+                if (c != null && c.assetInfo != null && c.assetInfo.fullAssetName == asset.fullAssetName)
                 {
                     contains = true;
                     break;
@@ -75,20 +75,8 @@ namespace AssetBundleBrowser.AssetBundleModel
         internal long fileSize;
 
         private HashSet<string> m_Parents;
+
         private string m_AssetName;
-        private string m_DisplayName;
-        private string m_BundleName;
-        private MessageSystem.MessageState m_AssetMessages = new MessageSystem.MessageState();
-
-        internal AssetInfo(string inName, string bundleName="")
-        {
-            fullAssetName = inName;
-            m_BundleName = bundleName;
-            m_Parents = new HashSet<string>();
-            isScene = false;
-            isFolder = false;
-        }
-
         internal string fullAssetName
         {
             get { return m_AssetName; }
@@ -105,17 +93,30 @@ namespace AssetBundleBrowser.AssetBundleModel
                     fileSize = 0;
             }
         }
-        internal string displayName
+
+        private string m_DisplayName;
+        internal string displayName { get { return m_DisplayName; } }
+
+        private string m_BundleName;
+        internal string bundleName { get { return System.String.IsNullOrEmpty(m_BundleName) ? "auto" : m_BundleName; } }
+
+        private MessageSystem.MessageState m_AssetMessages = new MessageSystem.MessageState();
+
+        private List<AssetInfo> m_dependencies = null;
+
+        internal AssetInfo(string inName, string bundleName = "")
         {
-            get { return m_DisplayName; }
+            fullAssetName = inName;
+            m_BundleName = bundleName;
+            m_Parents = new HashSet<string>();
+            isScene = false;
+            isFolder = false;
         }
-        internal string bundleName
-        { get { return System.String.IsNullOrEmpty(m_BundleName) ? "auto" : m_BundleName; } }
-        
+
         internal Color GetColor()
         {
             if (System.String.IsNullOrEmpty(m_BundleName))
-                return Model.k_LightGrey;
+                return Model.kLightGrey;
             else
                 return Color.white;
         }
@@ -124,18 +125,21 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             return m_AssetMessages.IsSet(flag);
         }
+
         internal void SetMessageFlag(MessageSystem.MessageFlag flag, bool on)
         {
             m_AssetMessages.SetFlag(flag, on);
         }
+
         internal MessageType HighestMessageLevel()
         {
             return m_AssetMessages.HighestMessageLevel();
         }
+
         internal IEnumerable<MessageSystem.Message> GetMessages()
         {
             List<MessageSystem.Message> messages = new List<MessageSystem.Message>();
-            if(IsMessageSet(MessageSystem.MessageFlag.SceneBundleConflict))
+            if (IsMessageSet(MessageSystem.MessageFlag.SceneBundleConflict))
             {
                 var message = displayName + "\n";
                 if (isScene)
@@ -144,7 +148,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                     message += "Is included in a bundle with a scene. Scene bundles must have only one or more scene assets.";
                 messages.Add(new MessageSystem.Message(message, MessageType.Error));
             }
-            if(IsMessageSet(MessageSystem.MessageFlag.DependencySceneConflict))
+            if (IsMessageSet(MessageSystem.MessageFlag.DependencySceneConflict))
             {
                 var message = displayName + "\n";
                 message += MessageSystem.GetMessage(MessageSystem.MessageFlag.DependencySceneConflict).message;
@@ -154,7 +158,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             {
                 var bundleNames = AssetBundleModel.Model.CheckDependencyTracker(this);
                 string message = displayName + "\n" + "Is auto-included in multiple bundles:\n";
-                foreach(var bundleName in bundleNames)
+                foreach (var bundleName in bundleNames)
                 {
                     message += bundleName + ", ";
                 }
@@ -172,7 +176,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                 }
                 message = message.Substring(0, message.Length - 2);//remove trailing comma.
                 messages.Add(new MessageSystem.Message(message, MessageType.Info));
-            }            
+            }
 
             if (m_dependencies != null && m_dependencies.Count > 0)
             {
@@ -191,16 +195,18 @@ namespace AssetBundleBrowser.AssetBundleModel
                     message = message.Substring(0, message.Length - 1);//remove trailing line break.
                     messages.Add(new MessageSystem.Message(message, MessageType.Info));
                 }
-            }            
+            }
 
             messages.Add(new MessageSystem.Message(displayName + "\n" + "Path: " + fullAssetName, MessageType.Info));
 
             return messages;
         }
+
         internal void AddParent(string name)
         {
             m_Parents.Add(name);
         }
+
         internal void RemoveParent(string name)
         {
             m_Parents.Remove(name);
@@ -213,7 +219,6 @@ namespace AssetBundleBrowser.AssetBundleModel
             return EditorUtility.FormatBytes(fileSize);
         }
 
-        List<AssetInfo> m_dependencies = null;
         internal List<AssetInfo> GetDependencies()
         {
             //TODO - not sure this refreshes enough. need to build tests around that.

@@ -82,17 +82,17 @@ namespace LuaInterface
 
         Dictionary<int, Type> typeMap = new Dictionary<int, Type>();
         HashSet<Type> genericSet = new HashSet<Type>();
-        HashSet<string> moduleSet = null;
+        HashSet<string> moduleSet;
 
-        private static LuaState mainState = null;
-        private static LuaState injectionState = null;
+        private static LuaState mainState;
+        private static LuaState injectionState;
         private static Dictionary<IntPtr, LuaState> stateMap = new Dictionary<IntPtr, LuaState>();
 
-        private int beginCount = 0;
-        private bool beLogGC = false;
-        private bool bInjectionInited = false;
+        private int beginCount;
+        private bool beLogGC;
+        private bool bInjectionInited;
 #if UNITY_EDITOR
-        private bool beStart = false;
+        private bool beStart;
 #endif
 
 #if MISS_WARNING
@@ -420,7 +420,6 @@ namespace LuaInterface
             }
 
             int baseMetaRef = 0;
-            int reference = 0;
 
             if (name == null)
             {
@@ -434,7 +433,7 @@ namespace LuaInterface
                 BindTypeRef(baseMetaRef, baseType);
             }
 
-            if (metaMap.TryGetValue(t, out reference))
+            if (metaMap.TryGetValue(t, out int reference))
             {
                 LuaDLL.tolua_beginclass(L, name, baseMetaRef, reference);
                 RegFunction("__gc", Collect);
@@ -926,8 +925,10 @@ namespace LuaInterface
                     delegateMap.Remove(reference);
                 }
 
-                LuaFunction fun = new LuaFunction(reference, this);
-                fun.name = name;
+                LuaFunction fun = new LuaFunction(reference, this)
+                {
+                    name = name
+                };
                 funcMap.Add(name, new WeakReference(fun));
                 funcRefMap.Add(reference, new WeakReference(fun));
                 RemoveFromGCList(reference);
@@ -1023,8 +1024,10 @@ namespace LuaInterface
                     funcRefMap.Remove(reference);
                 }
 
-                table = new LuaTable(reference, this);
-                table.name = fullPath;
+                table = new LuaTable(reference, this)
+                {
+                    name = fullPath
+                };
                 funcMap.Add(fullPath, new WeakReference(table));
                 funcRefMap.Add(reference, new WeakReference(table));
                 if (LogGC) Debugger.Log("Alloc LuaTable name {0}, id {1}", fullPath, reference);
@@ -1272,9 +1275,8 @@ namespace LuaInterface
 
         void PushUserData(object o, int reference)
         {
-            int index;
 
-            if (translator.Getudata(o, out index))
+            if (translator.Getudata(o, out int index))
             {
                 if (LuaDLL.tolua_pushudata(L, index))
                 {
@@ -1390,9 +1392,8 @@ namespace LuaInterface
 
         Vector3 ToVector3(int stackPos)
         {
-            float x, y, z;
             stackPos = LuaDLL.abs_index(L, stackPos);
-            LuaDLL.tolua_getvec3(L, stackPos, out x, out y, out z);
+            LuaDLL.tolua_getvec3(L, stackPos, out float x, out float y, out float z);
             return new Vector3(x, y, z);
         }
 
@@ -1406,9 +1407,8 @@ namespace LuaInterface
                 return Vector3.zero;
             }
 
-            float x, y, z;
             stackPos = LuaDLL.abs_index(L, stackPos);
-            LuaDLL.tolua_getvec3(L, stackPos, out x, out y, out z);
+            LuaDLL.tolua_getvec3(L, stackPos, out float x, out float y, out float z);
             return new Vector3(x, y, z);
         }
 
@@ -1422,9 +1422,8 @@ namespace LuaInterface
                 return Quaternion.identity;
             }
 
-            float x, y, z, w;
             stackPos = LuaDLL.abs_index(L, stackPos);
-            LuaDLL.tolua_getquat(L, stackPos, out x, out y, out z, out w);
+            LuaDLL.tolua_getquat(L, stackPos, out float x, out float y, out float z, out float w);
             return new Quaternion(x, y, z, w);
         }
 
@@ -1438,9 +1437,8 @@ namespace LuaInterface
                 return Vector2.zero;
             }
 
-            float x, y;
             stackPos = LuaDLL.abs_index(L, stackPos);
-            LuaDLL.tolua_getvec2(L, stackPos, out x, out y);
+            LuaDLL.tolua_getvec2(L, stackPos, out float x, out float y);
             return new Vector2(x, y);
         }
 
@@ -1454,9 +1452,8 @@ namespace LuaInterface
                 return Vector4.zero;
             }
 
-            float x, y, z, w;
             stackPos = LuaDLL.abs_index(L, stackPos);
-            LuaDLL.tolua_getvec4(L, stackPos, out x, out y, out z, out w);
+            LuaDLL.tolua_getvec4(L, stackPos, out float x, out float y, out float z, out float w);
             return new Vector4(x, y, z, w);
         }
 
@@ -1470,9 +1467,8 @@ namespace LuaInterface
                 return Color.black;
             }
 
-            float r, g, b, a;
             stackPos = LuaDLL.abs_index(L, stackPos);
-            LuaDLL.tolua_getclr(L, stackPos, out r, out g, out b, out a);
+            LuaDLL.tolua_getclr(L, stackPos, out float r, out float g, out float b, out float a);
             return new Color(r, g, b, a);
         }
 
@@ -2025,10 +2021,10 @@ namespace LuaInterface
             return RuntimeHelpers.GetHashCode(this);
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object obj)
         {
-            if (o == null) return L == IntPtr.Zero;
-            LuaState state = o as LuaState;
+            if (obj == null) return L == IntPtr.Zero;
+            LuaState state = obj as LuaState;
 
             if (state == null || state.L != L)
             {
@@ -2114,7 +2110,7 @@ namespace LuaInterface
 
                     if (LogGC)
                     {
-                        string str = name == null ? "null" : name;
+                        string str = name ?? "null";
                         Debugger.Log("collect lua reference name {0}, id {1} in thread", str, reference);
                     }
                 }
@@ -2142,7 +2138,7 @@ namespace LuaInterface
 
                 if (LogGC)
                 {
-                    string str = name == null ? "null" : name;
+                    string str = name ?? "null";
                     Debugger.Log("collect lua reference name {0}, id {1} in main", str, reference);
                 }
             }
@@ -2384,7 +2380,7 @@ namespace LuaInterface
                     return ret1;
                 }
 
-                return default(R1);
+                return default;
             }
             catch (Exception e)
             {
@@ -2408,7 +2404,7 @@ namespace LuaInterface
                     return ret1;
                 }
 
-                return default(R1);
+                return default;
             }
             catch (Exception e)
             {
@@ -2433,7 +2429,7 @@ namespace LuaInterface
                     return ret1;
                 }
 
-                return default(R1);
+                return default;
             }
             catch (Exception e)
             {
@@ -2459,7 +2455,7 @@ namespace LuaInterface
                     return ret1;
                 }
 
-                return default(R1);
+                return default;
             }
             catch (Exception e)
             {
@@ -2486,7 +2482,7 @@ namespace LuaInterface
                     return ret1;
                 }
 
-                return default(R1);
+                return default;
             }
             catch (Exception e)
             {
@@ -2514,7 +2510,7 @@ namespace LuaInterface
                     return ret1;
                 }
 
-                return default(R1);
+                return default;
             }
             catch (Exception e)
             {
@@ -2543,7 +2539,7 @@ namespace LuaInterface
                     return ret1;
                 }
 
-                return default(R1);
+                return default;
             }
             catch (Exception e)
             {
@@ -2570,19 +2566,19 @@ namespace LuaInterface
             TypeTraits<ulong>.Init(_ck.CheckULong);
             TypeTraits<string>.Init(_ck.CheckString);
 
-            TypeTraits<Nullable<sbyte>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<byte>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<short>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<ushort>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<char>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<int>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<uint>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<decimal>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<float>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<double>>.Init(_ck.CheckNullNumber);
-            TypeTraits<Nullable<bool>>.Init(_ck.CheckNullBool);
-            TypeTraits<Nullable<long>>.Init(_ck.CheckNullLong);
-            TypeTraits<Nullable<ulong>>.Init(_ck.CheckNullULong);
+            TypeTraits<sbyte?>.Init(_ck.CheckNullNumber);
+            TypeTraits<byte?>.Init(_ck.CheckNullNumber);
+            TypeTraits<short?>.Init(_ck.CheckNullNumber);
+            TypeTraits<ushort?>.Init(_ck.CheckNullNumber);
+            TypeTraits<char?>.Init(_ck.CheckNullNumber);
+            TypeTraits<int?>.Init(_ck.CheckNullNumber);
+            TypeTraits<uint?>.Init(_ck.CheckNullNumber);
+            TypeTraits<decimal?>.Init(_ck.CheckNullNumber);
+            TypeTraits<float?>.Init(_ck.CheckNullNumber);
+            TypeTraits<double?>.Init(_ck.CheckNullNumber);
+            TypeTraits<bool?>.Init(_ck.CheckNullBool);
+            TypeTraits<long?>.Init(_ck.CheckNullLong);
+            TypeTraits<ulong?>.Init(_ck.CheckNullULong);
 
             TypeTraits<byte[]>.Init(_ck.CheckByteArray);
             TypeTraits<char[]>.Init(_ck.CheckCharArray);
@@ -2610,16 +2606,16 @@ namespace LuaInterface
             TypeTraits<LayerMask>.Init(_ck.CheckLayerMask);
             TypeTraits<RaycastHit>.Init(_ck.CheckRaycastHit);
 
-            TypeTraits<Nullable<Vector3>>.Init(_ck.CheckNullVec3);
-            TypeTraits<Nullable<Quaternion>>.Init(_ck.CheckNullQuat);
-            TypeTraits<Nullable<Vector2>>.Init(_ck.CheckNullVec2);
-            TypeTraits<Nullable<Color>>.Init(_ck.CheckNullColor);
-            TypeTraits<Nullable<Vector4>>.Init(_ck.CheckNullVec4);
-            TypeTraits<Nullable<Ray>>.Init(_ck.CheckNullRay);
-            TypeTraits<Nullable<Bounds>>.Init(_ck.CheckNullBounds);
-            TypeTraits<Nullable<Touch>>.Init(_ck.CheckNullTouch);
-            TypeTraits<Nullable<LayerMask>>.Init(_ck.CheckNullLayerMask);
-            TypeTraits<Nullable<RaycastHit>>.Init(_ck.CheckNullRaycastHit);
+            TypeTraits<Vector3?>.Init(_ck.CheckNullVec3);
+            TypeTraits<Quaternion?>.Init(_ck.CheckNullQuat);
+            TypeTraits<Vector2?>.Init(_ck.CheckNullVec2);
+            TypeTraits<Color?>.Init(_ck.CheckNullColor);
+            TypeTraits<Vector4?>.Init(_ck.CheckNullVec4);
+            TypeTraits<Ray?>.Init(_ck.CheckNullRay);
+            TypeTraits<Bounds?>.Init(_ck.CheckNullBounds);
+            TypeTraits<Touch?>.Init(_ck.CheckNullTouch);
+            TypeTraits<LayerMask?>.Init(_ck.CheckNullLayerMask);
+            TypeTraits<RaycastHit?>.Init(_ck.CheckNullRaycastHit);
 
             TypeTraits<Vector3[]>.Init(_ck.CheckVec3Array);
             TypeTraits<Quaternion[]>.Init(_ck.CheckQuatArray);
@@ -2663,19 +2659,19 @@ namespace LuaInterface
             StackTraits<ulong>.Init(LuaDLL.tolua_pushuint64, LuaDLL.tolua_checkuint64, LuaDLL.tolua_touint64);
             StackTraits<string>.Init(LuaDLL.lua_pushstring, ToLua.CheckString, ToLua.ToString);
 
-            StackTraits<Nullable<sbyte>>.Init(op.Push, op.CheckNullSByte, op.ToNullSByte);
-            StackTraits<Nullable<byte>>.Init(op.Push, op.CheckNullByte, op.ToNullByte);
-            StackTraits<Nullable<short>>.Init(op.Push, op.CheckNullInt16, op.ToNullInt16);
-            StackTraits<Nullable<ushort>>.Init(op.Push, op.CheckNullUInt16, op.ToNullUInt16);
-            StackTraits<Nullable<char>>.Init(op.Push, op.CheckNullChar, op.ToNullChar);
-            StackTraits<Nullable<int>>.Init(op.Push, op.CheckNullInt32, op.ToNullInt32);
-            StackTraits<Nullable<uint>>.Init(op.Push, op.CheckNullUInt32, op.ToNullUInt32);
-            StackTraits<Nullable<decimal>>.Init(op.Push, op.CheckNullDecimal, op.ToNullDecimal);
-            StackTraits<Nullable<float>>.Init(op.Push, op.CheckNullFloat, op.ToNullFloat);
-            StackTraits<Nullable<double>>.Init(op.Push, op.CheckNullNumber, op.ToNullNumber);
-            StackTraits<Nullable<bool>>.Init(op.Push, op.CheckNullBool, op.ToNullBool);
-            StackTraits<Nullable<long>>.Init(op.Push, op.CheckNullInt64, op.ToNullInt64);
-            StackTraits<Nullable<ulong>>.Init(op.Push, op.CheckNullUInt64, op.ToNullUInt64);
+            StackTraits<sbyte?>.Init(op.Push, op.CheckNullSByte, op.ToNullSByte);
+            StackTraits<byte?>.Init(op.Push, op.CheckNullByte, op.ToNullByte);
+            StackTraits<short?>.Init(op.Push, op.CheckNullInt16, op.ToNullInt16);
+            StackTraits<ushort?>.Init(op.Push, op.CheckNullUInt16, op.ToNullUInt16);
+            StackTraits<char?>.Init(op.Push, op.CheckNullChar, op.ToNullChar);
+            StackTraits<int?>.Init(op.Push, op.CheckNullInt32, op.ToNullInt32);
+            StackTraits<uint?>.Init(op.Push, op.CheckNullUInt32, op.ToNullUInt32);
+            StackTraits<decimal?>.Init(op.Push, op.CheckNullDecimal, op.ToNullDecimal);
+            StackTraits<float?>.Init(op.Push, op.CheckNullFloat, op.ToNullFloat);
+            StackTraits<double?>.Init(op.Push, op.CheckNullNumber, op.ToNullNumber);
+            StackTraits<bool?>.Init(op.Push, op.CheckNullBool, op.ToNullBool);
+            StackTraits<long?>.Init(op.Push, op.CheckNullInt64, op.ToNullInt64);
+            StackTraits<ulong?>.Init(op.Push, op.CheckNullUInt64, op.ToNullUInt64);
 
             StackTraits<byte[]>.Init(ToLua.Push, ToLua.CheckByteBuffer, ToLua.ToByteBuffer);
             StackTraits<char[]>.Init(ToLua.Push, ToLua.CheckCharBuffer, ToLua.ToCharBuffer);
@@ -2703,16 +2699,16 @@ namespace LuaInterface
             StackTraits<LayerMask>.Init(ToLua.PushLayerMask, ToLua.CheckLayerMask, ToLua.ToLayerMask);
             StackTraits<RaycastHit>.Init(ToLua.Push, null, null);
 
-            StackTraits<Nullable<Vector3>>.Init(op.Push, op.CheckNullVec3, op.ToNullVec3);
-            StackTraits<Nullable<Quaternion>>.Init(op.Push, op.CheckNullQuat, op.ToNullQuat);
-            StackTraits<Nullable<Vector2>>.Init(op.Push, op.CheckNullVec2, op.ToNullVec2);
-            StackTraits<Nullable<Color>>.Init(op.Push, op.CheckNullColor, op.ToNullColor);
-            StackTraits<Nullable<Vector4>>.Init(op.Push, op.CheckNullVec4, op.ToNullVec4);
-            StackTraits<Nullable<Ray>>.Init(op.Push, op.CheckNullRay, op.ToNullRay);
-            StackTraits<Nullable<Touch>>.Init(op.Push, null, null);
-            StackTraits<Nullable<Bounds>>.Init(op.Push, op.CheckNullBounds, op.ToNullBounds);
-            StackTraits<Nullable<LayerMask>>.Init(op.Push, op.CheckNullLayerMask, op.ToNullLayerMask);
-            StackTraits<Nullable<RaycastHit>>.Init(op.Push, null, null);
+            StackTraits<Vector3?>.Init(op.Push, op.CheckNullVec3, op.ToNullVec3);
+            StackTraits<Quaternion?>.Init(op.Push, op.CheckNullQuat, op.ToNullQuat);
+            StackTraits<Vector2?>.Init(op.Push, op.CheckNullVec2, op.ToNullVec2);
+            StackTraits<Color?>.Init(op.Push, op.CheckNullColor, op.ToNullColor);
+            StackTraits<Vector4?>.Init(op.Push, op.CheckNullVec4, op.ToNullVec4);
+            StackTraits<Ray?>.Init(op.Push, op.CheckNullRay, op.ToNullRay);
+            StackTraits<Touch?>.Init(op.Push, null, null);
+            StackTraits<Bounds?>.Init(op.Push, op.CheckNullBounds, op.ToNullBounds);
+            StackTraits<LayerMask?>.Init(op.Push, op.CheckNullLayerMask, op.ToNullLayerMask);
+            StackTraits<RaycastHit?>.Init(op.Push, null, null);
 
             StackTraits<Vector3[]>.Init(ToLua.Push, op.CheckVec3Array, op.ToVec3Array);
             StackTraits<Quaternion[]>.Init(ToLua.Push, op.CheckQuatArray, op.ToQuatArray);

@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace LuaInterface
 {
-    public sealed class LuaUnityLibs
+    public static class LuaUnityLibs
     {
         public static void OpenLibs(IntPtr L)
         {

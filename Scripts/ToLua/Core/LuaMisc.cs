@@ -96,9 +96,9 @@ namespace LuaInterface
 
     public class LuaDelegate
     {
-        public LuaFunction func = null;
-        public LuaTable self = null;
-        public MethodInfo method = null; 
+        public LuaFunction func;
+        public LuaTable self;
+        public MethodInfo method; 
 
         public LuaDelegate(LuaFunction func)
         {
@@ -129,10 +129,10 @@ namespace LuaInterface
             }
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object obj)
         {                                    
-            if (o == null) return func == null && self == null;
-            LuaDelegate ld = o as LuaDelegate;
+            if (obj == null) return func == null && self == null;
+            LuaDelegate ld = obj as LuaDelegate;
 
             if (ld == null || ld.func != func || ld.self != self)
             {
@@ -279,7 +279,7 @@ namespace LuaInterface
             Type[] gArgs = t.GetGenericArguments();
             string typeName = t.FullName ?? t.Name;
             int count = gArgs.Length;
-            int pos = typeName.IndexOf("[");
+            int pos = typeName.IndexOf("[", StringComparison.Ordinal);
 
             if (pos > 0)
             {
@@ -289,7 +289,7 @@ namespace LuaInterface
             string str = null;
             string name = null;
             int offset = 0;
-            pos = typeName.IndexOf("+");
+            pos = typeName.IndexOf("+", StringComparison.Ordinal);
 
             while (pos > 0)
             {
@@ -306,7 +306,7 @@ namespace LuaInterface
                 }
 
                 name = CombineTypeStr(name, str);
-                pos = typeName.IndexOf("+");
+                pos = typeName.IndexOf("+", StringComparison.Ordinal);
             }
 
             str = typeName;

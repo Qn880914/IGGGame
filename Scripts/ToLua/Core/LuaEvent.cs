@@ -29,9 +29,9 @@ namespace LuaInterface
         protected LuaState luaState;
         protected bool beDisposed;
 
-        LuaTable self = null;
-        LuaFunction _add = null;
-        LuaFunction _remove = null;
+        LuaTable self;
+        LuaFunction _add;
+        LuaFunction _remove;
         //LuaFunction _call = null;
 
         public LuaEvent(LuaTable table)            

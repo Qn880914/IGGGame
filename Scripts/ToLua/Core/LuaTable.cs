@@ -293,11 +293,11 @@ namespace LuaInterface
             }
         }
 
-        bool BeginCall(string name, int top)
+        private bool BeginCall(string funName, int top)
         {
             luaState.Push(this);
             luaState.ToLuaPushTraceback();
-            luaState.Push(name);
+            luaState.Push(funName);
             luaState.LuaGetTable(top + 1);
             return luaState.LuaType(top + 3) == LuaTypes.LUA_TFUNCTION;
         }
@@ -469,7 +469,7 @@ namespace LuaInterface
 
             try
             {
-                R1 ret1 = default(R1);
+                R1 ret1 = default;
 
                 if (BeginCall(name, top))
                 {
@@ -493,7 +493,7 @@ namespace LuaInterface
 
             try
             {
-                R1 ret1 = default(R1);
+                R1 ret1 = default;
 
                 if (BeginCall(name, top))
                 {
@@ -518,7 +518,7 @@ namespace LuaInterface
 
             try
             {
-                R1 ret1 = default(R1);
+                R1 ret1 = default;
 
                 if (BeginCall(name, top))
                 {
@@ -544,7 +544,7 @@ namespace LuaInterface
 
             try
             {
-                R1 ret1 = default(R1);
+                R1 ret1 = default;
 
                 if (BeginCall(name, top))
                 {
@@ -571,7 +571,7 @@ namespace LuaInterface
 
             try
             {
-                R1 ret1 = default(R1);
+                R1 ret1 = default;
 
                 if (BeginCall(name, top))
                 {
@@ -599,7 +599,7 @@ namespace LuaInterface
 
             try
             {
-                R1 ret1 = default(R1);
+                R1 ret1 = default;
 
                 if (BeginCall(name, top))
                 {
@@ -628,7 +628,7 @@ namespace LuaInterface
 
             try
             {
-                R1 ret1 = default(R1);
+                R1 ret1 = default;
 
                 if (BeginCall(name, top))
                 {
@@ -770,8 +770,8 @@ namespace LuaInterface
 
     public class LuaArrayTable : IDisposable, IEnumerable<object>
     {       
-        private LuaTable table = null;
-        private LuaState state = null;
+        private LuaTable table;
+        private LuaState state;
 
         public LuaArrayTable(LuaTable table)           
         {
@@ -834,8 +834,8 @@ namespace LuaInterface
         {            
             LuaState state;
             int index = 1;
-            object current = null;
-            int top = -1;
+            object current;
+            readonly int top = -1;
 
             public Enumerator(LuaArrayTable list)
             {                
@@ -858,7 +858,7 @@ namespace LuaInterface
                 current = state.ToVariant(-1);
                 state.LuaPop(1);
                 ++index;
-                return current == null ? false : true;
+                return current != null;
             }
 
             public void Reset()
@@ -940,7 +940,7 @@ namespace LuaInterface
         {            
             LuaState state;                        
             DictionaryEntry current = new DictionaryEntry();
-            int top = -1;
+            readonly int top = -1;
 
             public Enumerator(LuaDictTable list)
             {                
@@ -970,9 +970,11 @@ namespace LuaInterface
             {
                 if (state.LuaNext(-2))
                 {
-                    current = new DictionaryEntry();
-                    current.Key = state.ToVariant(-2);
-                    current.Value = state.ToVariant(-1);
+                    current = new DictionaryEntry
+                    {
+                        Key = state.ToVariant(-2),
+                        Value = state.ToVariant(-1)
+                    };
                     state.LuaPop(1);
                     return true;
                 }
@@ -1074,7 +1076,7 @@ namespace LuaInterface
         {
             LuaState state;
             LuaDictEntry<K, V> current = new LuaDictEntry<K, V>();
-            int top = -1;
+            readonly int top = -1;
 
             public Enumerator(LuaDictTable<K, V> list)
             {
@@ -1104,9 +1106,11 @@ namespace LuaInterface
             {
                 if (state.LuaNext(-2))
                 {
-                    current = new LuaDictEntry<K, V>();
-                    current.Key = state.CheckValue<K>(-2);
-                    current.Value = state.CheckValue<V>(-1);
+                    current = new LuaDictEntry<K, V>
+                    {
+                        Key = state.CheckValue<K>(-2),
+                        Value = state.CheckValue<V>(-1)
+                    };
                     state.LuaPop(1);
                     return true;
                 }

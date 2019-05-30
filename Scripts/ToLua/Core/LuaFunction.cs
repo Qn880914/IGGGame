@@ -40,7 +40,7 @@ namespace LuaInterface
         }
 
         protected int oldTop = -1;
-        private int argCount = 0;
+        private int argCount;
         private int stackPos = -1;
         private Stack<FuncData> stack = new Stack<FuncData>();
 
@@ -369,9 +369,8 @@ namespace LuaInterface
         public object[] LazyCall(params object[] args)
         {
             BeginPCall();
-            int count = args == null ? 0 : args.Length;
 
-            if (!luaState.LuaCheckStack(count + 6))
+            if (!luaState.LuaCheckStack((args == null ? 0 : args.Length) + 6))
             {
                 EndPCall();
                 throw new LuaException("stack overflow");

@@ -26,15 +26,14 @@ using System.Collections;
 namespace LuaInterface
 {
     public static class TypeTraits<T>
-    {        
-        static public Func<IntPtr, int, bool> Check = DefaultCheck;
-        static public Type type = typeof(T);
-        static public bool IsValueType = type.IsValueType;
-        static public bool IsArray = type.IsArray;
-
-        static string typeName = string.Empty;                
-        static int nilType = -1;
-        static int metaref = -1;
+    {
+        public static Func<IntPtr, int, bool> Check = DefaultCheck;
+        public static Type type = typeof(T);
+        public static bool IsValueType = type.IsValueType;
+        public static bool IsArray = type.IsArray;
+        public static string typeName = string.Empty;
+        public static int nilType = -1;
+        public static int metaref = -1;
 
         static public void Init(Func<IntPtr, int, bool> check)
         {            

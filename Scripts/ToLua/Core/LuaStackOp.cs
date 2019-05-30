@@ -321,7 +321,7 @@ namespace LuaInterface
         }
 
         #region Nullable
-        public Nullable<sbyte> ToNullSByte(IntPtr L, int stackPos)
+        public sbyte? ToNullSByte(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -332,7 +332,7 @@ namespace LuaInterface
             return Convert.ToSByte(ret);
         }
 
-        public Nullable<byte> ToNullByte(IntPtr L, int stackPos)
+        public byte? ToNullByte(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -343,7 +343,7 @@ namespace LuaInterface
             return Convert.ToByte(ret);
         }
 
-        public Nullable<short> ToNullInt16(IntPtr L, int stackPos)
+        public short? ToNullInt16(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -354,7 +354,7 @@ namespace LuaInterface
             return Convert.ToInt16(ret);
         }
 
-        public Nullable<ushort> ToNullUInt16(IntPtr L, int stackPos)
+        public ushort? ToNullUInt16(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -365,7 +365,7 @@ namespace LuaInterface
             return Convert.ToUInt16(ret);
         }
 
-        public Nullable<char> ToNullChar(IntPtr L, int stackPos)
+        public char? ToNullChar(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -376,7 +376,7 @@ namespace LuaInterface
             return Convert.ToChar(ret);
         }
 
-        public Nullable<int> ToNullInt32(IntPtr L, int stackPos)
+        public int? ToNullInt32(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -387,7 +387,7 @@ namespace LuaInterface
             return Convert.ToInt32(ret);
         }
 
-        public Nullable<uint> ToNullUInt32(IntPtr L, int stackPos)
+        public uint? ToNullUInt32(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -398,7 +398,7 @@ namespace LuaInterface
             return Convert.ToUInt32(ret);
         }
 
-        public Nullable<decimal> ToNullDecimal(IntPtr L, int stackPos)
+        public decimal? ToNullDecimal(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -409,7 +409,7 @@ namespace LuaInterface
             return Convert.ToDecimal(ret);
         }
 
-        public Nullable<float> ToNullFloat(IntPtr L, int stackPos)
+        public float? ToNullFloat(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -420,7 +420,7 @@ namespace LuaInterface
             return Convert.ToSingle(ret);
         }
 
-        public Nullable<double> ToNullNumber(IntPtr L, int stackPos)
+        public double? ToNullNumber(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -430,7 +430,7 @@ namespace LuaInterface
             return LuaDLL.lua_tonumber(L, stackPos);
         }
 
-        public Nullable<bool> ToNullBool(IntPtr L, int stackPos)
+        public bool? ToNullBool(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -440,7 +440,7 @@ namespace LuaInterface
             return LuaDLL.lua_toboolean(L, stackPos);
         }
 
-        public Nullable<long> ToNullInt64(IntPtr L, int stackPos)
+        public long? ToNullInt64(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -450,7 +450,7 @@ namespace LuaInterface
             return LuaDLL.tolua_toint64(L, stackPos);
         }
 
-        public Nullable<ulong> ToNullUInt64(IntPtr L, int stackPos)
+        public ulong? ToNullUInt64(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -510,67 +510,62 @@ namespace LuaInterface
             return ToLua.ToStructArray<ulong>(L, stackPos);
         }
 
-        public Nullable<Vector3> ToNullVec3(IntPtr L, int stackPos)
+        public Vector3? ToNullVec3(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
                 return null;
             }
 
-            float x = 0, y = 0, z = 0;
-            LuaDLL.tolua_getvec3(L, stackPos, out x, out y, out z);
+            LuaDLL.tolua_getvec3(L, stackPos, out float x, out float y, out float z);
             return new Vector3(x, y, z);
         }
 
-        public Nullable<Quaternion> ToNullQuat(IntPtr L, int stackPos)
+        public Quaternion? ToNullQuat(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
                 return null;
             }
 
-            float x, y, z, w;
-            LuaDLL.tolua_getquat(L, stackPos, out x, out y, out z, out w);
+            LuaDLL.tolua_getquat(L, stackPos, out float x, out float y, out float z, out float w);
             return new Quaternion(x, y, z, w);
         }
 
-        public Nullable<Vector2> ToNullVec2(IntPtr L, int stackPos)
+        public Vector2? ToNullVec2(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
                 return null;
             }
 
-            float x, y;
-            LuaDLL.tolua_getvec2(L, stackPos, out x, out y);
+            LuaDLL.tolua_getvec2(L, stackPos, out float x, out float y);
             return new Vector2(x, y);
         }        
 
-        public Nullable<Color> ToNullColor(IntPtr L, int stackPos)
+        public Color? ToNullColor(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
                 return null;
             }
 
-            float r, g, b, a;
-            LuaDLL.tolua_getclr(L, stackPos, out r, out g, out b, out a);
+            LuaDLL.tolua_getclr(L, stackPos, out float r, out float g, out float b, out float a);
             return new Color(r, g, b, a);
         }      
 
-        public Nullable<Vector4> ToNullVec4(IntPtr L, int stackPos)
+        public Vector4? ToNullVec4(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
                 return null;
             }
 
-            float x, y, z, w;
-            LuaDLL.tolua_getvec4(L, stackPos, out x, out y, out z, out w);
+            LuaDLL.tolua_getvec4(L, stackPos, out float x, out float y, out float z, out float w);
             return new Vector4(x, y, z, w);
         }   
 
-        public Nullable<Ray> ToNullRay(IntPtr L, int stackPos)
+        public Ray? ToNullRay(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -580,7 +575,7 @@ namespace LuaInterface
             return ToLua.ToRay(L, stackPos);
         }  
 
-        public Nullable<Bounds> ToNullBounds(IntPtr L, int stackPos)
+        public Bounds? ToNullBounds(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -590,7 +585,7 @@ namespace LuaInterface
             return ToLua.ToBounds(L, stackPos);
         }      
 
-        public Nullable<LayerMask> ToNullLayerMask(IntPtr L, int stackPos)
+        public LayerMask? ToNullLayerMask(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -630,7 +625,7 @@ namespace LuaInterface
             return ToLua.ToObjectArray<Type>(L, stackPos);
         }
 
-        public Nullable<sbyte> CheckNullSByte(IntPtr L, int stackPos)
+        public sbyte? CheckNullSByte(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -641,7 +636,7 @@ namespace LuaInterface
             return Convert.ToSByte(ret);
         }
 
-        public Nullable<byte> CheckNullByte(IntPtr L, int stackPos)
+        public byte? CheckNullByte(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -652,7 +647,7 @@ namespace LuaInterface
             return Convert.ToByte(ret);
         }
 
-        public Nullable<short> CheckNullInt16(IntPtr L, int stackPos)
+        public short? CheckNullInt16(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -663,7 +658,7 @@ namespace LuaInterface
             return Convert.ToInt16(ret);
         }
 
-        public Nullable<ushort> CheckNullUInt16(IntPtr L, int stackPos)
+        public ushort? CheckNullUInt16(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -674,7 +669,7 @@ namespace LuaInterface
             return Convert.ToUInt16(ret);
         }
 
-        public Nullable<char> CheckNullChar(IntPtr L, int stackPos)
+        public char? CheckNullChar(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -685,7 +680,7 @@ namespace LuaInterface
             return Convert.ToChar(ret);
         }
 
-        public Nullable<int> CheckNullInt32(IntPtr L, int stackPos)
+        public int? CheckNullInt32(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -696,7 +691,7 @@ namespace LuaInterface
             return Convert.ToInt32(ret);
         }
 
-        public Nullable<uint> CheckNullUInt32(IntPtr L, int stackPos)
+        public uint? CheckNullUInt32(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -707,7 +702,7 @@ namespace LuaInterface
             return Convert.ToUInt32(ret);
         }
 
-        public Nullable<decimal> CheckNullDecimal(IntPtr L, int stackPos)
+        public decimal? CheckNullDecimal(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -718,7 +713,7 @@ namespace LuaInterface
             return Convert.ToDecimal(ret);
         }
 
-        public Nullable<float> CheckNullFloat(IntPtr L, int stackPos)
+        public float? CheckNullFloat(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -729,7 +724,7 @@ namespace LuaInterface
             return Convert.ToSingle(ret);
         }
 
-        public Nullable<double> CheckNullNumber(IntPtr L, int stackPos)
+        public double? CheckNullNumber(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -739,7 +734,7 @@ namespace LuaInterface
             return LuaDLL.luaL_checknumber(L, stackPos);
         }
 
-        public Nullable<bool> CheckNullBool(IntPtr L, int stackPos)
+        public bool? CheckNullBool(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -749,7 +744,7 @@ namespace LuaInterface
             return LuaDLL.luaL_checkboolean(L, stackPos);
         }
 
-        public Nullable<long> CheckNullInt64(IntPtr L, int stackPos)
+        public long? CheckNullInt64(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -759,7 +754,7 @@ namespace LuaInterface
             return LuaDLL.tolua_checkint64(L, stackPos);
         }
 
-        public Nullable<ulong> CheckNullUInt64(IntPtr L, int stackPos)
+        public ulong? CheckNullUInt64(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -819,7 +814,7 @@ namespace LuaInterface
             return ToLua.CheckStructArray<ulong>(L, stackPos);
         }
 
-        public Nullable<Vector3> CheckNullVec3(IntPtr L, int stackPos)
+        public Vector3? CheckNullVec3(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -829,7 +824,7 @@ namespace LuaInterface
             return ToLua.CheckVector3(L, stackPos);
         }
 
-        public Nullable<Quaternion> CheckNullQuat(IntPtr L, int stackPos)
+        public Quaternion? CheckNullQuat(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -839,7 +834,7 @@ namespace LuaInterface
             return ToLua.CheckQuaternion(L, stackPos);
         }     
 
-        public Nullable<Vector2> CheckNullVec2(IntPtr L, int stackPos)
+        public Vector2? CheckNullVec2(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -849,7 +844,7 @@ namespace LuaInterface
             return ToLua.CheckVector2(L, stackPos);
         }   
 
-        public Nullable<Color> CheckNullColor(IntPtr L, int stackPos)
+        public Color? CheckNullColor(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -859,7 +854,7 @@ namespace LuaInterface
             return ToLua.CheckColor(L, stackPos);
         }    
 
-        public Nullable<Vector4> CheckNullVec4(IntPtr L, int stackPos)
+        public Vector4? CheckNullVec4(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -869,7 +864,7 @@ namespace LuaInterface
             return ToLua.CheckVector4(L, stackPos);
         }      
 
-        public Nullable<Ray> CheckNullRay(IntPtr L, int stackPos)
+        public Ray? CheckNullRay(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -879,7 +874,7 @@ namespace LuaInterface
             return ToLua.CheckRay(L, stackPos);
         }       
 
-        public Nullable<Bounds> CheckNullBounds(IntPtr L, int stackPos)
+        public Bounds? CheckNullBounds(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -889,7 +884,7 @@ namespace LuaInterface
             return ToLua.CheckBounds(L, stackPos);
         }    
 
-        public Nullable<LayerMask> CheckNullLayerMask(IntPtr L, int stackPos)
+        public LayerMask? CheckNullLayerMask(IntPtr L, int stackPos)
         {
             if (LuaDLL.lua_type(L, stackPos) == LuaTypes.LUA_TNIL)
             {
@@ -929,7 +924,7 @@ namespace LuaInterface
             return ToLua.CheckObjectArray<Type>(L, stackPos);
         }
 
-        public void Push(IntPtr L, Nullable<sbyte> n)
+        public void Push(IntPtr L, sbyte? n)
         {
             if (n == null)
             {
@@ -941,7 +936,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<byte> n)
+        public void Push(IntPtr L, byte? n)
         {
             if (n == null)
             {
@@ -953,7 +948,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<short> n)
+        public void Push(IntPtr L, short? n)
         {
             if (n == null)
             {
@@ -965,7 +960,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<ushort> n)
+        public void Push(IntPtr L, ushort? n)
         {
             if (n == null)
             {
@@ -977,7 +972,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<char> n)
+        public void Push(IntPtr L, char? n)
         {
             if (n == null)
             {
@@ -989,7 +984,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<int> n)
+        public void Push(IntPtr L, int? n)
         {
             if (n == null)
             {
@@ -1001,7 +996,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<uint> n)
+        public void Push(IntPtr L, uint? n)
         {
             if (n == null)
             {
@@ -1013,7 +1008,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<decimal> n)
+        public void Push(IntPtr L, decimal? n)
         {
             if (n == null)
             {
@@ -1025,7 +1020,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<float> n)
+        public void Push(IntPtr L, float? n)
         {
             if (n == null)
             {
@@ -1037,7 +1032,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<double> n)
+        public void Push(IntPtr L, double? n)
         {
             if (n == null)
             {
@@ -1049,7 +1044,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<bool> n)
+        public void Push(IntPtr L, bool? n)
         {
             if (n == null)
             {
@@ -1061,7 +1056,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<long> n)
+        public void Push(IntPtr L, long? n)
         {
             if (n == null)
             {
@@ -1073,7 +1068,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<ulong> n)
+        public void Push(IntPtr L, ulong? n)
         {
             if (n == null)
             {
@@ -1085,7 +1080,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Vector3> v3)
+        public void Push(IntPtr L, Vector3? v3)
         {
             if (v3 == null)
             {
@@ -1099,7 +1094,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Quaternion> n)
+        public void Push(IntPtr L, Quaternion? n)
         {
             if (n == null)
             {
@@ -1112,7 +1107,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Vector2> n)
+        public void Push(IntPtr L, Vector2? n)
         {
             if (n == null)
             {
@@ -1125,7 +1120,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Color> n)
+        public void Push(IntPtr L, Color? n)
         {
             if (n == null)
             {
@@ -1138,7 +1133,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Vector4> n)
+        public void Push(IntPtr L, Vector4? n)
         {
             if (n == null)
             {
@@ -1151,7 +1146,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Ray> n)
+        public void Push(IntPtr L, Ray? n)
         {
             if (n == null)
             {
@@ -1163,7 +1158,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Bounds> n)
+        public void Push(IntPtr L, Bounds? n)
         {
             if (n == null)
             {
@@ -1175,7 +1170,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<LayerMask> n)
+        public void Push(IntPtr L, LayerMask? n)
         {
             if (n == null)
             {
@@ -1187,7 +1182,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<Touch> n)
+        public void Push(IntPtr L, Touch? n)
         {
             if (n == null)
             {
@@ -1199,7 +1194,7 @@ namespace LuaInterface
             }
         }
 
-        public void Push(IntPtr L, Nullable<RaycastHit> n)
+        public void Push(IntPtr L, RaycastHit? n)
         {
             if (n == null)
             {

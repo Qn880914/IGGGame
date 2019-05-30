@@ -27,15 +27,15 @@ namespace LuaInterface
 {
     public abstract class LuaBaseRef : IDisposable
     {
-        public string name = null;
+        public string name;
         protected int reference = -1;
         protected LuaState luaState;
-        protected ObjectTranslator translator = null;
+        protected ObjectTranslator translator;
 
         protected volatile bool beDisposed;
-        protected int count = 0;
+        protected int count;
 
-        public LuaBaseRef()
+        protected LuaBaseRef()
         {
             IsAlive = true;
             count = 1;
@@ -113,10 +113,10 @@ namespace LuaInterface
             return reference;
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object obj)
         {
-            if (o == null) return reference <= 0;
-            LuaBaseRef lr = o as LuaBaseRef;      
+            if (obj == null) return reference <= 0;
+            LuaBaseRef lr = obj as LuaBaseRef;      
             
             if (lr == null || lr.reference != reference)
             {

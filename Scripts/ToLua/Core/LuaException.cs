@@ -30,19 +30,13 @@ namespace LuaInterface
 {
     public class LuaException : Exception
     {
-        public static Exception luaStack = null;
-        public static string projectFolder = null;
-        public static int InstantiateCount = 0;
-        public static int SendMsgCount = 0;
+        public static Exception luaStack;
+        public static string projectFolder;
+        public static int InstantiateCount;
+        public static int SendMsgCount;
         public static IntPtr L = IntPtr.Zero;
 
-        public override string StackTrace
-        {
-            get
-            {
-                return _stack;
-            }
-        }
+        public override string StackTrace{ get { return _stack; } }
 
         protected string _stack = string.Empty;        
 
@@ -123,7 +117,7 @@ namespace LuaInterface
                     break;
                 }
 
-                if ((str != null) && (str.Length != 0))
+                if (!string.IsNullOrEmpty(str))
                 {
                     sb.Append(str);
                     sb.Append(".");
@@ -160,7 +154,7 @@ namespace LuaInterface
                     fileName = fileName.Replace('\\', '/');
                     sb.Append(" (at ");
 
-                    if (fileName.StartsWith(projectFolder))
+                    if (fileName.StartsWith(projectFolder, System.StringComparison.Ordinal))
                     {
                         fileName = fileName.Substring(projectFolder.Length, fileName.Length - projectFolder.Length);
                     }

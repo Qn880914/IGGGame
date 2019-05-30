@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using UnityEngine;
 
 // <summary>
 // 资源路径管理
@@ -151,7 +152,11 @@ public class ResourcesPath
 
     private static string GetABRunDir()
     {
-        return ConstantData.assetBundleSavePath;
+#if UNITY_STANDALONE_WIN
+            return Application.streamingAssetsPath + "/ab/" + ConstantData.mainVersion + "/";
+#else
+            return Application.persistentDataPath + "/ab/";
+#endif
     }
 
     private static string[] GetResTypePath(string resType)

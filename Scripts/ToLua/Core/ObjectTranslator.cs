@@ -59,10 +59,10 @@ namespace LuaInterface
         public readonly Dictionary<object, int> objectsBackMap = new Dictionary<object, int>(257, new CompareObject());
         public readonly LuaObjectPool objects = new LuaObjectPool();
         private List<DelayGC> gcList = new List<DelayGC>();
-        private Action<object, int> removeInvalidObject;
+        private readonly Action<object, int> removeInvalidObject;
 
 #if !MULTI_STATE
-        private static ObjectTranslator _translator = null;
+        private static ObjectTranslator _translator;
 #endif
 
         public ObjectTranslator()

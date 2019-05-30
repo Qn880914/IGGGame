@@ -209,7 +209,7 @@ namespace LuaInterface
             throw new LuaException("undefined type to check" + LuaDLL.luaL_typename(L, pos));
         }
 
-        static Type monoType = typeof(Type).GetType();
+        static readonly Type monoType = typeof(Type);
 
         public static T ChangeType<T>(object temp, Type type)
         {
@@ -425,7 +425,7 @@ namespace LuaInterface
                     {
                         ObjectTranslator translator = ObjectTranslator.Get(L);
                         object obj = translator.GetObject(udata);
-                        return obj == null ? true : type == obj.GetType();
+                        return obj == null || type == obj.GetType();
                     }
                     return false;
                 default:
@@ -443,7 +443,7 @@ namespace LuaInterface
                 {
                     ObjectTranslator translator = ObjectTranslator.Get(L);
                     object obj = translator.GetObject(udata);
-                    return obj == null ? false : type == obj.GetType();
+                    return obj != null && type == obj.GetType();
                 }
             }
 

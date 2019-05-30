@@ -616,7 +616,7 @@ namespace LuaInterface
                     {
                         ObjectTranslator translator = ObjectTranslator.Get(L);
                         object obj = translator.GetObject(udata);
-                        return obj == null ? true : obj is IEnumerator;
+                        return obj == null || obj is IEnumerator;
                     }
                     return false;                    
                 default:
@@ -660,7 +660,7 @@ namespace LuaInterface
                     {
                         ObjectTranslator translator = ObjectTranslator.Get(L);
                         object obj = translator.GetObject(udata);
-                        return obj == null ? true : obj is Transform;
+                        return obj == null || obj is Transform;
                     }
 
                     return false;                    
@@ -669,7 +669,7 @@ namespace LuaInterface
             }
         }
 
-        static Type monoType = typeof(Type).GetType();
+        static readonly Type monoType = typeof(Type);
 
         public bool CheckMonoType(IntPtr L, int pos)
         {
@@ -699,7 +699,7 @@ namespace LuaInterface
             {                
                 ObjectTranslator translator = ObjectTranslator.Get(L);
                 object obj = translator.GetObject(udata);
-                return obj == null ? true : obj.GetType() == t;
+                return obj == null || obj.GetType() == t;
             }
 
             return false;

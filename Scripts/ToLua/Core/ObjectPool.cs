@@ -41,9 +41,9 @@ namespace LuaInterface
 
         private List<PoolNode> list;
         //同lua_ref策略，0作为一个回收链表头，不使用这个位置
-        private PoolNode head = null;   
-        private int count = 0;
-        private int collectStep = 2;
+        private PoolNode head;   
+        private int count;
+        private readonly int collectStep = 2;
         private int collectedIndex = -1;
 
         public LuaObjectPool()
@@ -149,10 +149,7 @@ namespace LuaInterface
                 if (o != null && o.Equals(null))
                 {
                     node.obj = null;
-                    if (collectListener != null)
-                    {
-                        collectListener(o, collectedIndex);
-                    }
+                    collectListener?.Invoke(o, collectedIndex);
                 }
             }
         }

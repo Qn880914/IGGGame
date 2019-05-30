@@ -123,7 +123,7 @@ namespace LuaInterface
 
             if (ret == 0)
             {
-                ret1 = default(R1);
+                ret1 = default;
                 Dispose();
             }
             else
@@ -145,7 +145,7 @@ namespace LuaInterface
 
             if (ret == 0)
             {
-                ret1 = default(R1);
+                ret1 = default;
                 Dispose();
             }
             else
@@ -168,7 +168,7 @@ namespace LuaInterface
 
             if (ret == 0)
             {
-                ret1 = default(R1);
+                ret1 = default;
                 Dispose();
             }
             else
@@ -192,7 +192,7 @@ namespace LuaInterface
 
             if (ret == 0)
             {
-                ret1 = default(R1);
+                ret1 = default;
                 Dispose();
             }
             else

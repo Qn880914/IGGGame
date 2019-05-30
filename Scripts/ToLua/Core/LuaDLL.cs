@@ -203,8 +203,9 @@ namespace LuaInterface
     public delegate void LuaHookFunc(IntPtr L, ref Lua_Debug ar);    
 #endif
 
-    public class LuaDLL
+    public static class LuaDLL
     {
+        public static double EPSILON  = 0.000001;
         public static string version = "1.0.7.386";
         public static int LUA_MULTRET = -1;
         public static string[] LuaTypeName = { "none", "nil", "boolean", "lightuserdata", "number", "string", "table", "function", "userdata", "thread" };        
@@ -213,6 +214,7 @@ namespace LuaInterface
         const string LUADLL = "__Internal";
 #else
         const string LUADLL = "tolua";
+
 #endif
         /*
         ** third party library
@@ -589,8 +591,7 @@ namespace LuaInterface
 
         public static string lua_tostring(IntPtr luaState, int index)
         {
-            int len = 0;
-            IntPtr str = tolua_tolstring(luaState, index, out len);
+            IntPtr str = tolua_tolstring(luaState, index, out int len);
 
             if (str != IntPtr.Zero)
             {
@@ -734,7 +735,7 @@ namespace LuaInterface
         {
             double d = lua_tonumber(L, stackPos);
 
-            if (d == 0 && LuaDLL.lua_isnumber(L, stackPos) == 0)
+            if (Math.Abs(d) < EPSILON && LuaDLL.lua_isnumber(L, stackPos) == 0)
             {
                 luaL_typerror(L, stackPos, "number");
                 return 0;

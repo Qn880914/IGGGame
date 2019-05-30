@@ -40,7 +40,7 @@ namespace LuaInterface
     {
         public delegate object LuaTableToVar(IntPtr L, int pos);
         public delegate void LuaPushVarObject(IntPtr L, object o);
-        static Type monoType = typeof(Type).GetType();
+        static Type monoType = typeof(Type);
         static public LuaTableToVar[] ToVarMap = new LuaTableToVar[LuaValueType.Max];        
         static public Dictionary<Type, LuaPushVarObject> VarPushMap  = new Dictionary<Type, LuaPushVarObject>();
 
@@ -478,23 +478,23 @@ namespace LuaInterface
             LogEntriesGetEntry.Invoke(null, new object[] { row, logEntry });
             string condition = logEntryCondition.GetValue(logEntry) as string;
             condition = condition.Substring(0, condition.IndexOf('\n'));
-            int index = condition.IndexOf(".lua:");
+            int index = condition.IndexOf(".lua:", StringComparison.Ordinal);
 
             if (index >= 0)
             {
-                int start = condition.IndexOf("[");
-                int end = condition.IndexOf("]:");
+                int start = condition.IndexOf("[", StringComparison.Ordinal);
+                int end = condition.IndexOf("]:", StringComparison.Ordinal);
                 string _line = condition.Substring(index + 5, end - index - 4);
                 Int32.TryParse(_line, out line);
                 return condition.Substring(start + 1, index + 3 - start);
             }
 
-            index = condition.IndexOf(".cs:");
+            index = condition.IndexOf(".cs:", StringComparison.Ordinal);
 
             if (index >= 0)
             {
-                int start = condition.IndexOf("[");
-                int end = condition.IndexOf("]:");
+                int start = condition.IndexOf("[", StringComparison.Ordinal);
+                int end = condition.IndexOf("]:", StringComparison.Ordinal);
                 string _line = condition.Substring(index + 5, end - index - 4);
                 Int32.TryParse(_line, out line);
                 return condition.Substring(start + 1, index + 2 - start);
@@ -507,8 +507,8 @@ namespace LuaInterface
         {
             if (_instanceID == -1)
             {
-                int start = LuaConst.toluaDir.IndexOf("Assets");
-                int end = LuaConst.toluaDir.LastIndexOf("/Lua");
+                int start = LuaConst.toluaDir.IndexOf("Assets", StringComparison.Ordinal);
+                int end = LuaConst.toluaDir.LastIndexOf("/Lua", StringComparison.Ordinal);
                 string dir = LuaConst.toluaDir.Substring(start, end - start);
                 dir += "/Core/ToLua.cs";
                 _instanceID = AssetDatabase.LoadAssetAtPath(dir, typeof(MonoScript)).GetInstanceID();//"Assets/ToLua/Core/ToLua.cs"
@@ -534,7 +534,7 @@ namespace LuaInterface
                     return false;
                 }
 
-                if (fileName.EndsWith(".cs"))
+                if (fileName.EndsWith(".cs", StringComparison.Ordinal))
                 {
                     string filter = fileName.Substring(0, fileName.Length - 3);
                     filter += " t:MonoScript";
@@ -544,7 +544,7 @@ namespace LuaInterface
                     {
                         string path = AssetDatabase.GUIDToAssetPath(searchPaths[i]);
 
-                        if (path.EndsWith(fileName))
+                        if (path.EndsWith(fileName, StringComparison.Ordinal))
                         {
                             UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(path, typeof(MonoScript));
                             AssetDatabase.OpenAsset(obj, line);
@@ -555,7 +555,7 @@ namespace LuaInterface
                 else
                 {
                     string filter = fileName.Substring(0, fileName.Length - 4);
-                    int index = filter.IndexOf("/");
+                    int index = filter.IndexOf("/", StringComparison.Ordinal);
                     if (index > 0)
                     {
                         filter = filter.Substring(index + 1);
@@ -566,7 +566,8 @@ namespace LuaInterface
                     {
                         string path = AssetDatabase.GUIDToAssetPath(searchPaths[i]);
 
-                        if (path.EndsWith(fileName) || path.EndsWith(fileName + ".bytes"))
+                        if (path.EndsWith(fileName, StringComparison.Ordinal) ||
+                        path.EndsWith(fileName + ".bytes", StringComparison.Ordinal))
                         {
                             UnityEngine.Object obj = AssetDatabase.LoadMainAssetAtPath(path);
                             AssetDatabase.OpenAsset(obj, line);

@@ -49,11 +49,11 @@ namespace LuaInterface
         }
 
         //beZip = false 在search path 中查找读取lua文件。否则从外部设置过来bundel文件中读取lua文件
-        public bool beZip = false;
+        public bool beZip;
         protected List<string> searchPaths = new List<string>();
         protected Dictionary<string, AssetBundle> zipMap = new Dictionary<string, AssetBundle>();
 
-        protected static LuaFileUtils instance = null;
+        protected static LuaFileUtils instance;
 
         public LuaFileUtils()
         {
@@ -125,7 +125,7 @@ namespace LuaInterface
 
             if (Path.IsPathRooted(fileName))
             {
-                if (!fileName.EndsWith(".lua"))
+                if (!fileName.EndsWith(".lua", System.StringComparison.Ordinal))
                 {
                     fileName += ".lua";
                 }
@@ -133,7 +133,7 @@ namespace LuaInterface
                 return fileName;
             }
 
-            if (fileName.EndsWith(".lua"))
+            if (fileName.EndsWith(".lua", System.StringComparison.Ordinal))
             {
                 fileName = fileName.Substring(0, fileName.Length - 4);
             }
@@ -184,7 +184,7 @@ namespace LuaInterface
                 return fileName;
             }
 
-            if (fileName.EndsWith(".lua"))
+            if (fileName.EndsWith(".lua", System.StringComparison.Ordinal))
             {
                 fileName = fileName.Substring(0, fileName.Length - 4);
             }
@@ -226,6 +226,7 @@ namespace LuaInterface
             byte[] buffer = null;
             string zipName = null;
 
+            AssetBundle zipFile;
             using (CString.Block())
             {
                 CString sb = CString.Alloc(256);
@@ -239,7 +240,7 @@ namespace LuaInterface
                     fileName = fileName.Substring(pos + 1);
                 }
 
-                if (!fileName.EndsWith(".lua"))
+                if (!fileName.EndsWith(".lua", System.StringComparison.Ordinal))
                 {
                     fileName += ".lua";
                 }
@@ -248,7 +249,7 @@ namespace LuaInterface
                 fileName += ".bytes";
 #endif
                 zipName = sb.ToString();
-                zipMap.TryGetValue(zipName, out AssetBundle zipFile);
+                zipMap.TryGetValue(zipName, out zipFile);
             }
 
             if (zipFile != null)

@@ -65,7 +65,7 @@ public class ConfigDataHelper
 		get
 		{
 			ConfigDataProxy data = GetConfigData();
-			return data.GameName;
+			return data.gameName;
 		}
 	}
 
@@ -75,14 +75,14 @@ public class ConfigDataHelper
 		get
 		{
 			ConfigDataProxy data = GetConfigData();
-			return data.Release;
+			return data.release;
 		}
 
 		set
 		{
 			SaveConfigData((data) =>
 			{
-				data.Release = value;
+				data.release = value;
 			});
 		}
 	}
@@ -93,14 +93,14 @@ public class ConfigDataHelper
 		get
 		{
 			ConfigDataProxy data = GetConfigData();
-			return data.BuildId;
+			return data.buildID;
 		}
 
 		set
 		{
 			SaveConfigData((data) =>
 			{
-				data.BuildId = value;
+				data.buildID = value;
 			});
 		}
 	}
@@ -111,14 +111,14 @@ public class ConfigDataHelper
 		get
 		{
 			ConfigDataProxy data = GetConfigData();
-			return data.RevisionProject;
+			return data.revisionProject;
 		}
 
 		set
 		{
 			SaveConfigData((data) =>
 			{
-				data.RevisionProject = value;
+				data.revisionProject = value;
 			});
 		}
 	}
@@ -129,14 +129,14 @@ public class ConfigDataHelper
 		get
 		{
 			ConfigDataProxy data = GetConfigData();
-			return data.RevisionGame;
+			return data.revisionGame;
 		}
 
 		set
 		{
 			SaveConfigData((data) =>
 			{
-				data.RevisionGame = value;
+				data.revisionGame = value;
 			});
 		}
 	}
@@ -147,14 +147,14 @@ public class ConfigDataHelper
 		get
 		{
 			ConfigDataProxy data = GetConfigData();
-			return data.RevisionConfig;
+			return data.revisionConfig;
 		}
 
 		set
 		{
 			SaveConfigData((data) =>
 			{
-				data.RevisionConfig = value;
+				data.revisionConfig = value;
 			});
 		}
 	}

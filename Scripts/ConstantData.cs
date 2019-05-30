@@ -72,7 +72,7 @@ public class ConstantData
         {
             if (string.IsNullOrEmpty(s_Version))
             {
-                s_Version = string.Format("{0}.{1}", ConstantData.mainVersion, ConfigData.Inst.BuildId);
+                s_Version = string.Format("{0}.{1}", ConstantData.mainVersion, ConfigData.Inst.buildID);
             }
             return s_Version;
         }
@@ -87,7 +87,7 @@ public class ConstantData
             if (string.IsNullOrEmpty(s_FullVersion))
             {
                 s_FullVersion = string.Format("{0}_{1}.{2}_r{3}_r{4}_r{5}",
-                    releaseTypeName, mainVersion, ConfigData.Inst.BuildId, ConfigData.Inst.RevisionGame, ConfigData.Inst.RevisionConfig, ConfigData.Inst.RevisionProject);
+                    releaseTypeName, mainVersion, ConfigData.Inst.buildID, ConfigData.Inst.revisionGame, ConfigData.Inst.revisionConfig, ConfigData.Inst.revisionProject);
             }
             return s_FullVersion;
         }
@@ -116,7 +116,7 @@ public class ConstantData
     {
         get
         {
-            return ConfigData.Inst.Release;
+            return ConfigData.Inst.release;
         }
     }
 

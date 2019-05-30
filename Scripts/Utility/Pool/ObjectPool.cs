@@ -33,10 +33,7 @@ namespace IGG.Utility
                 element = m_Stack.Pop();
             }
 
-            if(null != m_ActionGet)
-            {
-                m_ActionGet(element);
-            }
+            m_ActionGet?.Invoke(element);
 
             return element;
         }
@@ -48,10 +45,7 @@ namespace IGG.Utility
                 Debug.LogError("Internal error, Trying to destroy object that is already released to pool.");
             }
 
-            if(null != m_ActionRelease)
-            {
-                m_ActionRelease(element);
-            }
+            m_ActionRelease?.Invoke(element);
 
             this.m_Stack.Push(element);
         }

@@ -11,22 +11,22 @@ namespace IGG.Game
     {
         // ----------------------------------------------------------------------------------------------
         // 应用名
-        public string GameName = "Brave Conquest";
+        public string gameName = "Brave Conquest";
 
         // 版本类型(测试包/正式包)
-        public ReleaseType Release = ReleaseType.TRUNK;
+        public ReleaseType release = ReleaseType.TRUNK;
 
         // 打包版本号,目前是Jenkins的BuildID,不使用Jenkins时为0
-        public uint BuildId = 0;
+        public uint buildID = 0;
 
         // Svn版本-表格
-        public uint RevisionConfig;
+        public uint revisionConfig;
 
         // Svn版本-Game
-        public uint RevisionGame;
+        public uint revisionGame;
 
         // Svn版本-工程
-        public uint RevisionProject;
+        public uint revisionProject;
 
         // ----------------------------------------------------------------------------------------------
         // 开启补丁
@@ -51,10 +51,10 @@ namespace IGG.Game
                 return;
             }
 
-            BuildId = json["build"].AsUInt;
-            RevisionConfig = json["config"].AsUInt;
-            RevisionGame = json["game"].AsUInt;
-            RevisionProject = json["project"].AsUInt;
+            buildID = json["build"].AsUInt;
+            revisionConfig = json["config"].AsUInt;
+            revisionGame = json["game"].AsUInt;
+            revisionProject = json["project"].AsUInt;
 
             ConstantData.ResetFullVersion();
         }

@@ -154,8 +154,7 @@ namespace Google.Protobuf
             }
             if (message.Descriptor.IsWellKnownType)
             {
-                Action<JsonParser, IMessage, JsonTokenizer> handler;
-                if (WellKnownTypeHandlers.TryGetValue(message.Descriptor.FullName, out handler))
+                if (WellKnownTypeHandlers.TryGetValue(message.Descriptor.FullName, out Action<JsonParser, IMessage, JsonTokenizer> handler))
                 {
                     handler(this, message, tokenizer);
                     return;
@@ -185,8 +184,7 @@ namespace Google.Protobuf
                     throw new InvalidOperationException("Unexpected token type " + token.Type);
                 }
                 string name = token.StringValue;
-                FieldDescriptor field;
-                if (jsonFieldMap.TryGetValue(name, out field))
+                if (jsonFieldMap.TryGetValue(name, out FieldDescriptor field))
                 {
                     if (field.ContainingOneof != null)
                     {

@@ -20,23 +20,34 @@ namespace AssetBundleBrowser.AssetBundleModel
     public static class Model
     {
         private const string kNewBundleBaseName = "newbundle";
+
         private const string kNewVariantBaseName = "newvariant";
+
         internal static /*const*/ Color kLightGrey = Color.grey * 1.5f;
+
         const string k_DefaultEmptyMessage = "Drag assets here or right-click to begin creating bundles.";
+
         const string k_ProblemEmptyMessage = "There was a problem parsing the list of bundles. See console.";
 
         private static BundleFolderConcreteInfo s_RootLevelBundles = new BundleFolderConcreteInfo("", null);
+
         private static List<ABMoveData> s_MoveData = new List<ABMoveData>();
+
         private static List<BundleInfo> s_BundlesToUpdate = new List<BundleInfo>();
+
         private static Dictionary<string, AssetInfo> s_GlobalAssetList = new Dictionary<string, AssetInfo>();
+
         private static Dictionary<string, HashSet<string>> s_DependencyTracker = new Dictionary<string, HashSet<string>>();
 
-        private static bool s_InErrorState = false;
+        private static bool s_InErrorState;
+
         private static string s_EmptyMessageString;
 
-        private static Texture2D s_folderIcon = null;
-        private static Texture2D s_bundleIcon = null;
-        private static Texture2D s_sceneIcon = null;
+        private static Texture2D s_folderIcon;
+
+        private static Texture2D s_bundleIcon;
+
+        private static Texture2D s_sceneIcon;
 
         /// <summary>
         ///     <para> If using a custom source of asset bundles, you can implement your own ABDataSource and set it here as the active </para>
@@ -568,8 +579,11 @@ namespace AssetBundleBrowser.AssetBundleModel
         internal class ABMoveData
         {
             internal string assetName;
+
             internal string bundleName;
+
             internal string variantName;
+
             internal ABMoveData(string asset, string bundle, string variant)
             {
                 assetName = asset;
@@ -654,14 +668,13 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         private static AssetInfo CreateAsset(string name, string bundleName, AssetInfo parent)
         {
-            if(!System.String.IsNullOrEmpty(bundleName))
+            if(!string.IsNullOrEmpty(bundleName))
             {
                 return new AssetInfo(name, bundleName);
             }
             else
             {
-                AssetInfo info = null;
-                if(!s_GlobalAssetList.TryGetValue(name, out info))
+                if(!s_GlobalAssetList.TryGetValue(name, out AssetInfo info))
                 {
                     info = new AssetInfo(name, string.Empty);
                     s_GlobalAssetList.Add(name, info);
@@ -669,7 +682,6 @@ namespace AssetBundleBrowser.AssetBundleModel
                 info.AddParent(parent.displayName);
                 return info;
             }
-
         }
 
         internal static bool ValidateAsset(string name)
@@ -677,7 +689,11 @@ namespace AssetBundleBrowser.AssetBundleModel
             if (!name.StartsWith("Assets/"))
                 return false;
             string ext = System.IO.Path.GetExtension(name);
-            if (ext == ".dll" || ext == ".cs" || ext == ".meta" || ext == ".js" || ext == ".boo")
+            if (string.Equals(ext, ".dll", System.StringComparison.Ordinal) ||
+                string.Equals(ext, ".cs", StringComparison.Ordinal) ||
+                string.Equals(ext, ".meta", StringComparison.Ordinal) ||
+                string.Equals(ext, ".js", StringComparison.Ordinal) ||
+                string.Equals(ext, ".boo", StringComparison.Ordinal))
                 return false;
 
             return true;

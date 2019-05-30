@@ -747,8 +747,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             if (name == null)
                 return null;
 
-            BundleInfo info = null;
-            if (m_Children.TryGetValue(name, out info))
+            if (m_Children.TryGetValue(name, out BundleInfo info))
                 return info;
             return null;
         }
@@ -843,8 +842,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                 return false;
             }
 
-            BundleInfo info = null;
-            if (m_Children.TryGetValue(oldName, out info))
+            if (m_Children.TryGetValue(oldName, out BundleInfo info))
             {
                 m_Children.Remove(oldName);
                 if (!System.String.IsNullOrEmpty(newName))

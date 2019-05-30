@@ -31,16 +31,13 @@ namespace LuaInterface
 
         static MethodInfo GetMethod(Type t, string name, Type[] ts)
         {
-            Dictionary<string, List<MethodInfo>> map = null;
-            List<MethodInfo> list = null;
-
-            if (!dict.TryGetValue(t, out map))
+            if (!dict.TryGetValue(t, out Dictionary<string, List<MethodInfo>> map))
             {
                 map = new Dictionary<string, List<MethodInfo>>();
                 dict.Add(t, map);
             }
 
-            if (!map.TryGetValue(name, out list))
+            if (!map.TryGetValue(name, out List<MethodInfo> list))
             {
                 list = new List<MethodInfo>();
                 MethodInfo[] mds = t.GetMethods();

@@ -596,8 +596,7 @@ public static class PGEditorUtils
             //   If this item is new, add it too (singleton)
             //   Singleton works better than multiple Add() calls because we can do 
             //   it all at once, and in one place.
-            bool foldOutState;
-            if (!foldOutStates.TryGetValue(item, out foldOutState))
+            if (!foldOutStates.TryGetValue(item, out bool foldOutState))
             {
                 foldOutStates[item] = true;
                 foldOutState = true;

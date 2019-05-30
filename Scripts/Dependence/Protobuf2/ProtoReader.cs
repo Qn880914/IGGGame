@@ -463,13 +463,13 @@ namespace ProtoBuf
         {
             if (value == null) return null;
             if (value.Length == 0) return "";
-            string found;
+
             if (stringInterner == null)
             {
                 stringInterner = new System.Collections.Generic.Dictionary<string, string>();
                 stringInterner.Add(value, value);        
             }
-            else if (stringInterner.TryGetValue(value, out found))
+            else if (stringInterner.TryGetValue(value, out string found))
             {
                 value = found;
             }

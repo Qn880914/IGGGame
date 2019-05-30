@@ -277,11 +277,11 @@ namespace Google.Protobuf.Reflection
         public bool TryGetMessage<T>(int field, out T value) where T : class, IMessage, new()
         {
             value = null;
-            List<FieldValue> values;
-            if (!valuesByField.TryGetValue(field, out values))
+            if (!valuesByField.TryGetValue(field, out List<FieldValue> values))
             {
                 return false;
             }
+
             foreach (FieldValue fieldValue in values)
             {
                 if (fieldValue.ByteString != null)
@@ -298,8 +298,7 @@ namespace Google.Protobuf.Reflection
 
         private ulong? GetLastNumericValue(int field)
         {
-            List<FieldValue> values;
-            if (!valuesByField.TryGetValue(field, out values))
+            if (!valuesByField.TryGetValue(field, out List<FieldValue> values))
             {
                 return null;
             }
@@ -316,8 +315,7 @@ namespace Google.Protobuf.Reflection
 
         private ByteString GetLastByteStringValue(int field)
         {
-            List<FieldValue> values;
-            if (!valuesByField.TryGetValue(field, out values))
+            if (!valuesByField.TryGetValue(field, out List<FieldValue> values))
             {
                 return null;
             }
@@ -366,8 +364,7 @@ namespace Google.Protobuf.Reflection
         private CustomOptions AddValue(int field, FieldValue value)
         {
             var ret = valuesByField.Count == 0 ? new CustomOptions() : this;
-            List<FieldValue> valuesForField;
-            if (!ret.valuesByField.TryGetValue(field, out valuesForField))
+            if (!ret.valuesByField.TryGetValue(field, out List<FieldValue> valuesForField))
             {
                 // Expect almost all 
                 valuesForField = new List<FieldValue>(1);

@@ -125,8 +125,7 @@ namespace ProtoBuf
         /// <returns>The effective value of the field, or the default value if not found.</returns>
         public static TValue GetValue<TValue>(IExtensible instance, int tag, DataFormat format)
         {
-            TValue value;
-            TryGetValue<TValue>(instance, tag, format, out value);
+            TryGetValue<TValue>(instance, tag, format, out TValue value);
             return value;
         }
 

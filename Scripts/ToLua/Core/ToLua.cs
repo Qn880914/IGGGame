@@ -2765,9 +2765,7 @@ namespace LuaInterface
                 }
                 else
                 {
-                    LuaPushVarObject _Push = null;
-
-                    if (VarPushMap.TryGetValue(t, out _Push))
+                    if (VarPushMap.TryGetValue(t, out LuaPushVarObject _Push))
                     {
                         _Push(L, obj);
                     }

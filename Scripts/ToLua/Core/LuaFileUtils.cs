@@ -223,7 +223,6 @@ namespace LuaInterface
 
         byte[] ReadZipFile(string fileName)
         {
-            AssetBundle zipFile = null;
             byte[] buffer = null;
             string zipName = null;
 
@@ -249,7 +248,7 @@ namespace LuaInterface
                 fileName += ".bytes";
 #endif
                 zipName = sb.ToString();
-                zipMap.TryGetValue(zipName, out zipFile);
+                zipMap.TryGetValue(zipName, out AssetBundle zipFile);
             }
 
             if (zipFile != null)

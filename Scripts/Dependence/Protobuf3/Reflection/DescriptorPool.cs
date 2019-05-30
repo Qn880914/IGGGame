@@ -131,8 +131,7 @@ namespace Google.Protobuf.Reflection
                 name = fullName;
             }
 
-            IDescriptor old;
-            if (descriptorsByName.TryGetValue(fullName, out old))
+            if (descriptorsByName.TryGetValue(fullName, out IDescriptor old))
             {
                 if (!(old is PackageDescriptor))
                 {
@@ -155,8 +154,7 @@ namespace Google.Protobuf.Reflection
             ValidateSymbolName(descriptor);
             String fullName = descriptor.FullName;
 
-            IDescriptor old;
-            if (descriptorsByName.TryGetValue(fullName, out old))
+            if (descriptorsByName.TryGetValue(fullName, out IDescriptor old))
             {
                 int dotPos = fullName.LastIndexOf('.');
                 string message;
@@ -208,8 +206,7 @@ namespace Google.Protobuf.Reflection
         /// </summary>
         internal FieldDescriptor FindFieldByNumber(MessageDescriptor messageDescriptor, int number)
         {
-            FieldDescriptor ret;
-            fieldsByNumber.TryGetValue(new DescriptorIntPair(messageDescriptor, number), out ret);
+            fieldsByNumber.TryGetValue(new DescriptorIntPair(messageDescriptor, number), out FieldDescriptor ret);
             return ret;
         }
 
@@ -228,8 +225,7 @@ namespace Google.Protobuf.Reflection
         internal void AddFieldByNumber(FieldDescriptor field)
         {
             DescriptorIntPair key = new DescriptorIntPair(field.ContainingType, field.FieldNumber);
-            FieldDescriptor old;
-            if (fieldsByNumber.TryGetValue(key, out old))
+            if (fieldsByNumber.TryGetValue(key, out FieldDescriptor old))
             {
                 throw new DescriptorValidationException(field, "Field number " + field.FieldNumber +
                                                                "has already been used in \"" +

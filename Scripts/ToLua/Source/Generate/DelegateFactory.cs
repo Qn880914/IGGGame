@@ -84,9 +84,7 @@ public class DelegateFactory
     
     public static Delegate CreateDelegate(Type t, LuaFunction func = null)
     {
-        DelegateCreate Create = null;
-
-        if (!dict.TryGetValue(t, out Create))
+        if (!dict.TryGetValue(t, out DelegateCreate Create))
         {
             throw new LuaException(string.Format("Delegate {0} not register", LuaMisc.GetTypeName(t)));            
         }
@@ -114,9 +112,7 @@ public class DelegateFactory
     
     public static Delegate CreateDelegate(Type t, LuaFunction func, LuaTable self)
     {
-        DelegateCreate Create = null;
-
-        if (!dict.TryGetValue(t, out Create))
+        if (!dict.TryGetValue(t, out DelegateCreate Create))
         {
             throw new LuaException(string.Format("Delegate {0} not register", LuaMisc.GetTypeName(t)));
         }

@@ -546,8 +546,7 @@ public class SplitAnimationClipAndMergeMesh
         int index = key.LastIndexOf('/');
         string parentKey = key.Remove(index);
         //Debug.Log(key+","+parentKey);
-        CustomAnimationData parentData;
-        if (m_aniData.TryGetValue(parentKey, out parentData))
+        if (m_aniData.TryGetValue(parentKey, out CustomAnimationData parentData))
         {
             return IsNodeCanRemove(parentKey, parentData.CanRemove && canRemove);
         }
@@ -607,8 +606,7 @@ public class SplitAnimationClipAndMergeMesh
                 continue;
             }
             string path = GetChildPath(root, child);
-            CustomAnimationData caData;
-            if (!m_aniData.TryGetValue(path, out caData))
+            if (!m_aniData.TryGetValue(path, out CustomAnimationData caData))
             {
                 if (child.GetComponent<MeshRenderer>() != null &&
                     child.GetComponent<MeshFilter>() != null)

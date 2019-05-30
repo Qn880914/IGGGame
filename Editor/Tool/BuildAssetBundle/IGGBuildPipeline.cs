@@ -81,8 +81,7 @@ public class IGGBuildPipeline
 
     static void AddMapping(string assetPath, string abName)
     {
-        HashSet<string> files = null;
-        if (!s_AssetBundleNameMapFilePaths.TryGetValue(abName, out files))
+        if (!s_AssetBundleNameMapFilePaths.TryGetValue(abName, out HashSet<string> files))
         {
             files = new HashSet<string>();
             s_AssetBundleNameMapFilePaths.Add(abName, files);
@@ -392,8 +391,8 @@ public class IGGBuildPipeline
                 }
 
                 string path = name.Substring(0, name.LastIndexOf("/"));
-                List<string> files = null;
-                if (!paths.TryGetValue(path, out files))
+
+                if (!paths.TryGetValue(path, out List<string> files))
                 {
                     files = new List<string>();
                     paths.Add(path, files);

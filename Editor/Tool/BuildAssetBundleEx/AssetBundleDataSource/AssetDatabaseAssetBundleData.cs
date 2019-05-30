@@ -92,10 +92,7 @@ namespace AssetBundleBrowser.AssetBundleDataSource
 
             foreach (var assetBundleName in buildManifest.GetAllAssetBundles())
             {
-                if (null != settings.buildCallback)
-                {
-                    settings.buildCallback(assetBundleName);
-                }
+                settings.buildCallback?.Invoke(assetBundleName);
             }
             return true;
         }

@@ -98,9 +98,7 @@ namespace LuaInterface
         //fixed 枚举唯一性问题（对象唯一，没有实现__eq操作符）
         void RemoveObject(object o, int udata)
         {
-            int index = -1;
-            
-            if (objectsBackMap.TryGetValue(o, out index) && index == udata)
+            if (objectsBackMap.TryGetValue(o, out int index) && index == udata)
             {
                 objectsBackMap.Remove(o);
             }

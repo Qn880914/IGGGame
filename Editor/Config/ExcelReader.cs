@@ -238,8 +238,7 @@ namespace IGG.Game.Data.Config
                 return null;
             }
 
-            uint index;
-            if (!m_head.TryGetValue(colName, out index))
+            if (!m_head.TryGetValue(colName, out uint index))
             {
                 return null;
             }

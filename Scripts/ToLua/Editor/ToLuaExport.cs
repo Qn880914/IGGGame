@@ -1181,7 +1181,6 @@ public static class ToLuaExport
         for (int i = 0; i < methods.Count; i++)
         {
             _MethodBase m = methods[i];
-            int count = 1;
 
             if (IsGenericMethod(m.Method))
             {
@@ -1190,7 +1189,7 @@ public static class ToLuaExport
 
             string name = GetMethodName(m.Method);
 
-            if (!nameCounter.TryGetValue(name, out count))
+            if (!nameCounter.TryGetValue(name, out int count))
             {
                 if (name == "get_Item" && IsThisArray(m.Method, 1))
                 {

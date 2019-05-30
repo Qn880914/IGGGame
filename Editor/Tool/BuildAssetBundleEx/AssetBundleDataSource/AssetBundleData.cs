@@ -11,39 +11,22 @@ namespace AssetBundleBrowser
         /// <summary>
         ///     <para> Directory to place build result </para>
         /// </summary>
-        private string m_OutputDirectory;
-        public string outputDirectory
-        {
-            get { return m_OutputDirectory; }
-            set { m_OutputDirectory = value; }
-        }
+        public string outputDirectory { get; set; }
+
         /// <summary>
         ///     <para> Standard asset bundle build options. </para>
         /// </summary>
-        private BuildAssetBundleOptions m_Options;
-        public BuildAssetBundleOptions options
-        {
-            get { return m_Options; }
-            set { m_Options = value; }
-        }
+        public BuildAssetBundleOptions options { get; set; }
+
         /// <summary>
         ///     <para> Target platform for build. </para>
         /// </summary>
-        private BuildTarget m_buildTarget;
-        public BuildTarget buildTarget
-        {
-            get { return m_buildTarget; }
-            set { m_buildTarget = value; }
-        }
+        public BuildTarget buildTarget { get; set; }
+
         /// <summary>
         ///     <para> Callback for build event. </para>
         /// </summary>
-        private Action<string> m_BuildCallback;
-        public Action<string> buildCallback
-        {
-            get { return m_BuildCallback; }
-            set { m_BuildCallback = value; }
-        }
+        public Action<string> buildCallback { get; set; }
     }
 
     /// <summary>

@@ -157,8 +157,7 @@ namespace AssetBundleBrowser
 
         internal void RemoveBundleFolder(string pathToRemove)
         {
-            List<string> paths = null;
-            if(m_BundleList.TryGetValue(pathToRemove, out paths))
+            if(m_BundleList.TryGetValue(pathToRemove, out List<string> paths))
             {
                 foreach(var p in paths)
                 {
@@ -277,8 +276,7 @@ namespace AssetBundleBrowser
 
         private void AddBundleToList(string parent, string bundlePath)
         {
-            List<string> bundles = null;
-            m_BundleList.TryGetValue(parent, out bundles);
+            m_BundleList.TryGetValue(parent, out List<string> bundles);
 
             if(bundles == null)
             {

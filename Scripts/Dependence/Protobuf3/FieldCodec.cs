@@ -282,8 +282,7 @@ namespace Google.Protobuf
             /// </summary>
             internal static FieldCodec<T> GetCodec<T>()
             {
-                object value;
-                if (!Codecs.TryGetValue(typeof(T), out value))
+                if (!Codecs.TryGetValue(typeof(T), out object value))
                 {
                     throw new InvalidOperationException("Invalid type argument requested for wrapper codec: " + typeof(T));
                 }

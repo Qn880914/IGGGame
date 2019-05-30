@@ -81,9 +81,11 @@ public static class BuildHelper
                 continue;
 
             string name = scene.path.Substring(scene.path.LastIndexOf("/", System.StringComparison.Ordinal) + 1);
+
             name = name.Substring(0, name.IndexOf(".", System.StringComparison.Ordinal)).ToLower();
 
-            if (string.Equals(name, "lauch") || string.Equals(name, "empty"))
+            if (string.Equals(name, "lauch", System.StringComparison.Ordinal) ||
+                string.Equals(name, "empty", System.StringComparison.Ordinal))
                 continue;
 
             Reimport(scene.path, string.Format("scene/{0}", name));

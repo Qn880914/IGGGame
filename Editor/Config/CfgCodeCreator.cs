@@ -331,8 +331,7 @@ public class CfgCodeCreator
         for (int i = 0; i < fieldInfos.Length; i++)
         {
             CfgFieldInfo typeInfo = fieldInfos[i];
-            string funCode;
-            if (!m_readValueFunMap.TryGetValue(typeInfo.Type, out funCode))
+            if (!m_readValueFunMap.TryGetValue(typeInfo.Type, out string funCode))
             {
                 m_readValueFunMap.TryGetValue("string", out funCode);
             }

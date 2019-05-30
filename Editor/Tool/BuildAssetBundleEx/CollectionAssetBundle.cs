@@ -206,8 +206,7 @@ public class CollectionAssetBundle
     {
         foreach (string asset in data.assets)
         {
-            HashSet<string> abs = null;
-            if (!assets.TryGetValue(asset, out abs))
+            if (!assets.TryGetValue(asset, out HashSet<string> abs))
             {
                 abs = new HashSet<string>();
                 assets.Add(asset, abs);

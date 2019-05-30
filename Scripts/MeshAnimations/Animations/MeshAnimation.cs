@@ -163,8 +163,7 @@ namespace IGG.MeshAnimation
         public Vector3 GetBonePosition(int pFrame, string pBoneName)
         {
             // Look up if we have a position for this bone name
-            Vector3[] frames;
-            if (m_bonePositions.TryGetValue(pBoneName, out frames))
+            if (m_bonePositions.TryGetValue(pBoneName, out Vector3[] frames))
             {
                 if (pFrame >= 0 && pFrame < frames.Length)
                 {

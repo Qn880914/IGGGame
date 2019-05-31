@@ -132,7 +132,7 @@ namespace AssetBundleBrowser
                 Color old = GUI.color;
                 if (args.item.depth == 1 &&
                     (args.item.displayName == kMessageEmpty || args.item.displayName == kDependencyEmpty))
-                    GUI.color = AssetBundleModel.Model.kLightGrey;
+                    GUI.color = AssetBundleModel.Model.lightGrey;
                 base.RowGUI(args);
                 GUI.color = old;
             }
@@ -168,7 +168,7 @@ namespace AssetBundleBrowser
                 }
             }
 
-            AssetBundleBrowserMain.instance.m_ManageTab.SetAssetListSelection(pathList);
+            AssetBundleBrowserMain.instance.manageTab.SetAssetListSelection(pathList);
         }
 
         void AddDependentAssetsRecursive(TreeViewItem item, List<string> pathList)

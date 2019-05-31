@@ -116,7 +116,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         internal Color GetColor()
         {
             if (System.String.IsNullOrEmpty(m_BundleName))
-                return Model.kLightGrey;
+                return Model.lightGrey;
             else
                 return Color.white;
         }

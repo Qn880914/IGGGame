@@ -1,12 +1,10 @@
-﻿using System;
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.Assertions;
+﻿using AssetBundleBrowser.AssetBundleDataSource;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.IMGUI.Controls;
-
-using AssetBundleBrowser.AssetBundleDataSource;
+using UnityEngine;
 
 namespace AssetBundleBrowser.AssetBundleModel
 {
@@ -23,7 +21,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         private const string kNewVariantBaseName = "newvariant";
 
-        internal static /*const*/ Color kLightGrey = Color.grey * 1.5f;
+        internal static Color lightGrey = Color.grey * 1.5f;
 
         const string k_DefaultEmptyMessage = "Drag assets here or right-click to begin creating bundles.";
 

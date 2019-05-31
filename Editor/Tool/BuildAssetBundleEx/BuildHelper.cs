@@ -11,7 +11,8 @@ public static class BuildHelper
     /// <param name="checkRedundance"></param>
     public static void ReimportAll(bool checkRedundance = true)
     {
-        ReimportScene();
+        return;
+        /*ReimportScene();
         ReimportLua();
 
         ReimportPathSingle("Assets/Data/wnd", "wnd", "prefab");
@@ -64,7 +65,7 @@ public static class BuildHelper
             ReimportRedundance();
         }
 
-        SaveMapping();
+        SaveMapping();*/
     }
 
     /// <summary>
@@ -72,7 +73,7 @@ public static class BuildHelper
     ///     
     ///     <para> Note : lauch scene release with package and don't need build into assetbundle. </para>
     /// </summary>
-    private static void ReimportScene()
+    /*private static void ReimportScene()
     {
         EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
         foreach(var scene in scenes)
@@ -359,6 +360,6 @@ public static class BuildHelper
         s_AssetBundleNameMapFilePaths.Clear();
 
         Reimport(path, "ab_mapping");
-    }
+    }*/
 
 }

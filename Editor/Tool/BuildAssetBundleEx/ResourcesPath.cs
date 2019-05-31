@@ -153,7 +153,7 @@ public class ResourcesPath
     private static string GetABRunDir()
     {
 #if UNITY_STANDALONE_WIN
-            return Application.streamingAssetsPath + "/ab/" + ConstantData.mainVersion + "/";
+            return Application.streamingAssetsPath + "/ab/" + "0.16.0" + "/";
 #else
             return Application.persistentDataPath + "/ab/";
 #endif

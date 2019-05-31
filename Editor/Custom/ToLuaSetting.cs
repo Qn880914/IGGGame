@@ -94,7 +94,7 @@ namespace IGG.Editor
             _GT(typeof(Component)),
             _GT(typeof(Transform)),
             _GT(typeof(Material)),
-            _GT(typeof(Light)),
+            //_GT(typeof(Light)),
             _GT(typeof(Rigidbody)),
             _GT(typeof(Camera)),
             _GT(typeof(AudioSource)),

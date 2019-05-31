@@ -30,7 +30,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             get
             {
-                return AssetBundleBrowserMain.instance.m_ManageTab.hasSearch ? m_Bundle.m_Name.fullNativeName : m_Bundle.displayName;
+                return AssetBundleBrowserMain.instance.manageTab.hasSearch ? m_Bundle.m_Name.fullNativeName : m_Bundle.displayName;
             }
         }
     }

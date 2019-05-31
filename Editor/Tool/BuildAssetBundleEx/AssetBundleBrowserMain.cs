@@ -26,17 +26,17 @@ namespace AssetBundleBrowser
         /// <summary>
         ///     <para> Configure AssetBundle Tab </para>
         /// </summary>
-        [SerializeField] internal AssetBundleManageTab m_ManageTab;
+        [SerializeField] internal AssetBundleManageTab manageTab;
 
         /// <summary>
         ///     <para> Build AssetBundle Setting Tab </para>
         /// </summary>
-        [SerializeField] internal AssetBundleBuildTab m_BuildTab;
+        [SerializeField] internal AssetBundleBuildTab buildTab;
 
         /// <summary>
         ///     <para> Inspect AssetBundle Tab</para>
         /// </summary>
-        [SerializeField] internal AssetBundleInspectTab m_InspectTab;
+        [SerializeField] internal AssetBundleInspectTab inspectTab;
 
         [SerializeField] internal bool m_MultiDataSource;
 
@@ -77,17 +77,17 @@ namespace AssetBundleBrowser
         private void OnEnable()
         {
             Rect subPos = GetSubWindowArea();
-            if(m_ManageTab == null)
-                m_ManageTab = new AssetBundleManageTab();
-            m_ManageTab.OnEnable(subPos, this);
+            if(manageTab == null)
+                manageTab = new AssetBundleManageTab();
+            manageTab.OnEnable(subPos, this);
 
-            if(m_BuildTab == null)
-                m_BuildTab = new AssetBundleBuildTab();
-            m_BuildTab.OnEnable(this);
+            if(buildTab == null)
+                buildTab = new AssetBundleBuildTab();
+            buildTab.OnEnable(this);
 
-            if (m_InspectTab == null)
-                m_InspectTab = new AssetBundleInspectTab();
-            m_InspectTab.OnEnable(subPos);
+            if (inspectTab == null)
+                inspectTab = new AssetBundleInspectTab();
+            inspectTab.OnEnable(subPos);
 
             m_TextureRefresh = EditorGUIUtility.FindTexture("Refresh");
 
@@ -114,11 +114,11 @@ namespace AssetBundleBrowser
         }
         private void OnDisable()
         {
-            if (m_BuildTab != null)
-                m_BuildTab.OnDisable();
+            if (buildTab != null)
+                buildTab.OnDisable();
 
-            if (m_InspectTab != null)
-                m_InspectTab.OnDisable();
+            if (inspectTab != null)
+                inspectTab.OnDisable();
         }
 
         public void OnBeforeSerialize()
@@ -148,7 +148,7 @@ namespace AssetBundleBrowser
                     break;
                 case Mode.Browser:
                 default:
-                    m_ManageTab.Update();
+                    manageTab.Update();
                     break;
             }
         }
@@ -160,14 +160,14 @@ namespace AssetBundleBrowser
             switch(m_Mode)
             {
                 case Mode.Builder:
-                    m_BuildTab.OnGUI();
+                    buildTab.OnGUI();
                     break;
                 case Mode.Inspect:
-                    m_InspectTab.OnGUI(GetSubWindowArea());
+                    inspectTab.OnGUI(GetSubWindowArea());
                     break;
                 case Mode.Browser:
                 default:
-                    m_ManageTab.OnGUI(GetSubWindowArea());
+                    manageTab.OnGUI(GetSubWindowArea());
                     break;
             }
         }
@@ -180,14 +180,14 @@ namespace AssetBundleBrowser
             {
                 case Mode.Browser:
                     if (GUILayout.Button(m_TextureRefresh))
-                        m_ManageTab.ForceReloadData();
+                        manageTab.ForceReloadData();
                     break;
                 case Mode.Builder:
                     GUILayout.Space(m_TextureRefresh.width + kToolbarPadding);
                     break;
                 case Mode.Inspect:
                     if (GUILayout.Button(m_TextureRefresh))
-                        m_InspectTab.RefreshBundles();
+                        inspectTab.RefreshBundles();
                     break;
             }
 
@@ -226,7 +226,7 @@ namespace AssetBundleBrowser
                                 {
                                     m_DataSourceIndex = counter;
                                     AssetBundleModel.Model.assetBundleData = assetBundleData;
-                                    m_ManageTab.ForceReloadData();
+                                    manageTab.ForceReloadData();
                                 }
                             );
 

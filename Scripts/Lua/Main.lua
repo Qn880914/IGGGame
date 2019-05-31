@@ -8,10 +8,10 @@ function OnLevelWasLoaded(level)
 	collectgarbage("collect")
 	Time.timeSinceLevelLoad = 0
 	local GameObject = UnityEngine.GameObject
-	local ParticleSystem = UnityEngine.ParticleSystem
+	--local ParticleSystem = UnityEngine.ParticleSystem
 
 	local go = GameObject('go')
-	go:AddComponent(typeof(ParticleSystem))
+	--go:AddComponent(typeof(ParticleSystem))
 	local node = go.transform
 	node.position = Vector3.one
 end

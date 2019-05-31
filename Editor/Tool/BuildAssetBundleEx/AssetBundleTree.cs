@@ -51,7 +51,7 @@ namespace AssetBundleBrowser
 
             Color old = GUI.color;
             if ((bundleItem.bundle as AssetBundleModel.BundleVariantFolderInfo) != null)
-                GUI.color = AssetBundleModel.Model.kLightGrey; //new Color(0.3f, 0.5f, 0.85f);
+                GUI.color = AssetBundleModel.Model.lightGrey; //new Color(0.3f, 0.5f, 0.85f);
             base.RowGUI(args);
             GUI.color = old;
 

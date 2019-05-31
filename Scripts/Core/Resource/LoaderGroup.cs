@@ -14,8 +14,7 @@ namespace IGG.Core.Resource
         /// <summary>
         ///  加载任务
         /// </summary>
-        private LoaderTask m_LoaderTask;
-        public LoaderTask loaderTask { get { return m_LoaderTask; } set { m_LoaderTask = value; } }
+        public LoaderTask loaderTask { get; set; }
 
         /// <summary>
         /// 当前加载器
@@ -45,12 +44,12 @@ namespace IGG.Core.Resource
         /// <param name="task">加载任务</param>
         public LoaderGroup(LoaderTask task)
         {
-            m_LoaderTask = task;
+            loaderTask = task;
         }
 
         public void Inti(LoaderTask loaderTask)
         {
-            m_LoaderTask = loaderTask;
+            this.loaderTask = loaderTask;
         }
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace IGG.Core.Resource
         {
             if (null != m_LoaderInfo)
             {
-                m_LoaderTask.ReleaseLoader(m_LoaderInfo.loader);
+                loaderTask.ReleaseLoader(m_LoaderInfo.loader);
                 m_LoaderInfo = null;
             }
 
@@ -127,7 +126,7 @@ namespace IGG.Core.Resource
         {
             LoaderInfo loaderInfo = new LoaderInfo
             {
-                loader = m_LoaderTask.GetLoader(type, path, param, async),
+                loader = loaderTask.GetLoader(type, path, param, async),
                 completeCallback = completeCallback
             };
 
@@ -152,7 +151,7 @@ namespace IGG.Core.Resource
         /// </summary>
         private void PushCallback()
         {
-            m_LoaderTask.PushCallback(m_LoaderInfo.loader, (data) => { LoadCompleted(m_LoaderInfo, data); });
+            loaderTask.PushCallback(m_LoaderInfo.loader, (data) => { LoadCompleted(m_LoaderInfo, data); });
         }
 
         /// <summary>

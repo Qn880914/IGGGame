@@ -9,7 +9,7 @@ using UnityEngine;
 namespace AssetBundleBrowser
 {
     [System.Serializable]
-    internal class AssetBundleInspectTab
+    internal class AssetBundleWindowInspectTab
     {
         private Rect m_Position;
 
@@ -30,7 +30,7 @@ namespace AssetBundleBrowser
         /// </summary>
         private Dictionary<string, AssetBundleRecord> m_LoadedAssetBundles;
 
-        internal AssetBundleInspectTab()
+        internal AssetBundleWindowInspectTab()
         {
             bundleList = new Dictionary<string, List<string>>();
             m_SingleInspector = new SingleBundleInspector();

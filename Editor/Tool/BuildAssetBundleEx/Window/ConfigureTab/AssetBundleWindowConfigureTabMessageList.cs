@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace AssetBundleBrowser
 {
-    internal class MessageList
+    internal class AssetBundleWindowConfigureTabMessageList
     {
         private Vector2 m_ScrollPosition = Vector2.zero;
 
         private GUIStyle[] m_Style = new GUIStyle[2];
 
-        private IEnumerable<AssetBundleModel.AssetInfo> m_Selecteditems;
+        private IEnumerable<Model.AssetInfo> m_Selecteditems;
 
         private List<MessageSystem.Message> m_Messages;
 
@@ -20,7 +20,7 @@ namespace AssetBundleBrowser
 
         private const float kBorderSize = 1f;
 
-        internal MessageList()
+        internal AssetBundleWindowConfigureTabMessageList()
         {
             Init();
         }
@@ -74,7 +74,7 @@ namespace AssetBundleBrowser
             GUI.EndScrollView();
         }
 
-        internal void SetItems(IEnumerable<AssetBundleModel.AssetInfo> items)
+        internal void SetItems(IEnumerable<Model.AssetInfo> items)
         {
             m_Selecteditems = items;
             CollectMessages();

@@ -9,7 +9,7 @@ using AssetBundleBrowser.AssetBundleDataSource;
 namespace AssetBundleBrowser
 {
     [System.Serializable]
-    internal class AssetBundleBuildTab
+    internal class AssetBundleWindowBuildTab
     {
         private const string kBuildPrefPrefix = "ABBBuild:";
 
@@ -21,7 +21,7 @@ namespace AssetBundleBrowser
 
         [SerializeField] private BuildTabData m_UserData;
 
-        private AssetBundleInspectTab m_InspectTab;
+        private AssetBundleWindowInspectTab m_InspectTab;
 
         private List<ToggleData> m_ToggleDatas;
 
@@ -52,7 +52,7 @@ namespace AssetBundleBrowser
         int[] m_CompressionValues = { 0, 1, 2 };
 
 
-        internal AssetBundleBuildTab()
+        internal AssetBundleWindowBuildTab()
         {
             m_AdvancedSettings = false;
             m_UserData = new BuildTabData();
@@ -75,7 +75,7 @@ namespace AssetBundleBrowser
         }
         internal void OnEnable(EditorWindow parent)
         {
-            m_InspectTab = (parent as AssetBundleBrowserMain).inspectTab;
+            m_InspectTab = (parent as AssetBundleWindow).inspectTab;
 
             #region Load Data
             var dataPath = System.IO.Path.GetFullPath(".");
@@ -181,7 +181,7 @@ namespace AssetBundleBrowser
             GUILayout.BeginVertical();
 
             // build target
-            using (new EditorGUI.DisabledScope(!AssetBundleModel.Model.assetBundleData.canSpecifyBuildTarget))
+            using (new EditorGUI.DisabledScope(!Model.AssetBundleModel.assetBundleData.canSpecifyBuildTarget))
             {
                 ValidBuildTarget buildTarget = (ValidBuildTarget)EditorGUILayout.EnumPopup(m_TargetContent, m_UserData.m_BuildTarget);
                 if (buildTarget != m_UserData.m_BuildTarget)
@@ -197,7 +197,7 @@ namespace AssetBundleBrowser
             }
 
             ////output path
-            using (new EditorGUI.DisabledScope(!AssetBundleModel.Model.assetBundleData.canSpecifyBuildOutputDirectory))
+            using (new EditorGUI.DisabledScope(!Model.AssetBundleModel.assetBundleData.canSpecifyBuildOutputDirectory))
             {
                 EditorGUILayout.Space();
                 GUILayout.BeginHorizontal();
@@ -246,7 +246,7 @@ namespace AssetBundleBrowser
             }
 
             // advanced options
-            using (new EditorGUI.DisabledScope(!AssetBundleModel.Model.assetBundleData.canSpecifyBuildOptions))
+            using (new EditorGUI.DisabledScope(!Model.AssetBundleModel.assetBundleData.canSpecifyBuildOptions))
             {
                 EditorGUILayout.Space();
                 m_AdvancedSettings = EditorGUILayout.Foldout(m_AdvancedSettings, "Advanced Settings");
@@ -302,7 +302,7 @@ namespace AssetBundleBrowser
 
         private void ExecuteBuild()
         {
-            if (AssetBundleModel.Model.assetBundleData.canSpecifyBuildOutputDirectory)
+            if (Model.AssetBundleModel.assetBundleData.canSpecifyBuildOutputDirectory)
             {
                 if (string.IsNullOrEmpty(m_UserData.m_OutputPath))
                     BrowseForFolder();
@@ -358,12 +358,13 @@ namespace AssetBundleBrowser
 
             BuildAssetBundleOptions options = BuildAssetBundleOptions.None;
 
-            if (AssetBundleModel.Model.assetBundleData.canSpecifyBuildOptions)
+            if (Model.AssetBundleModel.assetBundleData.canSpecifyBuildOptions)
             {
                 if (m_UserData.m_Compression == CompressOptions.Uncompressed)
                     options |= BuildAssetBundleOptions.UncompressedAssetBundle;
                 else if (m_UserData.m_Compression == CompressOptions.ChunkBasedCompression)
                     options |= BuildAssetBundleOptions.ChunkBasedCompression;
+
                 foreach (var toggleData in m_ToggleDatas)
                 {
                     if (toggleData.state)
@@ -384,7 +385,7 @@ namespace AssetBundleBrowser
                 m_InspectTab.RefreshBundles();
             };
 
-            AssetBundleModel.Model.assetBundleData.BuildAssetBundles(buildInfo);
+            Model.AssetBundleModel.assetBundleData.BuildAssetBundles(buildInfo);
 
             AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
 

@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
-using AssetBundleBrowser.AssetBundleModel;
+using AssetBundleBrowser.Model;
 using UnityEditor.IMGUI.Controls;
 
 namespace AssetBundleBrowser
@@ -62,9 +62,9 @@ namespace AssetBundleBrowser
         }
     }
 
-    internal class BundleDetailList : TreeView
+    internal class AssetBundleWindowConfigureTabAssetBundleDetailTreeView : TreeView
     {
-        private HashSet<AssetBundleModel.BundleDataInfo> m_Selecteditems;
+        private HashSet<Model.BundleDataInfo> m_Selecteditems;
 
         private Rect m_TotalRect;
 
@@ -82,9 +82,9 @@ namespace AssetBundleBrowser
 
         private const string kReferencedPrefix = "- ";
 
-        internal BundleDetailList(TreeViewState state) : base(state)
+        internal AssetBundleWindowConfigureTabAssetBundleDetailTreeView(TreeViewState state) : base(state)
         {
-            m_Selecteditems = new HashSet<AssetBundleModel.BundleDataInfo>();
+            m_Selecteditems = new HashSet<Model.BundleDataInfo>();
             showBorder = true;
         }
 
@@ -132,7 +132,7 @@ namespace AssetBundleBrowser
                 Color old = GUI.color;
                 if (args.item.depth == 1 &&
                     (args.item.displayName == kMessageEmpty || args.item.displayName == kDependencyEmpty))
-                    GUI.color = AssetBundleModel.Model.lightGrey;
+                    GUI.color = Model.AssetBundleModel.lightGrey;
                 base.RowGUI(args);
                 GUI.color = old;
             }
@@ -168,7 +168,7 @@ namespace AssetBundleBrowser
                 }
             }
 
-            AssetBundleBrowserMain.instance.manageTab.SetAssetListSelection(pathList);
+            AssetBundleWindow.instance.manageTab.SetAssetListSelection(pathList);
         }
 
         void AddDependentAssetsRecursive(TreeViewItem item, List<string> pathList)
@@ -206,7 +206,7 @@ namespace AssetBundleBrowser
             }
         }
 
-        internal static TreeViewItem AppendBundleToTree(AssetBundleModel.BundleDataInfo bundle)
+        internal static TreeViewItem AppendBundleToTree(Model.BundleDataInfo bundle)
         {
             var itemName = bundle.m_Name.fullNativeName;
             var bunRoot = new TreeViewItem(itemName.GetHashCode(), 0, itemName);
@@ -225,7 +225,7 @@ namespace AssetBundleBrowser
                     str = itemName + dep.m_BundleName;
                     TreeViewItem newItem = new TreeViewItem(str.GetHashCode(), 2, dep.m_BundleName)
                     {
-                        icon = Model.GetBundleIcon()
+                        icon = Model.AssetBundleModel.bundleIcon
                     };
                     dependency.AddChild(newItem);
 
@@ -276,7 +276,7 @@ namespace AssetBundleBrowser
             return bunRoot;
         }
 
-        internal void SetItems(IEnumerable<AssetBundleModel.BundleInfo> items)
+        internal void SetItems(IEnumerable<Model.AssetBundleInfo> items)
         {
             m_Selecteditems.Clear();
             foreach (var item in items)
@@ -288,13 +288,13 @@ namespace AssetBundleBrowser
             ExpandAll(2);
         }
 
-        internal void CollectBundles(AssetBundleModel.BundleInfo bundle)
+        internal void CollectBundles(Model.AssetBundleInfo bundle)
         {
-            if (bundle is AssetBundleModel.BundleDataInfo bunData)
+            if (bundle is Model.BundleDataInfo bunData)
                 m_Selecteditems.Add(bunData);
             else
             {
-                var bunFolder = bundle as AssetBundleModel.BundleFolderInfo;
+                var bunFolder = bundle as Model.AssetBundleFolderInfo;
                 foreach (var bun in bunFolder.GetChildList())
                 {
                     CollectBundles(bun);

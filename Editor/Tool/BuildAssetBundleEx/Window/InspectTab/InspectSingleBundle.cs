@@ -14,14 +14,14 @@ namespace AssetBundleBrowser
 
         private Rect m_Position;
 
-        private AssetBundleInspectTab m_AssetBundleInspectTab = null;
+        private AssetBundleWindowInspectTab m_AssetBundleInspectTab = null;
 
-        private AssetBundleInspectTab.InspectTabData m_InspectTabData = null;
+        private AssetBundleWindowInspectTab.InspectTabData m_InspectTabData = null;
 
         internal SingleBundleInspector() { }
 
         internal void SetBundle(AssetBundle bundle, string path = "", 
-            AssetBundleInspectTab.InspectTabData inspectTabData = null, AssetBundleInspectTab assetBundleInspectTab = null)
+            AssetBundleWindowInspectTab.InspectTabData inspectTabData = null, AssetBundleWindowInspectTab assetBundleInspectTab = null)
         {
             //static var...
             currentPath = path;
@@ -114,9 +114,7 @@ namespace AssetBundleBrowser
                     EditorGUI.indentLevel--;
                 }
 
-
                 advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, "Advanced Data");
-
             }
 
             if (advancedFoldout)

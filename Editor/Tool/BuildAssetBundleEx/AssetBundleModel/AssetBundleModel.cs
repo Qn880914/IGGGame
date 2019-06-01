@@ -6,8 +6,9 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace AssetBundleBrowser.AssetBundleModel
+namespace AssetBundleBrowser.Model
 {
+
     /// <summary>
     ///     <para> Static class holding model data for Asset Bundle Browser tool. Data in Model is read from DataSource, but is not pushed.  </para>
     ///  
@@ -15,23 +16,47 @@ namespace AssetBundleBrowser.AssetBundleModel
     ///     <para> you should just push changes to the AssetDatabase then tell the Model to Rebuild(). If needed, you can also loop over </para>
     ///     <para> Update() until it returns true to force all sub-items to refresh. </para>
     /// </summary>
-    public static class Model
+    public static class AssetBundleModel
     {
+        internal class AssetBundleMoveData
+        {
+            internal string assetName;
+
+            internal string bundleName;
+
+            internal string variantName;
+
+            internal AssetBundleMoveData(string asset, string bundle, string variant)
+            {
+                assetName = asset;
+                bundleName = bundle;
+                variantName = variant;
+            }
+
+            internal void Apply()
+            {
+                if (!assetBundleData.IsReadOnly())
+                {
+                    assetBundleData.SetAssetBundleNameAndVariant(assetName, bundleName, variantName);
+                }
+            }
+        }
+
         private const string kNewBundleBaseName = "newbundle";
 
         private const string kNewVariantBaseName = "newvariant";
 
         internal static Color lightGrey = Color.grey * 1.5f;
 
-        const string k_DefaultEmptyMessage = "Drag assets here or right-click to begin creating bundles.";
+        const string kDefaultEmptyMessage = "Drag assets here or right-click to begin creating bundles.";
 
-        const string k_ProblemEmptyMessage = "There was a problem parsing the list of bundles. See console.";
+        const string kProblemEmptyMessage = "There was a problem parsing the list of bundles. See console.";
 
-        private static BundleFolderConcreteInfo s_RootLevelBundles = new BundleFolderConcreteInfo("", null);
+        private static AssetBundleFolderInfoConcrete s_RootLevelBundles = new AssetBundleFolderInfoConcrete("", null);
 
-        private static List<ABMoveData> s_MoveData = new List<ABMoveData>();
+        private static List<AssetBundleMoveData> s_MoveDatas = new List<AssetBundleMoveData>();
 
-        private static List<BundleInfo> s_BundlesToUpdate = new List<BundleInfo>();
+        private static List<AssetBundleInfo> s_UpdateAssetBundleInfos = new List<AssetBundleInfo>();
 
         private static Dictionary<string, AssetInfo> s_GlobalAssetList = new Dictionary<string, AssetInfo>();
 
@@ -41,11 +66,38 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         private static string s_EmptyMessageString;
 
-        private static Texture2D s_folderIcon;
+        private static Texture2D s_FolderIcon;
+        internal static Texture2D folderIcon
+        {
+            get
+            {
+                if (s_FolderIcon == null)
+                    FindBundleIcons();
+                return s_FolderIcon;
+            }
+        }
 
-        private static Texture2D s_bundleIcon;
+        private static Texture2D s_BundleIcon;
+        static internal Texture2D bundleIcon
+        {
+            get
+            {
+                if (s_BundleIcon == null)
+                    FindBundleIcons();
+                return s_BundleIcon;
+            }
+        }
 
         private static Texture2D s_sceneIcon;
+        static internal Texture2D sceneIcon
+        {
+            get
+            {
+                if (s_sceneIcon == null)
+                    FindBundleIcons();
+                return s_sceneIcon;
+            }
+        }
 
         /// <summary>
         ///     <para> If using a custom source of asset bundles, you can implement your own ABDataSource and set it here as the active </para>
@@ -80,12 +132,12 @@ namespace AssetBundleBrowser.AssetBundleModel
 
             //TODO - look into EditorApplication callback functions.
             
-            int size = s_BundlesToUpdate.Count;
+            int size = s_UpdateAssetBundleInfos.Count;
             if (size > 0)
             {
-                s_BundlesToUpdate[size - 1].Update();
-                s_BundlesToUpdate.RemoveAll(item => item.doneUpdating == true);
-                if (s_BundlesToUpdate.Count == 0)
+                s_UpdateAssetBundleInfos[size - 1].Update();
+                s_UpdateAssetBundleInfos.RemoveAll(item => item.doneUpdating == true);
+                if (s_UpdateAssetBundleInfos.Count == 0)
                 {
                     shouldRepaint = true;
                     foreach(var bundle in s_RootLevelBundles.GetChildList())
@@ -102,14 +154,14 @@ namespace AssetBundleBrowser.AssetBundleModel
             s_InErrorState = false;
             Rebuild();
             tree.Reload();
-            bool doneUpdating = s_BundlesToUpdate.Count == 0;
+            bool doneUpdating = s_UpdateAssetBundleInfos.Count == 0;
 
             EditorUtility.DisplayProgressBar("Updating Bundles", "", 0);
-            int fullBundleCount = s_BundlesToUpdate.Count;
+            int fullBundleCount = s_UpdateAssetBundleInfos.Count;
             while (!doneUpdating && !s_InErrorState)
             {
-                int currCount = s_BundlesToUpdate.Count;
-                EditorUtility.DisplayProgressBar("Updating Bundles", s_BundlesToUpdate[currCount-1].displayName, (float)(fullBundleCount- currCount) / (float)fullBundleCount);
+                int currCount = s_UpdateAssetBundleInfos.Count;
+                EditorUtility.DisplayProgressBar("Updating Bundles", s_UpdateAssetBundleInfos[currCount-1].displayName, (float)(fullBundleCount- currCount) / (float)fullBundleCount);
                 doneUpdating = Update();
             }
             EditorUtility.ClearProgressBar();
@@ -120,47 +172,47 @@ namespace AssetBundleBrowser.AssetBundleModel
         /// </summary>
         public static void Rebuild()
         {
-            s_RootLevelBundles = new BundleFolderConcreteInfo("", null);
-            s_MoveData = new List<ABMoveData>();
-            s_BundlesToUpdate = new List<BundleInfo>();
+            s_RootLevelBundles = new AssetBundleFolderInfoConcrete("", null);
+            s_MoveDatas = new List<AssetBundleMoveData>();
+            s_UpdateAssetBundleInfos = new List<AssetBundleInfo>();
             s_GlobalAssetList = new Dictionary<string, AssetInfo>();
             Refresh();
         }
 
-        internal static void AddBundlesToUpdate(IEnumerable<BundleInfo> bundles)
+        internal static void AddBundlesToUpdate(IEnumerable<AssetBundleInfo> bundles)
         {
             foreach(var bundle in bundles)
             {
                 bundle.ForceNeedUpdate();
-                s_BundlesToUpdate.Add(bundle);
+                s_UpdateAssetBundleInfos.Add(bundle);
             }
         }
 
         internal static void Refresh()
         {
-            s_EmptyMessageString = k_ProblemEmptyMessage;
+            s_EmptyMessageString = kProblemEmptyMessage;
             if (s_InErrorState)
                 return;
 
-            var bundleList = ValidateBundleList();
-            if(bundleList != null)
+            var assetBundleNames = GetValidateAssetBundleNames();
+            if(assetBundleNames != null)
             {
-                s_EmptyMessageString = k_DefaultEmptyMessage;
-                foreach (var bundleName in bundleList)
+                s_EmptyMessageString = kDefaultEmptyMessage;
+                foreach (var assetBundleName in assetBundleNames)
                 {
-                    AddBundleToModel(bundleName);
+                    AddAssetBundleByName(assetBundleName);
                 }
                 AddBundlesToUpdate(s_RootLevelBundles.GetChildList());
             }
 
             if(s_InErrorState)
             {
-                s_RootLevelBundles = new BundleFolderConcreteInfo("", null);
-                s_EmptyMessageString = k_ProblemEmptyMessage;
+                s_RootLevelBundles = new AssetBundleFolderInfoConcrete("", null);
+                s_EmptyMessageString = kProblemEmptyMessage;
             }
         }
 
-        internal static string[] ValidateBundleList()
+        internal static string[] GetValidateAssetBundleNames()
         {
             var bundleList = assetBundleData.GetAllAssetBundleNames();
             bool valid = true;
@@ -250,73 +302,73 @@ namespace AssetBundleBrowser.AssetBundleModel
             return s_EmptyMessageString;
         }
 
-        internal static BundleInfo CreateEmptyBundle(BundleFolderInfo folder = null, string newName = null)
+        internal static AssetBundleInfo CreateEmptyBundle(AssetBundleFolderInfo folder = null, string newName = null)
         {
             if ((folder as BundleVariantFolderInfo) != null)
                 return CreateEmptyVariant(folder as BundleVariantFolderInfo);
 
             folder = (folder == null) ? s_RootLevelBundles : folder;
             string name = GetUniqueName(folder, newName);
-            BundleNameData nameData;
-            nameData = new BundleNameData(folder.m_Name.bundleName, name);
+            AssetBundleNameInfo nameData;
+            nameData = new AssetBundleNameInfo(folder.m_Name.bundleName, name);
             return AddBundleToFolder(folder, nameData);
         }
 
-        internal static BundleInfo CreateEmptyVariant(BundleVariantFolderInfo folder)
+        internal static AssetBundleInfo CreateEmptyVariant(BundleVariantFolderInfo folder)
         {
             string name = GetUniqueName(folder, kNewVariantBaseName);
             string variantName = folder.m_Name.bundleName + "." + name;
-            BundleNameData nameData = new BundleNameData(variantName);
+            AssetBundleNameInfo nameData = new AssetBundleNameInfo(variantName);
             return AddBundleToFolder(folder.parent, nameData);
         }
 
-        internal static BundleFolderInfo CreateEmptyBundleFolder(BundleFolderConcreteInfo folder = null)
+        internal static AssetBundleFolderInfo CreateEmptyBundleFolder(AssetBundleFolderInfoConcrete folder = null)
         {
             folder = (folder == null) ? s_RootLevelBundles : folder;
             string name = GetUniqueName(folder) + "/dummy";
-            BundleNameData nameData = new BundleNameData(folder.m_Name.bundleName, name);
+            AssetBundleNameInfo nameData = new AssetBundleNameInfo(folder.m_Name.bundleName, name);
             return AddFoldersToBundle(s_RootLevelBundles, nameData);
         }
 
-        private static BundleInfo AddBundleToModel(string name)
+        private static AssetBundleInfo AddAssetBundleByName(string name)
         {
             if (name == null)
                 return null;
             
-            BundleNameData nameData = new BundleNameData(name);
+            AssetBundleNameInfo assetBundleNameInfo = new AssetBundleNameInfo(name);
 
-            BundleFolderInfo folder = AddFoldersToBundle(s_RootLevelBundles, nameData);
-            BundleInfo currInfo = AddBundleToFolder(folder, nameData);
+            AssetBundleFolderInfo assetBundleFolderInfo = AddFoldersToBundle(s_RootLevelBundles, assetBundleNameInfo);
+            AssetBundleInfo assetBundleInfo = AddBundleToFolder(assetBundleFolderInfo, assetBundleNameInfo);
 
-            return currInfo;
+            return assetBundleInfo;
         }
 
-        private static BundleFolderConcreteInfo AddFoldersToBundle(BundleFolderInfo root, BundleNameData nameData)
+        private static AssetBundleFolderInfoConcrete AddFoldersToBundle(AssetBundleFolderInfo root, AssetBundleNameInfo nameData)
         {
-            BundleInfo currInfo = root;
-            var folder = currInfo as BundleFolderConcreteInfo;
+            AssetBundleInfo assetBundleInfo = root;
+            var folder = assetBundleInfo as AssetBundleFolderInfoConcrete;
             var size = nameData.pathTokens.Count;
             for (var index = 0; index < size; index++)
             {
                 if (folder != null)
                 {
-                    currInfo = folder.GetChild(nameData.pathTokens[index]);
-                    if (currInfo == null)
+                    assetBundleInfo = folder.GetAssetBundleInfoByName(nameData.pathTokens[index]);
+                    if (assetBundleInfo == null)
                     {
-                        currInfo = new BundleFolderConcreteInfo(nameData.pathTokens, index + 1, folder);
-                        folder.AddChild(currInfo);
+                        assetBundleInfo = new AssetBundleFolderInfoConcrete(nameData.pathTokens, index + 1, folder);
+                        folder.AddChild(assetBundleInfo);
                     }
 
-                    folder = currInfo as BundleFolderConcreteInfo;
+                    folder = assetBundleInfo as AssetBundleFolderInfoConcrete;
                     if (folder == null)
                     {
                         s_InErrorState = true;
-                        LogFolderAndBundleNameConflict(currInfo.m_Name.fullNativeName);
+                        LogFolderAndBundleNameConflict(assetBundleInfo.m_Name.fullNativeName);
                         break;
                     }
                 }
             }
-            return currInfo as BundleFolderConcreteInfo;
+            return assetBundleInfo as AssetBundleFolderInfoConcrete;
         }
 
         private static void LogFolderAndBundleNameConflict(string name)
@@ -329,9 +381,9 @@ namespace AssetBundleBrowser.AssetBundleModel
             LogError(message);
         }
 
-        private static BundleInfo AddBundleToFolder(BundleFolderInfo root, BundleNameData nameData)
+        private static AssetBundleInfo AddBundleToFolder(AssetBundleFolderInfo root, AssetBundleNameInfo nameData)
         {
-            BundleInfo currInfo = root.GetChild(nameData.shortName);
+            AssetBundleInfo currInfo = root.GetAssetBundleInfoByName(nameData.shortName);
             if (!System.String.IsNullOrEmpty(nameData.variant))
             {
                 if(currInfo == null)
@@ -352,7 +404,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                 }
                 
                 
-                currInfo = folder.GetChild(nameData.variant);
+                currInfo = folder.GetAssetBundleInfoByName(nameData.variant);
                 if (currInfo == null)
                 {
                     currInfo = new BundleVariantDataInfo(nameData.fullNativeName, folder);
@@ -380,29 +432,29 @@ namespace AssetBundleBrowser.AssetBundleModel
             return currInfo;
         }
 
-        private static string GetUniqueName(BundleFolderInfo folder, string suggestedName = null)
+        private static string GetUniqueName(AssetBundleFolderInfo folder, string suggestedName = null)
         {
             suggestedName = (suggestedName == null) ? kNewBundleBaseName : suggestedName;
             string name = suggestedName;
             int index = 1;
-            bool foundExisting = (folder.GetChild(name) != null);
+            bool foundExisting = (folder.GetAssetBundleInfoByName(name) != null);
             while (foundExisting)
             {
                 name = suggestedName + index;
                 index++;
-                foundExisting = (folder.GetChild(name) != null);
+                foundExisting = (folder.GetAssetBundleInfoByName(name) != null);
             }
             return name;
         }
 
-        internal static BundleTreeItem CreateBundleTreeView()
+        internal static BundleTreeViewItem CreateBundleTreeView()
         {
             return s_RootLevelBundles.CreateTreeView(-1);
         }
 
-        internal static AssetTreeItem CreateAssetListTreeView(IEnumerable<AssetBundleModel.BundleInfo> selectedBundles)
+        internal static AssetTreeViewItem CreateAssetListTreeView(IEnumerable<AssetBundleInfo> selectedBundles)
         {
-            var root = new AssetTreeItem();
+            var root = new AssetTreeViewItem();
             if (selectedBundles != null)
             {
                 foreach (var bundle in selectedBundles)
@@ -413,9 +465,9 @@ namespace AssetBundleBrowser.AssetBundleModel
             return root;
         }
 
-        internal static bool HandleBundleRename(BundleTreeItem item, string newName)
+        internal static bool HandleBundleRename(BundleTreeViewItem item, string newName)
         {
-            var originalName = new BundleNameData(item.bundle.m_Name.fullNativeName);
+            var originalName = new AssetBundleNameInfo(item.assetBundleInfo.m_Name.fullNativeName);
 
             var findDot = newName.LastIndexOf('.');
             var findSlash = newName.LastIndexOf('/');
@@ -423,11 +475,11 @@ namespace AssetBundleBrowser.AssetBundleModel
             if (findDot == 0 || findSlash == 0 || findBSlash == 0)
                 return false; //can't start a bundle with a / or .
 
-            bool result = item.bundle.HandleRename(newName, 0);
+            bool result = item.assetBundleInfo.HandleRename(newName, 0);
 
             if (findDot > 0 || findSlash > 0 || findBSlash > 0)
             {
-                item.bundle.parent.HandleChildRename(newName, string.Empty);
+                item.assetBundleInfo.parent.HandleChildRename(newName, string.Empty);
             }
 
             ExecuteAssetMove();
@@ -444,7 +496,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             return result;  
         }
 
-        internal static void HandleBundleReparent(IEnumerable<BundleInfo> bundles, BundleFolderInfo parent)
+        internal static void HandleBundleReparent(IEnumerable<AssetBundleInfo> bundles, AssetBundleFolderInfo parent)
         {
             parent = (parent == null) ? s_RootLevelBundles : parent;
             foreach (var bundle in bundles)
@@ -454,7 +506,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             ExecuteAssetMove();
         }
 
-        internal static void HandleBundleMerge(IEnumerable<BundleInfo> bundles, BundleDataInfo target)
+        internal static void HandleBundleMerge(IEnumerable<AssetBundleInfo> bundles, BundleDataInfo target)
         {
             foreach (var bundle in bundles)
             {
@@ -463,9 +515,9 @@ namespace AssetBundleBrowser.AssetBundleModel
             ExecuteAssetMove();
         }
 
-        internal static void HandleBundleDelete(IEnumerable<BundleInfo> bundles)
+        internal static void HandleBundleDelete(IEnumerable<AssetBundleInfo> bundles)
         {
-            var nameList = new List<BundleNameData>();
+            var nameList = new List<AssetBundleNameInfo>();
             foreach (var bundle in bundles)
             {
                 nameList.Add(bundle.m_Name);
@@ -487,14 +539,14 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
         }
 
-        internal static BundleInfo FindBundle(BundleNameData name)
+        internal static AssetBundleInfo FindBundle(AssetBundleNameInfo name)
         {
-            BundleInfo currNode = s_RootLevelBundles;
+            AssetBundleInfo currNode = s_RootLevelBundles;
             foreach (var token in name.pathTokens)
             {
-                if(currNode is BundleFolderInfo)
+                if(currNode is AssetBundleFolderInfo)
                 {
-                    currNode = (currNode as BundleFolderInfo).GetChild(token);
+                    currNode = (currNode as AssetBundleFolderInfo).GetAssetBundleInfoByName(token);
                     if (currNode == null)
                         return null;
                 }
@@ -504,12 +556,12 @@ namespace AssetBundleBrowser.AssetBundleModel
                 }
             }
 
-            if(currNode is BundleFolderInfo)
+            if(currNode is AssetBundleFolderInfo)
             {
-                currNode = (currNode as BundleFolderInfo).GetChild(name.shortName);
+                currNode = (currNode as AssetBundleFolderInfo).GetAssetBundleInfoByName(name.shortName);
                 if(currNode is BundleVariantFolderInfo)
                 {
-                    currNode = (currNode as BundleVariantFolderInfo).GetChild(name.variant);
+                    currNode = (currNode as BundleVariantFolderInfo).GetAssetBundleInfoByName(name.variant);
                 }
                 return currNode;
             }
@@ -519,14 +571,14 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
         }
 
-        internal static BundleInfo HandleDedupeBundles(IEnumerable<BundleInfo> bundles, bool onlyOverlappedAssets)
+        internal static AssetBundleInfo HandleDedupeBundles(IEnumerable<AssetBundleInfo> bundles, bool onlyOverlappedAssets)
         {
             var newBundle = CreateEmptyBundle();
             HashSet<string> dupeAssets = new HashSet<string>();
             HashSet<string> fullAssetList = new HashSet<string>();
 
             //if they were just selected, then they may still be updating.
-            bool doneUpdating = s_BundlesToUpdate.Count == 0;
+            bool doneUpdating = s_UpdateAssetBundleInfos.Count == 0;
             while (!doneUpdating)
                 doneUpdating = Update();
 
@@ -555,14 +607,14 @@ namespace AssetBundleBrowser.AssetBundleModel
             return newBundle;
         }
 
-        internal static BundleInfo HandleConvertToVariant(BundleDataInfo bundle)
+        internal static AssetBundleInfo HandleConvertToVariant(BundleDataInfo bundle)
         {
             bundle.HandleDelete(true, bundle.m_Name.bundleName, kNewVariantBaseName);
             ExecuteAssetMove();
-            var root = bundle.parent.GetChild(bundle.m_Name.shortName) as BundleVariantFolderInfo;
+            var root = bundle.parent.GetAssetBundleInfoByName(bundle.m_Name.shortName) as BundleVariantFolderInfo;
 
             if (root != null)
-                return root.GetChild(kNewVariantBaseName);
+                return root.GetAssetBundleInfoByName(kNewVariantBaseName);
             else
             {
                 //we got here because the converted bundle was empty.
@@ -574,41 +626,22 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
         }
 
-        internal class ABMoveData
-        {
-            internal string assetName;
-
-            internal string bundleName;
-
-            internal string variantName;
-
-            internal ABMoveData(string asset, string bundle, string variant)
-            {
-                assetName = asset;
-                bundleName = bundle;
-                variantName = variant;
-            }
-            internal void Apply()
-            {
-                if (!assetBundleData.IsReadOnly ())
-                {
-                    assetBundleData.SetAssetBundleNameAndVariant(assetName, bundleName, variantName);
-                }
-            }
-        }
         internal static void MoveAssetToBundle(AssetInfo asset, string bundleName, string variant)
         {
-            s_MoveData.Add(new ABMoveData(asset.fullAssetName, bundleName, variant));
+            s_MoveDatas.Add(new AssetBundleMoveData(asset.fullAssetName, bundleName, variant));
         }
+
         internal static void MoveAssetToBundle(string assetName, string bundleName, string variant)
         {
-            s_MoveData.Add(new ABMoveData(assetName, bundleName, variant));
+            s_MoveDatas.Add(new AssetBundleMoveData(assetName, bundleName, variant));
         }
+
         internal static void MoveAssetToBundle(IEnumerable<AssetInfo> assets, string bundleName, string variant)
         {
             foreach (var asset in assets)
                 MoveAssetToBundle(asset, bundleName, variant);
         }
+
         internal static void MoveAssetToBundle(IEnumerable<string> assetNames, string bundleName, string variant)
         {
             foreach (var assetName in assetNames)
@@ -617,7 +650,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         internal static void ExecuteAssetMove(bool forceAct=true)
         {
-            var size = s_MoveData.Count;
+            var size = s_MoveDatas.Count;
             if(forceAct)
             {
                 if (size > 0)
@@ -628,13 +661,13 @@ namespace AssetBundleBrowser.AssetBundleModel
                     EditorUtility.DisplayProgressBar("Moving assets to bundles", "", 0);
                     for (int i = 0; i < size; i++)
                     {
-                        EditorUtility.DisplayProgressBar("Moving assets to bundle " + s_MoveData[i].bundleName, System.IO.Path.GetFileNameWithoutExtension(s_MoveData[i].assetName), (float)i / (float)size);
-                        s_MoveData[i].Apply();
+                        EditorUtility.DisplayProgressBar("Moving assets to bundle " + s_MoveDatas[i].bundleName, System.IO.Path.GetFileNameWithoutExtension(s_MoveDatas[i].assetName), (float)i / (float)size);
+                        s_MoveDatas[i].Apply();
                     }
                     EditorUtility.ClearProgressBar();
                     AssetDatabase.StopAssetEditing();
                     EditorPrefs.SetBool("kAutoRefresh", autoRefresh);
-                    s_MoveData.Clear();
+                    s_MoveDatas.Clear();
                 }
                 if (!assetBundleData.IsReadOnly ())
                 {
@@ -771,37 +804,20 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             Debug.LogError("AssetBundleBrowser: " + message);
         }
+
         static internal void LogWarning(string message)
         {
             Debug.LogWarning("AssetBundleBrowser: " + message);
         }
 
-        static internal Texture2D GetFolderIcon()
-        {
-            if (s_folderIcon == null)
-                FindBundleIcons();
-            return s_folderIcon;
-        }
-        static internal Texture2D GetBundleIcon()
-        {
-            if (s_bundleIcon == null)
-                FindBundleIcons();
-            return s_bundleIcon;
-        }
-        static internal Texture2D GetSceneIcon()
-        {
-            if (s_sceneIcon == null)
-                FindBundleIcons();
-            return s_sceneIcon;
-        }
         static private void FindBundleIcons()
         {
-            s_folderIcon = EditorGUIUtility.FindTexture("Folder Icon");
+            s_FolderIcon = EditorGUIUtility.FindTexture("Folder Icon");
 
             var packagePath = System.IO.Path.GetFullPath("Packages/com.unity.assetbundlebrowser");
             if (System.IO.Directory.Exists(packagePath))
             {
-                s_bundleIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Packages/com.unity.assetbundlebrowser/Editor/Icons/ABundleBrowserIconY1756Basic.png", typeof(Texture2D));
+                s_BundleIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Packages/com.unity.assetbundlebrowser/Editor/Icons/ABundleBrowserIconY1756Basic.png", typeof(Texture2D));
                 s_sceneIcon = (Texture2D)AssetDatabase.LoadAssetAtPath("Packages/com.unity.assetbundlebrowser/Editor/Icons/ABundleBrowserIconY1756Scene.png", typeof(Texture2D));
             }
         }

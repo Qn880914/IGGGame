@@ -3,40 +3,66 @@ using UnityEditor;
 using UnityEngine;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleToAttribute("Unity.AssetBundleBrowser.Editor.Tests")]
-
 namespace AssetBundleBrowser
 {
-    public class AssetBundleBrowserMain : EditorWindow, IHasCustomMenu, ISerializationCallbackReceiver
+    public class AssetBundleWindow : EditorWindow, IHasCustomMenu, ISerializationCallbackReceiver
     {
         enum Mode
         {
-            Browser,
-            Builder,
+            Configure,
+            BuildSetting,
             Inspect,
+        }
+
+        private static class Styles
+        {
+            public static readonly GUIContent[] modeToggles = new GUIContent[]
+            {
+                EditorGUIUtility.TrTextContent("Configure"),
+                EditorGUIUtility.TrTextContent("Build"),
+                EditorGUIUtility.TrTextContent("Inspect")
+            };
+
+            public static readonly GUIContent refreshIcon = new GUIContent(EditorGUIUtility.FindTexture("Refresh"));
+
+            public static readonly GUIStyle buttongStyle = "LargeButton";
         }
 
         internal const float kButtonWidth = 150;
         internal const float kToolbarPadding = 15;
         internal const float kMenubarPadding = 32;
 
-        [SerializeField] Mode m_Mode;
+        private float m_ToolbarPadding = -1f;
+        private float toolbarPadding
+        {
+            get
+            {
+                if (this.m_ToolbarPadding == -1f)
+                {
+                    this.m_ToolbarPadding = EditorStyles.toolbarButton.CalcSize(EditorGUIUtility.IconContent("HelpIcon")).x * 2f + 6f;
+                }
+                return this.m_ToolbarPadding;
+            }
+        }
+
+        [SerializeField] AssetBundleWindow.Mode m_Mode = AssetBundleWindow.Mode.Configure;
 
         [SerializeField] int m_DataSourceIndex;
 
         /// <summary>
         ///     <para> Configure AssetBundle Tab </para>
         /// </summary>
-        [SerializeField] internal AssetBundleManageTab manageTab;
+        [SerializeField] internal AssetBundleWindowConfigureTab manageTab;
 
         /// <summary>
         ///     <para> Build AssetBundle Setting Tab </para>
         /// </summary>
-        [SerializeField] internal AssetBundleBuildTab buildTab;
+        [SerializeField] internal AssetBundleWindowBuildTab buildTab;
 
         /// <summary>
         ///     <para> Inspect AssetBundle Tab</para>
         /// </summary>
-        [SerializeField] internal AssetBundleInspectTab inspectTab;
+        [SerializeField] internal AssetBundleWindowInspectTab inspectTab;
 
         [SerializeField] internal bool m_MultiDataSource;
 
@@ -44,29 +70,21 @@ namespace AssetBundleBrowser
 
         private Texture2D m_TextureRefresh;
 
-        private static AssetBundleBrowserMain s_Instance;
-        internal static AssetBundleBrowserMain instance
+        private static AssetBundleWindow s_Instance;
+        internal static AssetBundleWindow instance
         {
             get
             {
                 if (s_Instance == null)
-                    s_Instance = GetWindow<AssetBundleBrowserMain>();
+                    s_Instance = GetWindow<AssetBundleWindow>();
                 return s_Instance;
             }
         }
 
-        [MenuItem("Window/AssetBundle Browser", priority = 2050)]
-        static void ShowWindow()
-        {
-            s_Instance = null;
-            instance.titleContent = new GUIContent("AssetBundles");
-            instance.Show();
-        }
-
         public virtual void AddItemsToMenu(GenericMenu menu)
         {
-            if(menu != null)
-               menu.AddItem(new GUIContent("Custom Sources"), m_MultiDataSource, FlipDataSource);
+            if (menu != null)
+                menu.AddItem(new GUIContent("Custom Sources"), m_MultiDataSource, FlipDataSource);
         }
 
         internal void FlipDataSource()
@@ -77,22 +95,17 @@ namespace AssetBundleBrowser
         private void OnEnable()
         {
             Rect subPos = GetSubWindowArea();
-            if(manageTab == null)
-                manageTab = new AssetBundleManageTab();
+            manageTab = new AssetBundleWindowConfigureTab();
             manageTab.OnEnable(subPos, this);
-
-            if(buildTab == null)
-                buildTab = new AssetBundleBuildTab();
+            buildTab = new AssetBundleWindowBuildTab();
             buildTab.OnEnable(this);
-
-            if (inspectTab == null)
-                inspectTab = new AssetBundleInspectTab();
+            inspectTab = new AssetBundleWindowInspectTab();
             inspectTab.OnEnable(subPos);
 
             m_TextureRefresh = EditorGUIUtility.FindTexture("Refresh");
 
             InitDataSources();
-        } 
+        }
 
         private void InitDataSources()
         {
@@ -103,13 +116,13 @@ namespace AssetBundleBrowser
             {
                 m_AssetBundleDatas.AddRange(info.GetMethod("CreateDataSources").Invoke(null, null) as List<AssetBundleData>);
             }
-             
+
             if (m_AssetBundleDatas.Count > 1)
             {
                 m_MultiDataSource = true;
                 if (m_DataSourceIndex >= m_AssetBundleDatas.Count)
                     m_DataSourceIndex = 0;
-                AssetBundleModel.Model.assetBundleData = m_AssetBundleDatas[m_DataSourceIndex];
+                Model.AssetBundleModel.assetBundleData = m_AssetBundleDatas[m_DataSourceIndex];
             }
         }
         private void OnDisable()
@@ -142,11 +155,11 @@ namespace AssetBundleBrowser
         {
             switch (m_Mode)
             {
-                case Mode.Builder:
+                case Mode.BuildSetting:
                     break;
                 case Mode.Inspect:
                     break;
-                case Mode.Browser:
+                case Mode.Configure:
                 default:
                     manageTab.Update();
                     break;
@@ -155,49 +168,30 @@ namespace AssetBundleBrowser
 
         private void OnGUI()
         {
-            ModeToggle();
+            EditorGUILayout.Space();
+            GUILayout.BeginHorizontal(new GUILayoutOption[0]);
+            GUILayout.Space(kToolbarPadding);
+            DrawRefreshGUI();
+            this.ModeToggle();
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
 
-            switch(m_Mode)
+            switch (m_Mode)
             {
-                case Mode.Builder:
+                case Mode.BuildSetting:
+                    GUILayout.Space(m_TextureRefresh.width + kToolbarPadding);
                     buildTab.OnGUI();
                     break;
                 case Mode.Inspect:
                     inspectTab.OnGUI(GetSubWindowArea());
                     break;
-                case Mode.Browser:
+                case Mode.Configure:
                 default:
                     manageTab.OnGUI(GetSubWindowArea());
                     break;
             }
-        }
 
-        void ModeToggle()
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(kToolbarPadding);
-            switch(m_Mode)
-            {
-                case Mode.Browser:
-                    if (GUILayout.Button(m_TextureRefresh))
-                        manageTab.ForceReloadData();
-                    break;
-                case Mode.Builder:
-                    GUILayout.Space(m_TextureRefresh.width + kToolbarPadding);
-                    break;
-                case Mode.Inspect:
-                    if (GUILayout.Button(m_TextureRefresh))
-                        inspectTab.RefreshBundles();
-                    break;
-            }
-
-            float toolbarWidth = position.width - kToolbarPadding * 4 - m_TextureRefresh.width;
-            //string[] labels = new string[2] { "Configure", "Build"};
-            string[] labels = { "Configure", "Build", "Inspect" };
-            m_Mode = (Mode)GUILayout.Toolbar((int)m_Mode, labels, "LargeButton", GUILayout.Width(toolbarWidth) );
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-            if(m_MultiDataSource)
+            if (m_MultiDataSource)
             {
                 //GUILayout.BeginArea(r);
                 GUILayout.BeginHorizontal();
@@ -206,8 +200,8 @@ namespace AssetBundleBrowser
                 {
                     GUILayout.Label("Bundle Data Source:");
                     GUILayout.FlexibleSpace();
-                    var c = new GUIContent(string.Format("{0} ({1})", AssetBundleModel.Model.assetBundleData.name, AssetBundleModel.Model.assetBundleData.providerName), "Select Asset Bundle Set");
-                    if (GUILayout.Button(c , EditorStyles.toolbarPopup) )
+                    var c = new GUIContent(string.Format("{0} ({1})", Model.AssetBundleModel.assetBundleData.name, Model.AssetBundleModel.assetBundleData.providerName), "Select Asset Bundle Set");
+                    if (GUILayout.Button(c, EditorStyles.toolbarPopup))
                     {
                         GenericMenu menu = new GenericMenu();
 
@@ -219,13 +213,13 @@ namespace AssetBundleBrowser
 
                             if (index > 0)
                                 menu.AddSeparator("");
-                             
+
                             var counter = index;
                             menu.AddItem(new GUIContent(string.Format("{0} ({1})", assetBundleData.name, assetBundleData.providerName)), false,
                                 () =>
                                 {
                                     m_DataSourceIndex = counter;
-                                    AssetBundleModel.Model.assetBundleData = assetBundleData;
+                                    Model.AssetBundleModel.assetBundleData = assetBundleData;
                                     manageTab.ForceReloadData();
                                 }
                             );
@@ -236,7 +230,7 @@ namespace AssetBundleBrowser
                     }
 
                     GUILayout.FlexibleSpace();
-                    if (AssetBundleModel.Model.assetBundleData.IsReadOnly())
+                    if (Model.AssetBundleModel.assetBundleData.IsReadOnly())
                     {
                         GUIStyle tbLabel = new GUIStyle(EditorStyles.toolbar)
                         {
@@ -250,6 +244,39 @@ namespace AssetBundleBrowser
                 GUILayout.EndHorizontal();
                 //GUILayout.EndArea();
             }
+        }
+
+        void ModeToggle()
+        {
+            float toolbarWidth = base.position.width - toolbarPadding * 2;
+            m_Mode = (Mode)GUILayout.Toolbar((int)m_Mode, AssetBundleWindow.Styles.modeToggles, AssetBundleWindow.Styles.buttongStyle, new GUILayoutOption[] 
+            {
+                GUILayout.Width(toolbarWidth)
+            } );
+        }
+
+        private void DrawRefreshGUI()
+        {
+            switch (m_Mode)
+            {
+                case Mode.Inspect:
+                    if (GUILayout.Button(Styles.refreshIcon))
+                        inspectTab.RefreshBundles();
+                    break;
+                case Mode.Configure:
+                    if (GUILayout.Button(Styles.refreshIcon))
+                        manageTab.ForceReloadData();
+                    break;
+            }
+        }
+
+        [MenuItem("Window/AssetBundle Browser", priority = 2050)]
+        static void CreateBuildAssetBundleWindow()
+        {
+            s_Instance = null;
+            instance.titleContent = new GUIContent("Build AssetBundle");
+            instance.minSize = new Vector2(360f, 390f);
+            instance.Show();
         }
     }
 }

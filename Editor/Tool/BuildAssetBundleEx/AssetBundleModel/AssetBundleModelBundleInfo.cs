@@ -1,47 +1,68 @@
 ﻿using System;
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+using UnityEngine;
 
-namespace AssetBundleBrowser.AssetBundleModel
+namespace AssetBundleBrowser.Model
 {
-    internal sealed class BundleTreeItem : TreeViewItem
+    internal sealed class BundleTreeViewItem : TreeViewItem
     {   
-        private BundleInfo m_Bundle;
-        internal BundleInfo bundle
+        internal AssetBundleInfo assetBundleInfo { get; set; }
+
+        internal BundleTreeViewItem(AssetBundleInfo info, int depth, Texture2D iconTexture) : base(info.nameHashCode, depth, info.displayName)
         {
-            get { return m_Bundle; }
-        }
-        internal BundleTreeItem(BundleInfo b, int depth, Texture2D iconTexture) : base(b.nameHashCode, depth, b.displayName)
-        {
-            m_Bundle = b;
+            assetBundleInfo = info;
             icon = iconTexture;
             children = new List<TreeViewItem>();
         }
 
         internal MessageSystem.Message BundleMessage()
         {
-            return m_Bundle.HighestMessage();
+            return assetBundleInfo.HighestMessage();
         }
 
         public override string displayName
         {
             get
             {
-                return AssetBundleBrowserMain.instance.manageTab.hasSearch ? m_Bundle.m_Name.fullNativeName : m_Bundle.displayName;
+                return AssetBundleWindow.instance.manageTab.hasSearch ? assetBundleInfo.m_Name.fullNativeName : assetBundleInfo.displayName;
             }
         }
     }
 
-    internal class BundleNameData
+    internal class AssetBundleNameInfo
     {
         private List<string> m_PathTokens;
-        private string m_FullBundleName;
-        private string m_ShortName;
+        internal List<string> pathTokens
+        {
+            get { return m_PathTokens; }
+            set
+            {
+                m_PathTokens = value.GetRange(0, value.Count - 1);
+                SetShortName(value.Last());
+                GenerateFullName();
+            }
+        }
+
+        internal string bundleName { get; set; }
+
+        internal string shortName { get; set; }
+
         private string m_VariantName;
-        private string m_FullNativeName;
+        internal string variant
+        {
+            get { return m_VariantName; }
+            set
+            {
+                m_VariantName = value;
+                fullNativeName = bundleName;
+                fullNativeName += System.String.IsNullOrEmpty(m_VariantName) ? "" : "." + m_VariantName;
+            }
+        }
+
+        internal string fullNativeName{ get; set; }
 
         //input (received from native) is a string of format:
         //  /folder0/.../folderN/name.variant
@@ -51,8 +72,9 @@ namespace AssetBundleBrowser.AssetBundleModel
         //  m_fullBundleName = /m_pathTokens[0]/.../m_pathTokens[n]/m_shortName
         // and...
         //  m_fullNativeName = m_fullBundleName.m_variantName which is the same as the initial input.
-        internal BundleNameData(string name) { SetName(name); }
-        internal BundleNameData(string path, string name)
+        internal AssetBundleNameInfo(string name) { SetName(name); }
+
+        internal AssetBundleNameInfo(string path, string name)
         {
             string finalName = System.String.IsNullOrEmpty(path) ? "" : path + '/';
             finalName += name;
@@ -62,43 +84,12 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             return fullNativeName.GetHashCode();
         }
-        internal string fullNativeName
-        { get { return m_FullNativeName; } }
 
         internal void SetBundleName(string bundleName, string variantName)
         {
             string name = bundleName;
             name += System.String.IsNullOrEmpty(variantName) ? "" : "." + variantName;
             SetName(name);
-        }
-        internal string bundleName
-        {
-            get { return m_FullBundleName; }
-            //set { SetName(value); }
-        }
-        internal string shortName
-        {
-            get { return m_ShortName; }
-        }
-        internal string variant
-        {
-            get { return m_VariantName; }
-            set
-            {
-                m_VariantName = value;
-                m_FullNativeName = m_FullBundleName;
-                m_FullNativeName += System.String.IsNullOrEmpty(m_VariantName) ? "" : "." + m_VariantName;
-            }
-        }
-        internal List<string> pathTokens
-        {
-            get { return m_PathTokens; }
-            set
-            {
-                m_PathTokens = value.GetRange(0, value.Count-1);
-                SetShortName(value.Last());
-                GenerateFullName();
-            }
         }
 
         private void SetName(string name)
@@ -121,12 +112,12 @@ namespace AssetBundleBrowser.AssetBundleModel
         }
         private void SetShortName(string inputName)
         {
-            m_ShortName = inputName;
-            int indexOfDot = m_ShortName.LastIndexOf('.');
+            shortName = inputName;
+            int indexOfDot = shortName.LastIndexOf('.');
             if (indexOfDot > -1)
             {
-                m_VariantName = m_ShortName.Substring(indexOfDot + 1);
-                m_ShortName = m_ShortName.Substring(0, indexOfDot);
+                m_VariantName = shortName.Substring(indexOfDot + 1);
+                shortName = shortName.Substring(0, indexOfDot);
             }
             else
                 m_VariantName = string.Empty;
@@ -142,39 +133,40 @@ namespace AssetBundleBrowser.AssetBundleModel
             {
                 m_PathTokens[m_PathTokens.Count - indexFromBack] = newToken;
             }
+
             GenerateFullName();
         }
 
         private void GenerateFullName()
         {
-            m_FullBundleName = string.Empty;
+            bundleName = string.Empty;
             for(int i = 0; i < m_PathTokens.Count; i++)
             {
-                m_FullBundleName += m_PathTokens[i];
-                m_FullBundleName += '/';
+                bundleName += m_PathTokens[i];
+                bundleName += '/';
             }
-            m_FullBundleName += m_ShortName;
-            m_FullNativeName = m_FullBundleName;
-            m_FullNativeName += System.String.IsNullOrEmpty(m_VariantName) ? "" : "." + m_VariantName;
+            bundleName += shortName;
+            fullNativeName = bundleName;
+            fullNativeName += System.String.IsNullOrEmpty(m_VariantName) ? "" : "." + m_VariantName;
         }
     }
 
-    internal abstract class BundleInfo
+    internal abstract class AssetBundleInfo
     {
-        protected BundleFolderInfo m_Parent;
+        protected AssetBundleFolderInfo m_Parent;
         protected bool m_DoneUpdating;
         protected bool m_Dirty;
-        internal BundleNameData m_Name;
+        internal AssetBundleNameInfo m_Name;
         protected MessageSystem.MessageState m_BundleMessages = new MessageSystem.MessageState();
         protected MessageSystem.Message m_CachedHighMessage = null;
 
-        internal BundleInfo(string name, BundleFolderInfo parent)
+        internal AssetBundleInfo(string name, AssetBundleFolderInfo parent)
         {
-            m_Name = new BundleNameData(name);
+            m_Name = new AssetBundleNameInfo(name);
             m_Parent = parent;
         }
 
-        internal BundleFolderInfo parent
+        internal AssetBundleFolderInfo parent
         { get { return m_Parent; } }
         internal virtual string displayName
         {
@@ -184,7 +176,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             get { return m_Name.GetHashCode(); }
         }
-        internal abstract BundleTreeItem CreateTreeView(int depth);
+        internal abstract BundleTreeViewItem CreateTreeView(int depth);
 
         protected virtual void RefreshMessages()
         {
@@ -225,7 +217,9 @@ namespace AssetBundleBrowser.AssetBundleModel
                 if (!m_Parent.HandleChildRename(m_Name.shortName, newName))
                     return false;
             }
+
             m_Name.PartialNameChange(newName, reverseDepth);
+
             return true;
         }
         internal virtual void HandleDelete(bool isRootOfDelete, string forcedNewName="", string forcedNewVariant = "")
@@ -236,7 +230,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
         }
         abstract internal void RefreshAssetList();
-        abstract internal void AddAssetsToNode(AssetTreeItem node);
+        abstract internal void AddAssetsToNode(AssetTreeViewItem node);
         abstract internal void Update();
         internal virtual bool doneUpdating
         { get { return m_DoneUpdating; } }
@@ -248,7 +242,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             m_Dirty = true;
         }
 
-        abstract internal void HandleReparent(string parentName, BundleFolderInfo newParent = null);
+        abstract internal void HandleReparent(string parentName, AssetBundleFolderInfo newParent = null);
         abstract internal List<AssetInfo> GetDependencies();
 
         abstract internal bool DoesItemMatchSearch(string search);
@@ -270,7 +264,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         }
     }
 
-    internal class BundleDataInfo : BundleInfo
+    internal class BundleDataInfo : AssetBundleInfo
     {
         protected List<AssetInfo> m_ConcreteAssets;
         protected List<AssetInfo> m_DependentAssets;
@@ -280,7 +274,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         protected bool m_IsSceneBundle;
         protected long m_TotalSize;
 
-        internal BundleDataInfo(string name, BundleFolderInfo parent) : base(name, parent)
+        internal BundleDataInfo(string name, AssetBundleFolderInfo parent) : base(name, parent)
         {
             m_ConcreteAssets = new List<AssetInfo>();
             m_DependentAssets = new List<AssetInfo>();
@@ -292,7 +286,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             foreach (var asset in m_DependentAssets)
             {
-                AssetBundleModel.Model.UnRegisterAsset(asset, m_Name.fullNativeName);
+                AssetBundleBrowser.Model.AssetBundleModel.UnRegisterAsset(asset, m_Name.fullNativeName);
             }
         }
         internal override bool HandleRename(string newName, int reverseDepth)
@@ -300,14 +294,14 @@ namespace AssetBundleBrowser.AssetBundleModel
             RefreshAssetList();
             if (!base.HandleRename(newName, reverseDepth))
                 return false;
-            Model.MoveAssetToBundle(m_ConcreteAssets, m_Name.bundleName, m_Name.variant);
+            AssetBundleModel.MoveAssetToBundle(m_ConcreteAssets, m_Name.bundleName, m_Name.variant);
             return true;
         }
         internal override void HandleDelete(bool isRootOfDelete, string forcedNewName="", string forcedNewVariant="")
         {
             RefreshAssetList();
             base.HandleDelete(isRootOfDelete);
-            Model.MoveAssetToBundle(m_ConcreteAssets, forcedNewName, forcedNewVariant);
+            AssetBundleModel.MoveAssetToBundle(m_ConcreteAssets, forcedNewName, forcedNewVariant);
         }
 
         internal string TotalSize()
@@ -329,14 +323,14 @@ namespace AssetBundleBrowser.AssetBundleModel
 
             foreach (var asset in m_DependentAssets)
             {
-                AssetBundleModel.Model.UnRegisterAsset(asset, m_Name.fullNativeName);
+                AssetBundleBrowser.Model.AssetBundleModel.UnRegisterAsset(asset, m_Name.fullNativeName);
             }
             m_DependentAssets.Clear();
             m_BundleDependencies.Clear();
             
             bool assetInBundle = false;
             bool sceneError = false;
-            var assets = AssetBundleModel.Model.assetBundleData.GetAssetPathsFromAssetBundle(m_Name.fullNativeName);
+            var assets = AssetBundleBrowser.Model.AssetBundleModel.assetBundleData.GetAssetPathsFromAssetBundle(m_Name.fullNativeName);
             foreach(var assetName in assets)
             {
                 if (AssetDatabase.GetMainAssetTypeAtPath(assetName) == typeof(SceneAsset))
@@ -352,7 +346,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                         sceneError = true;
                 }
 
-                var bundleName = Model.GetBundleName(assetName);
+                var bundleName = AssetBundleModel.GetBundleName(assetName);
                 if (System.String.IsNullOrEmpty(bundleName))  
                 {
                     ///we get here if the current asset is only added due to being in an explicitly added folder
@@ -365,18 +359,18 @@ namespace AssetBundleBrowser.AssetBundleModel
                         System.String.IsNullOrEmpty(bundleName))
                     {
                         partialPath = partialPath.Substring(0, partialPath.LastIndexOf('/'));
-                        bundleName = Model.GetBundleName(partialPath);
+                        bundleName = AssetBundleModel.GetBundleName(partialPath);
                     }
                     if(!System.String.IsNullOrEmpty(bundleName))
                     {
-                        var folderAsset = Model.CreateAsset(partialPath, bundleName);
+                        var folderAsset = AssetBundleModel.CreateAsset(partialPath, bundleName);
                         folderAsset.isFolder = true;
                         if (m_ConcreteAssets.FindIndex(a => a.displayName == folderAsset.displayName) == -1)
                         {
                             m_ConcreteAssets.Add(folderAsset);
                         }
 
-                        var newAsset = Model.CreateAsset(assetName, folderAsset);
+                        var newAsset = AssetBundleModel.CreateAsset(assetName, folderAsset);
                         if (newAsset != null)
                         {
                             m_DependentAssets.Add(newAsset);
@@ -391,7 +385,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                 }
                 else
                 {
-                    var newAsset = Model.CreateAsset (assetName, m_Name.fullNativeName);
+                    var newAsset = AssetBundleModel.CreateAsset (assetName, m_Name.fullNativeName);
                     if (newAsset != null)
                     {
                         m_ConcreteAssets.Add(newAsset);
@@ -428,15 +422,15 @@ namespace AssetBundleBrowser.AssetBundleModel
             m_Dirty = true;
         }
 
-        internal override void AddAssetsToNode(AssetTreeItem node)
+        internal override void AddAssetsToNode(AssetTreeViewItem node)
         {
             foreach (var asset in m_ConcreteAssets)
-                node.AddChild(new AssetTreeItem(asset));
+                node.AddChild(new AssetTreeViewItem(asset));
 
             foreach (var asset in m_DependentAssets)
             {
                 if(!node.ContainsChild(asset))
-                    node.AddChild(new AssetTreeItem(asset));
+                    node.AddChild(new AssetTreeViewItem(asset));
             }
 
             m_Dirty = false;
@@ -488,12 +482,12 @@ namespace AssetBundleBrowser.AssetBundleModel
                 if (ai == asset || m_ConcreteAssets.Contains(ai) || m_DependentAssets.Contains(ai))
                     continue;
 
-                var bundleName = AssetBundleModel.Model.assetBundleData.GetImplicitAssetBundleName(ai.fullAssetName);
+                var bundleName = AssetBundleBrowser.Model.AssetBundleModel.assetBundleData.GetImplicitAssetBundleName(ai.fullAssetName);
                 if (string.IsNullOrEmpty(bundleName))
                 {
                     m_DependentAssets.Add(ai);
                     m_TotalSize += ai.fileSize;
-                    if (Model.RegisterAsset(ai, parentBundle) > 1)
+                    if (AssetBundleModel.RegisterAsset(ai, parentBundle) > 1)
                     {
                         SetDuplicateWarning();
                     }
@@ -550,17 +544,17 @@ namespace AssetBundleBrowser.AssetBundleModel
         internal bool isSceneBundle
         { get { return m_IsSceneBundle; } }
 
-        internal override BundleTreeItem CreateTreeView(int depth)
+        internal override BundleTreeViewItem CreateTreeView(int depth)
         {
             RefreshAssetList();
             RefreshMessages();
             if (isSceneBundle)
-                return new BundleTreeItem(this, depth, Model.GetSceneIcon());
+                return new BundleTreeViewItem(this, depth, AssetBundleModel.sceneIcon);
             else
-                return new BundleTreeItem(this, depth, Model.GetBundleIcon());
+                return new BundleTreeViewItem(this, depth, AssetBundleModel.bundleIcon);
         }
 
-        internal override void HandleReparent(string parentName, BundleFolderInfo newParent = null)
+        internal override void HandleReparent(string parentName, AssetBundleFolderInfo newParent = null)
         {
             RefreshAssetList();
             string newName = System.String.IsNullOrEmpty(parentName) ? "" : parentName + '/';
@@ -568,15 +562,15 @@ namespace AssetBundleBrowser.AssetBundleModel
             if (newName == m_Name.bundleName)
                 return;
 
-            if (newParent != null && newParent.GetChild(newName) != null)
+            if (newParent != null && newParent.GetAssetBundleInfoByName(newName) != null)
             {
-                Model.LogWarning("An item named '" + newName + "' already exists at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
+                AssetBundleModel.LogWarning("An item named '" + newName + "' already exists at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
                 return;
             }
             
             foreach (var asset in m_ConcreteAssets)
             {
-                Model.MoveAssetToBundle(asset, newName, m_Name.variant);
+                AssetBundleModel.MoveAssetToBundle(asset, newName, m_Name.variant);
             }
 
             if (newParent != null)
@@ -612,7 +606,7 @@ namespace AssetBundleBrowser.AssetBundleModel
     internal class BundleVariantDataInfo : BundleDataInfo
     {
         protected List<AssetInfo> m_FolderIncludeAssets = new List<AssetInfo>();
-        internal BundleVariantDataInfo(string name, BundleFolderInfo parent) : base(name, parent)
+        internal BundleVariantDataInfo(string name, AssetBundleFolderInfo parent) : base(name, parent)
         {
         }
 
@@ -645,13 +639,13 @@ namespace AssetBundleBrowser.AssetBundleModel
                 if (!m_Parent.HandleChildRename(m_Name.variant, newName))
                     return false;
                 m_Name.variant = newName;
-                Model.MoveAssetToBundle(m_ConcreteAssets, m_Name.bundleName, m_Name.variant);
+                AssetBundleModel.MoveAssetToBundle(m_ConcreteAssets, m_Name.bundleName, m_Name.variant);
             }
             else if (reverseDepth == 1)
             {
                 RefreshAssetList();
                 m_Name.PartialNameChange(newName + "." + m_Name.variant, 0);
-                Model.MoveAssetToBundle(m_ConcreteAssets, m_Name.bundleName, m_Name.variant);
+                AssetBundleModel.MoveAssetToBundle(m_ConcreteAssets, m_Name.bundleName, m_Name.variant);
             }
             else
             {
@@ -666,7 +660,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             {
                 m_Parent.HandleChildRename(m_Name.variant, string.Empty);
             }
-            Model.MoveAssetToBundle(m_ConcreteAssets, forcedNewName, forcedNewVariant);
+            AssetBundleModel.MoveAssetToBundle(m_ConcreteAssets, forcedNewName, forcedNewVariant);
         }
 
         internal bool FindContentMismatch(BundleVariantDataInfo other)
@@ -725,58 +719,59 @@ namespace AssetBundleBrowser.AssetBundleModel
         }
     }
 
-
-    internal abstract class BundleFolderInfo : BundleInfo
+    internal abstract class AssetBundleFolderInfo : AssetBundleInfo
     {
-        protected Dictionary<string, BundleInfo> m_Children;
+        protected Dictionary<string, AssetBundleInfo> m_AssetBundleInfos;
 
-        internal BundleFolderInfo(string name, BundleFolderInfo parent) : base(name, parent)
+        internal AssetBundleFolderInfo(string name, AssetBundleFolderInfo parent) : base(name, parent)
         {
-            m_Children = new Dictionary<string, BundleInfo>();
+            m_AssetBundleInfos = new Dictionary<string, AssetBundleInfo>();
         }
         
-        internal BundleFolderInfo(List<string> path, int depth, BundleFolderInfo parent) : base("", parent)
+        internal AssetBundleFolderInfo(List<string> path, int depth, AssetBundleFolderInfo parent) : base("", parent)
         {
-            m_Children = new Dictionary<string, BundleInfo>();
-            m_Name = new BundleNameData("");
+            m_AssetBundleInfos = new Dictionary<string, AssetBundleInfo>();
+            m_Name = new AssetBundleNameInfo("");
             m_Name.pathTokens = path.GetRange(0, depth);
         }
 
-        internal BundleInfo GetChild(string name)
+        internal AssetBundleInfo GetAssetBundleInfoByName(string name)
         {
             if (name == null)
                 return null;
 
-            if (m_Children.TryGetValue(name, out BundleInfo info))
-                return info;
-            return null;
+            m_AssetBundleInfos.TryGetValue(name, out AssetBundleInfo info);
+            return info;
         }
-        internal Dictionary<string, BundleInfo>.ValueCollection GetChildList()
+
+        internal Dictionary<string, AssetBundleInfo>.ValueCollection GetChildList()
         {
-            return m_Children.Values;
+            return m_AssetBundleInfos.Values;
         }
-        internal abstract void AddChild(BundleInfo info);
+
+        internal abstract void AddChild(AssetBundleInfo info);
 
         internal override bool HandleRename(string newName, int reverseDepth)
         {
             if (!base.HandleRename(newName, reverseDepth))
                 return false;
 
-            foreach (var child in m_Children)
+            foreach (var child in m_AssetBundleInfos)
             {
                 child.Value.HandleRename(newName, reverseDepth + 1);
             }
+
             return true;
         }
 
         internal override void HandleDelete(bool isRootOfDelete, string forcedNewName="", string forcedNewVariant = "")
         {
             base.HandleDelete(isRootOfDelete);
-            foreach (var child in m_Children)
+            foreach (var child in m_AssetBundleInfos)
             {
                 child.Value.HandleDelete(false, forcedNewName, forcedNewVariant);
             }
-            m_Children.Clear();
+            m_AssetBundleInfos.Clear();
         }
 
         internal override bool DoesItemMatchSearch(string search)
@@ -787,9 +782,9 @@ namespace AssetBundleBrowser.AssetBundleModel
         protected override void RefreshMessages()
         {
             m_BundleMessages.SetFlag(MessageSystem.MessageFlag.ErrorInChildren, false);
-            foreach(var child in m_Children)
+            foreach(var assetBundleInfo in m_AssetBundleInfos)
             {
-                if (child.Value.IsMessageSet(MessageSystem.MessageFlag.Error))
+                if (assetBundleInfo.Value.IsMessageSet(MessageSystem.MessageFlag.Error))
                 {
                     m_BundleMessages.SetFlag(MessageSystem.MessageFlag.ErrorInChildren, true);
                     break;
@@ -799,8 +794,8 @@ namespace AssetBundleBrowser.AssetBundleModel
         }
         internal override bool RefreshEmptyStatus()
         {
-            bool empty = m_Children.Count == 0;
-            foreach (var child in m_Children)
+            bool empty = m_AssetBundleInfos.Count == 0;
+            foreach (var child in m_AssetBundleInfos)
             {
                 empty |= child.Value.RefreshEmptyStatus();
             }
@@ -810,7 +805,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         internal override void RefreshAssetList()
         {
-            foreach (var child in m_Children)
+            foreach (var child in m_AssetBundleInfos)
             {
                 child.Value.RefreshAssetList();
             }
@@ -818,36 +813,47 @@ namespace AssetBundleBrowser.AssetBundleModel
         internal override bool RefreshDupeAssetWarning()
         {
             bool dupeWarning = false;
-            foreach (var child in m_Children)
+            foreach (var assetBundleInfo in m_AssetBundleInfos)
             {
-                dupeWarning |= child.Value.RefreshDupeAssetWarning();
+                dupeWarning |= assetBundleInfo.Value.RefreshDupeAssetWarning();
             }
             m_BundleMessages.SetFlag(MessageSystem.MessageFlag.WarningInChildren, dupeWarning);
             return dupeWarning;
         }
-        internal override void AddAssetsToNode(AssetTreeItem node)
+        internal override void AddAssetsToNode(AssetTreeViewItem node)
         {
-            foreach (var child in m_Children)
+            foreach (var assetBundleInfo in m_AssetBundleInfos)
             {
-                child.Value.AddAssetsToNode(node);
+                assetBundleInfo.Value.AddAssetsToNode(node);
             }
             m_Dirty = false;
         }
         internal virtual bool HandleChildRename(string oldName, string newName)
         {
-
-            if (!System.String.IsNullOrEmpty(newName) && m_Children.ContainsKey(newName))
+            if(string.IsNullOrEmpty(oldName))
             {
-                Model.LogWarning("Attempting to name an item '" + newName + "' which matches existing name at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
+                AssetBundleModel.LogWarning("Attempting to Rename an item '" + "' which oldName is NullOrEmpty.");
                 return false;
             }
 
-            if (m_Children.TryGetValue(oldName, out BundleInfo info))
+            if (string.IsNullOrEmpty(newName))
             {
-                m_Children.Remove(oldName);
-                if (!System.String.IsNullOrEmpty(newName))
-                    m_Children.Add(newName, info);
+                AssetBundleModel.LogWarning("Attempting to Rename an item '" + "' which newName is NullOrEmpty.");
+                return false;
             }
+
+            if (!System.String.IsNullOrEmpty(newName) && m_AssetBundleInfos.ContainsKey(newName))
+            {
+                AssetBundleModel.LogWarning("Attempting to name an item '" + newName + "' which matches existing name at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
+                return false;
+            }
+
+            if (m_AssetBundleInfos.TryGetValue(oldName, out AssetBundleInfo info))
+            {
+                m_AssetBundleInfos.Remove(oldName);
+                m_AssetBundleInfos.Add(newName, info);
+            }
+
             return true;
         }
 
@@ -855,7 +861,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             m_Dirty = false;
             m_DoneUpdating = true;
-            foreach (var child in m_Children)
+            foreach (var child in m_AssetBundleInfos)
             {
                 child.Value.Update();
                 m_Dirty |= child.Value.dirty;
@@ -869,7 +875,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             get
             {
-                foreach (var child in m_Children)
+                foreach (var child in m_AssetBundleInfos)
                 {
                     m_DoneUpdating &= child.Value.doneUpdating;
                 }
@@ -877,11 +883,10 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
         }
 
-
         internal override List<AssetInfo> GetDependencies()
         {
             List<AssetInfo> assets = new List<AssetInfo>();
-            foreach (var child in m_Children)
+            foreach (var child in m_AssetBundleInfos)
             {
                 assets.AddRange(child.Value.GetDependencies());
             }
@@ -889,44 +894,45 @@ namespace AssetBundleBrowser.AssetBundleModel
         }
     }
 
-    internal class BundleFolderConcreteInfo : BundleFolderInfo
+    internal class AssetBundleFolderInfoConcrete : AssetBundleFolderInfo
     {
-        internal BundleFolderConcreteInfo(string name, BundleFolderInfo parent) : base(name, parent)
+        internal AssetBundleFolderInfoConcrete(string name, AssetBundleFolderInfo parent) : base(name, parent)
         {
         }
 
-        internal BundleFolderConcreteInfo(List<string> path, int depth, BundleFolderInfo parent) : base(path, depth, parent)
+        internal AssetBundleFolderInfoConcrete(List<string> path, int depth, AssetBundleFolderInfo parent) : base(path, depth, parent)
         {
         }
 
-        internal override void AddChild(BundleInfo info)
+        internal override void AddChild(AssetBundleInfo info)
         {
-            m_Children.Add(info.displayName, info);
+            m_AssetBundleInfos.Add(info.displayName, info);
         }
-        internal override BundleTreeItem CreateTreeView(int depth)
+
+        internal override BundleTreeViewItem CreateTreeView(int depth)
         {
             RefreshMessages();
-            var result = new BundleTreeItem(this, depth, Model.GetFolderIcon());
-            foreach (var child in m_Children)
+            var result = new BundleTreeViewItem(this, depth, AssetBundleModel.folderIcon);
+            foreach (var child in m_AssetBundleInfos)
             {
                 result.AddChild(child.Value.CreateTreeView(depth + 1));
             }
             return result;
         }
-        internal override void HandleReparent(string parentName, BundleFolderInfo newParent = null)
+        internal override void HandleReparent(string parentName, AssetBundleFolderInfo newParent = null)
         {
             string newName = System.String.IsNullOrEmpty(parentName) ? "" : parentName + '/';
             newName += displayName;
             if (newName == m_Name.bundleName)
                 return;
 
-            if (newParent != null && newParent.GetChild(newName) != null)
+            if (newParent != null && newParent.GetAssetBundleInfoByName(newName) != null)
             {
-                Model.LogWarning("An item named '" + newName + "' already exists at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
+                AssetBundleModel.LogWarning("An item named '" + newName + "' already exists at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
                 return;
             }
 
-            foreach (var child in m_Children)
+            foreach (var child in m_AssetBundleInfos)
             {
                 child.Value.HandleReparent(newName);
             }
@@ -942,14 +948,14 @@ namespace AssetBundleBrowser.AssetBundleModel
     }
 
 
-    internal class BundleVariantFolderInfo : BundleFolderInfo
+    internal class BundleVariantFolderInfo : AssetBundleFolderInfo
     {
-        internal BundleVariantFolderInfo(string name, BundleFolderInfo parent) : base(name, parent)
+        internal BundleVariantFolderInfo(string name, AssetBundleFolderInfo parent) : base(name, parent)
         {
         }
-        internal override void AddChild(BundleInfo info)
+        internal override void AddChild(AssetBundleInfo info)
         {
-            m_Children.Add(info.m_Name.variant, info);
+            m_AssetBundleInfos.Add(info.m_Name.variant, info);
         }
         private bool m_validated;
         internal override void Update()
@@ -963,10 +969,10 @@ namespace AssetBundleBrowser.AssetBundleModel
         {
             m_validated = true;
             bool childMismatch = false;
-            if(m_Children.Count > 1)
+            if(m_AssetBundleInfos.Count > 1)
             {
                 BundleVariantDataInfo goldChild = null;
-                foreach(var c in m_Children)
+                foreach(var c in m_AssetBundleInfos)
                 {
                     var child = c.Value as BundleVariantDataInfo;
                     child.SetMessageFlag(MessageSystem.MessageFlag.VariantBundleMismatch, false);
@@ -982,40 +988,40 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         }
 
-        internal override BundleTreeItem CreateTreeView(int depth)
+        internal override BundleTreeViewItem CreateTreeView(int depth)
         {
             RefreshMessages();
             Texture2D icon = null;
-            if ((m_Children.Count > 0) &&
-                ((m_Children.First().Value as BundleVariantDataInfo).IsSceneVariant()))
+            if ((m_AssetBundleInfos.Count > 0) &&
+                ((m_AssetBundleInfos.First().Value as BundleVariantDataInfo).IsSceneVariant()))
             {
-                icon = Model.GetSceneIcon();
+                icon = AssetBundleModel.sceneIcon;
             }
             else
-                icon = Model.GetBundleIcon();
+                icon = AssetBundleModel.bundleIcon;
 
-            var result = new BundleTreeItem(this, depth, icon);
-            foreach (var child in m_Children)
+            var result = new BundleTreeViewItem(this, depth, icon);
+            foreach (var child in m_AssetBundleInfos)
             {
                 result.AddChild(child.Value.CreateTreeView(depth + 1));
             }
             return result;
         }
 
-        internal override void HandleReparent(string parentName, BundleFolderInfo newParent = null)
+        internal override void HandleReparent(string parentName, AssetBundleFolderInfo newParent = null)
         {
             string newName = System.String.IsNullOrEmpty(parentName) ? "" : parentName + '/';
             newName += displayName;
             if (newName == m_Name.bundleName)
                 return;
 
-            if (newParent != null && newParent.GetChild(newName) != null)
+            if (newParent != null && newParent.GetAssetBundleInfoByName(newName) != null)
             {
-                Model.LogWarning("An item named '" + newName + "' already exists at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
+                AssetBundleModel.LogWarning("An item named '" + newName + "' already exists at this level in hierarchy.  If your desire is to merge bundles, drag one on top of the other.");
                 return;
             }
 
-            foreach (var child in m_Children)
+            foreach (var child in m_AssetBundleInfos)
             {
                 child.Value.HandleReparent(parentName);
             }
@@ -1031,7 +1037,7 @@ namespace AssetBundleBrowser.AssetBundleModel
         internal override bool HandleChildRename(string oldName, string newName)
         {
             var result = base.HandleChildRename(oldName, newName);
-            if (m_Children.Count == 0)
+            if (m_AssetBundleInfos.Count == 0)
                 HandleDelete(true);
             return result;
         }

@@ -4,9 +4,9 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace AssetBundleBrowser.AssetBundleModel
+namespace AssetBundleBrowser.Model
 {
-    internal sealed class AssetTreeItem : TreeViewItem
+    internal sealed class AssetTreeViewItem : TreeViewItem
     {
         private AssetInfo m_AssetInfo;
         internal AssetInfo assetInfo { get { return m_AssetInfo; } }
@@ -26,8 +26,8 @@ namespace AssetBundleBrowser.AssetBundleModel
             set { m_Color = value; }
         }
 
-        internal AssetTreeItem() : base(-1, -1) { }
-        internal AssetTreeItem(AssetInfo a) : base(a != null ? a.fullAssetName.GetHashCode() : Random.Range(int.MinValue, int.MaxValue), 0, a != null ? a.displayName : "failed")
+        internal AssetTreeViewItem() : base(-1, -1) { }
+        internal AssetTreeViewItem(AssetInfo a) : base(a != null ? a.fullAssetName.GetHashCode() : Random.Range(int.MinValue, int.MaxValue), 0, a != null ? a.displayName : "failed")
         {
             m_AssetInfo = a;
             if (a != null)
@@ -54,7 +54,7 @@ namespace AssetBundleBrowser.AssetBundleModel
                 return false;
             foreach (var child in children)
             {
-                var c = child as AssetTreeItem;
+                var c = child as AssetTreeViewItem;
                 if (c != null && c.assetInfo != null && c.assetInfo.fullAssetName == asset.fullAssetName)
                 {
                     contains = true;
@@ -71,22 +71,24 @@ namespace AssetBundleBrowser.AssetBundleModel
     internal class AssetInfo
     {
         internal bool isScene { get; set; }
+
         internal bool isFolder { get; set; }
+
         internal long fileSize;
 
         private HashSet<string> m_Parents;
 
-        private string m_AssetName;
+        private string m_FullAssetName;
         internal string fullAssetName
         {
-            get { return m_AssetName; }
+            get { return m_FullAssetName; }
             set
             {
-                m_AssetName = value;
-                m_DisplayName = System.IO.Path.GetFileNameWithoutExtension(m_AssetName);
+                m_FullAssetName = value;
+                displayName = System.IO.Path.GetFileNameWithoutExtension(m_FullAssetName);
 
                 //TODO - maybe there's a way to ask the AssetDatabase for this size info.
-                System.IO.FileInfo fileInfo = new System.IO.FileInfo(m_AssetName);
+                System.IO.FileInfo fileInfo = new System.IO.FileInfo(m_FullAssetName);
                 if (fileInfo.Exists)
                     fileSize = fileInfo.Length;
                 else
@@ -94,8 +96,7 @@ namespace AssetBundleBrowser.AssetBundleModel
             }
         }
 
-        private string m_DisplayName;
-        internal string displayName { get { return m_DisplayName; } }
+        internal string displayName { get; set; }
 
         private string m_BundleName;
         internal string bundleName { get { return System.String.IsNullOrEmpty(m_BundleName) ? "auto" : m_BundleName; } }
@@ -115,10 +116,7 @@ namespace AssetBundleBrowser.AssetBundleModel
 
         internal Color GetColor()
         {
-            if (System.String.IsNullOrEmpty(m_BundleName))
-                return Model.lightGrey;
-            else
-                return Color.white;
+            return System.String.IsNullOrEmpty(m_BundleName) ? AssetBundleModel.lightGrey : Color.white;
         }
 
         internal bool IsMessageSet(MessageSystem.MessageFlag flag)
@@ -148,15 +146,17 @@ namespace AssetBundleBrowser.AssetBundleModel
                     message += "Is included in a bundle with a scene. Scene bundles must have only one or more scene assets.";
                 messages.Add(new MessageSystem.Message(message, MessageType.Error));
             }
+
             if (IsMessageSet(MessageSystem.MessageFlag.DependencySceneConflict))
             {
                 var message = displayName + "\n";
                 message += MessageSystem.GetMessage(MessageSystem.MessageFlag.DependencySceneConflict).message;
                 messages.Add(new MessageSystem.Message(message, MessageType.Error));
             }
+
             if (IsMessageSet(MessageSystem.MessageFlag.AssetsDuplicatedInMultBundles))
             {
-                var bundleNames = AssetBundleModel.Model.CheckDependencyTracker(this);
+                var bundleNames = AssetBundleBrowser.Model.AssetBundleModel.CheckDependencyTracker(this);
                 string message = displayName + "\n" + "Is auto-included in multiple bundles:\n";
                 foreach (var bundleName in bundleNames)
                 {
@@ -225,18 +225,18 @@ namespace AssetBundleBrowser.AssetBundleModel
             if (m_dependencies == null)
             {
                 m_dependencies = new List<AssetInfo>();
-                if (AssetDatabase.IsValidFolder(m_AssetName))
+                if (AssetDatabase.IsValidFolder(m_FullAssetName))
                 {
                     //if we have a folder, its dependencies were already pulled in through alternate means.  no need to GatherFoldersAndFiles
                     //GatherFoldersAndFiles();
                 }
                 else
                 {
-                    foreach (var dep in AssetDatabase.GetDependencies(m_AssetName, true))
+                    foreach (var dep in AssetDatabase.GetDependencies(m_FullAssetName, true))
                     {
-                        if (dep != m_AssetName)
+                        if (dep != m_FullAssetName)
                         {
-                            var asset = Model.CreateAsset(dep, this);
+                            var asset = AssetBundleModel.CreateAsset(dep, this);
                             if (asset != null)
                                 m_dependencies.Add(asset);
                         }

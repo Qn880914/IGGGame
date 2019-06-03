@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TestAltas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: d0945d3c4a5508c41aaea01bd3c1e770, type: 3}
+    - {fileID: 21300000, guid: d9d8cbf961867974d90e46e67b0f200c, type: 3}
+    - {fileID: 2800000, guid: 4efafa677084b664db4e72c3cbb30ba8, type: 3}
+    - {fileID: 2800000, guid: 6b855310c90da4344b993a93b0c82ffc, type: 3}
+    totalSpriteSurfaceArea: 212992
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 6b855310c90da4344b993a93b0c82ffc, type: 3}
+  - {fileID: 21300000, guid: 4efafa677084b664db4e72c3cbb30ba8, type: 3}
+  - {fileID: 21300000, guid: d9d8cbf961867974d90e46e67b0f200c, type: 3}
+  - {fileID: 21300000, guid: d0945d3c4a5508c41aaea01bd3c1e770, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - UI_blood
+  - UI_04
+  - UI_03
+  - UI_01
+  m_Tag: TestAltas
+  m_IsVariant: 0

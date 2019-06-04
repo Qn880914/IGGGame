@@ -27,6 +27,8 @@ namespace AssetBundleBrowser
         ///     <para> Callback for build event. </para>
         /// </summary>
         public Action<string> buildCallback { get; set; }
+
+        public bool reporter { get; set; }
     }
 
     /// <summary>

@@ -33,6 +33,8 @@ namespace AssetBundleBrowser
 
         private ToggleData m_CopyToStreaming;
 
+        private ToggleData m_Reporter;
+
         private GUIContent m_TargetContent;
 
         private GUIContent m_CompressionContent;
@@ -158,6 +160,12 @@ namespace AssetBundleBrowser
                 "After build completes, will copy all build content to " + m_streamingPath + " for use in stand-alone player.",
                 m_UserData.m_OnToggles);
 
+            m_Reporter = new ToggleData(
+                false, 
+                "AssetBundle Report",
+                "After Build completes, Report assetbundle into excel",
+                m_UserData.m_OnToggles);
+
             m_TargetContent = new GUIContent("Build Target", "Choose target platform to build for.");
 
             m_CompressionContent = new GUIContent("Compression", "Choose no compress, standard (LZMA), or chunk based (LZ4)");
@@ -243,6 +251,12 @@ namespace AssetBundleBrowser
                     m_CopyToStreaming.state,
                     m_CopyToStreaming.content);
                 CheckToggleDataState(m_CopyToStreaming, newState);
+
+                newState = GUILayout.Toggle(
+                    m_Reporter.state,
+                    m_Reporter.content
+                    );
+                CheckToggleDataState(m_Reporter, newState);
             }
 
             // advanced options
@@ -377,6 +391,7 @@ namespace AssetBundleBrowser
             buildInfo.outputDirectory = m_UserData.m_OutputPath;
             buildInfo.options = options;
             buildInfo.buildTarget = (BuildTarget)m_UserData.m_BuildTarget;
+            buildInfo.reporter = m_Reporter.state;
             buildInfo.buildCallback = (assetBundleName) =>
             {
                 if (m_InspectTab == null)

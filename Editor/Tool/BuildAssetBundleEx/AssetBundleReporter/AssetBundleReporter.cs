@@ -18,36 +18,35 @@ namespace AssetBundleBrowser
         [MenuItem("Window/AssetBundleReporter")]
         public static void AnalyzePrintCmd()
         {
-            string path = EditorUtility.OpenFolderPanel(Application.streamingAssetsPath, "", "");
-            if (string.IsNullOrEmpty(path))
+            string assetBundlePath = EditorUtility.OpenFolderPanel(Application.streamingAssetsPath, "", "");
+            if (string.IsNullOrEmpty(assetBundlePath))
             {
                 return;
             }
 
-            string bundlePath = path;
-            string outputPath = Path.Combine(path, "AssetBundle报告" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".xlsx");
-            AnalyzePrint(bundlePath, outputPath);
+            string outputPath = Path.Combine(assetBundlePath,
+                string.Format("AssetBundle报告{0}{1}", DateTime.Now.ToString("yyyyMMdd_HHmmss"), ".xlsx"));
+
+            AnalyzePrint(assetBundlePath, outputPath);
         }
 
         /// <summary>
         /// 分析打印 AssetBundle
         /// </summary>
-        /// <param name="bundlePath">AssetBundle 文件所在文件夹路径</param>
+        /// <param name="assetBundlePath">AssetBundle 文件所在文件夹路径</param>
         /// <param name="outputPath">Excel 报告文件保存路径</param>
-        /// <param name="completed">分析打印完毕后的回调</param>
-        public static void AnalyzePrint(string bundlePath, string outputPath, UnityAction completed = null)
+        /// <param name="completedCallback">分析打印完毕后的回调</param>
+        public static void AnalyzePrint(string assetBundlePath, string outputPath, UnityAction completedCallback = null)
         {
             AssetBundleFilesAnalyze.analyzeCompletedCallback = () =>
             {
                 PrintToExcel(outputPath);
-                if (completed != null)
-                {
-                    completed();
-                }
+
+                completedCallback?.Invoke();
             };
 
             EditorUtility.DisplayProgressBar("AssetBundle报告", "正在分析 AssetBundle 文件...", 0.35f);
-            if (!AssetBundleFilesAnalyze.Analyze(bundlePath))
+            if (!AssetBundleFilesAnalyze.Analyze(assetBundlePath))
             {
                 EditorUtility.ClearProgressBar();
             }

@@ -48,7 +48,7 @@ namespace AssetBundleBrowser
             int startRow = 3;
             int maxCol = 4;
 
-            var dicts = AssetBundleFilesAnalyze.GetAllAssetFileInfo();
+            var dicts = AssetBundleFilesAnalyze.assetFileInfos;
             if (dicts == null)
             {
                 ws.Cells[1, 1].Value = ws.Cells[1, 1].Value + " (0)";

@@ -61,7 +61,7 @@ namespace AssetBundleBrowser
         {
             int startRow = 3;
 
-            List<AssetBundleFileInfo> infos = AssetBundleFilesAnalyze.GetAllAssetBundleFileInfos();
+            List<AssetBundleFileInfo> infos = AssetBundleFilesAnalyze.assetBundleFileInfos;
             foreach (var info in infos)
             {
                 int colIndex = 1;

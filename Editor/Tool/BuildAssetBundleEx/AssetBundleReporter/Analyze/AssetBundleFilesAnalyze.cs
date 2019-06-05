@@ -3,11 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
-#if UNITY_5 || UNITY_5_3_OR_NEWER
 using UnityEditor.Animations;
-#else
-using UnityEditorInternal;
-#endif
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -23,7 +19,7 @@ namespace AssetBundleBrowser
         /// <summary>
         /// 自定义分析依赖
         /// </summary>
-        public static System.Func<string, List<AssetBundleFileInfo>> analyzeCustomDepend;
+        public static System.Func<string, List<AssetBundleFileInfo>> analyzeCustomDepend { get; set; }
 
         /// <summary>
         /// 分析的时候，也导出资源
@@ -39,62 +35,59 @@ namespace AssetBundleBrowser
 
         #region 内部实现
 
-        private static List<AssetBundleFileInfo> s_AssetBundleFileInfos;
-        private static Dictionary<long, AssetFileInfo> s_AssetFileInfos;
-        private static AssetBundleFilesAnalyzeScene s_AnalyzeScene;
-
-        public static UnityAction analyzeCompletedCallback;
+        /// <summary>
+        ///     <para> all AssetBundle File Info. </para>
+        /// </summary>
+        public static List<AssetBundleFileInfo> assetBundleFileInfos { get; set; }
 
         /// <summary>
-        /// 获取所有的AB文件信息
+        ///     <para> all Asset File Info. </para>
+        ///     <para> guid map AssetFileInfo. </para>
         /// </summary>
-        /// <returns></returns>
-        public static List<AssetBundleFileInfo> GetAllAssetBundleFileInfos()
-        {
-            return s_AssetBundleFileInfos;
-        }
+        public static Dictionary<long, AssetFileInfo> assetFileInfos { get; set; }
+
+        private static AssetBundleFilesAnalyzeScene s_AnalyzeScene;
+
+        public static UnityAction analyzeCompletedCallback { get; set; }
+
+        private static PropertyInfo s_InspectorMode;
+
 
         public static AssetBundleFileInfo GetAssetBundleFileInfo(string name)
         {
-            return s_AssetBundleFileInfos.Find(info => info.name == name);
-        }
+            if (assetBundleFileInfos == null)
+                return null;
 
-        /// <summary>
-        /// 获取所有的资产文件信息
-        /// </summary>
-        /// <returns></returns>
-        public static Dictionary<long, AssetFileInfo> GetAllAssetFileInfo()
-        {
-            return s_AssetFileInfos;
+            return assetBundleFileInfos.Find(info => info.name == name);
         }
 
         public static AssetFileInfo GetAssetFileInfo(long guid)
         {
-            if (s_AssetFileInfos == null)
+            if (assetFileInfos == null)
             {
-                s_AssetFileInfos = new Dictionary<long, AssetFileInfo>();
+                assetFileInfos = new Dictionary<long, AssetFileInfo>();
             }
 
-            AssetFileInfo info;
-            if (!s_AssetFileInfos.TryGetValue(guid, out info))
+            if (!assetFileInfos.TryGetValue(guid, out AssetFileInfo info))
             {
                 info = new AssetFileInfo { guid = guid };
-                s_AssetFileInfos.Add(guid, info);
+                assetFileInfos.Add(guid, info);
             }
+
             return info;
         }
 
         public static void Clear()
         {
-            if (s_AssetBundleFileInfos != null)
+            if (assetBundleFileInfos != null)
             {
-                s_AssetBundleFileInfos.Clear();
-                s_AssetBundleFileInfos = null;
+                assetBundleFileInfos.Clear();
+                assetBundleFileInfos = null;
             }
-            if (s_AssetFileInfos != null)
+            if (assetFileInfos != null)
             {
-                s_AssetFileInfos.Clear();
-                s_AssetFileInfos = null;
+                assetFileInfos.Clear();
+                assetFileInfos = null;
             }
             s_AnalyzeScene = null;
 
@@ -108,40 +101,38 @@ namespace AssetBundleBrowser
         {
             if (!Directory.Exists(directoryPath))
             {
-                Debug.LogError(directoryPath + " is not exists!");
+                Debug.LogErrorFormat("{0} is not exists!", directoryPath);
                 return false;
             }
 
-            if (analyzeCustomDepend != null)
-            {
-                s_AssetBundleFileInfos = analyzeCustomDepend(directoryPath);
-            }
-            if (s_AssetBundleFileInfos == null)
+            assetBundleFileInfos = analyzeCustomDepend?.Invoke(directoryPath);
+
+            if (assetBundleFileInfos == null)
             {
 #if UNITY_5 || UNITY_5_3_OR_NEWER
-                s_AssetBundleFileInfos = AnalyzeManifestDepend(directoryPath);
+                assetBundleFileInfos = AnalyzeManifestDepend(directoryPath);
 #endif
             }
-            if (s_AssetBundleFileInfos == null)
+
+            if (assetBundleFileInfos == null)
             {
-                s_AssetBundleFileInfos = AnalyzAllFiles(directoryPath);
+                assetBundleFileInfos = AnalyzAllFiles(directoryPath);
             }
-            if (s_AssetBundleFileInfos == null)
+
+            if (assetBundleFileInfos == null)
             {
                 return false;
             }
 
             s_AnalyzeScene = new AssetBundleFilesAnalyzeScene();
-            AnalyzeBundleFiles(s_AssetBundleFileInfos);
+            AnalyzeBundleFiles(assetBundleFileInfos);
             s_AnalyzeScene.Analyze();
 
             if (!s_AnalyzeScene.IsAnalyzing())
             {
-                if (analyzeCompletedCallback != null)
-                {
-                    analyzeCompletedCallback();
-                }
+                analyzeCompletedCallback?.Invoke();
             }
+
             return true;
         }
 
@@ -156,7 +147,7 @@ namespace AssetBundleBrowser
             string manifestPath = Path.Combine(directoryPath, manifestName);
             if (!File.Exists(manifestPath))
             {
-                Debug.LogWarning(manifestPath + " is not exists! Use AnalyzAllFiles ...");
+                Debug.LogWarningFormat("{0} is not exists! Use AnalyzAllFiles ...", manifestPath);
                 return null;
             }
 #if UNITY_5_3_OR_NEWER
@@ -164,33 +155,33 @@ namespace AssetBundleBrowser
 #else
             AssetBundle manifestAb = AssetBundle.CreateFromMemoryImmediate(File.ReadAllBytes(manifestPath));
 #endif
-            if (!manifestAb)
+            if (manifestAb == null)
             {
-                Debug.LogError(manifestPath + " ab load faild!");
+                Debug.LogErrorFormat("{0} ab load faild!", manifestPath);
                 return null;
             }
 
-            List<AssetBundleFileInfo> infos = new List<AssetBundleFileInfo>();
+            List<AssetBundleFileInfo> assetBundleFileInfos = new List<AssetBundleFileInfo>();
 #if UNITY_5 || UNITY_5_3_OR_NEWER
             AssetBundleManifest assetBundleManifest = manifestAb.LoadAsset<AssetBundleManifest>("assetbundlemanifest");
-            var bundles = assetBundleManifest.GetAllAssetBundles();
-            foreach (var bundle in bundles)
+            var assetBundles = assetBundleManifest.GetAllAssetBundles();
+            foreach (var assetBundle in assetBundles)
             {
-                string path = Path.Combine(directoryPath, bundle);
-                AssetBundleFileInfo info = new AssetBundleFileInfo
+                string path = Path.Combine(directoryPath, assetBundle);
+                AssetBundleFileInfo assetBundleFileInfo = new AssetBundleFileInfo
                 {
-                    name = bundle,
+                    name = assetBundle,
                     path = path,
                     rootPath = directoryPath,
                     size = new FileInfo(path).Length,
-                    directDepends = assetBundleManifest.GetDirectDependencies(bundle),
-                    allDepends = assetBundleManifest.GetAllDependencies(bundle)
+                    directDepends = assetBundleManifest.GetDirectDependencies(assetBundle),
+                    allDepends = assetBundleManifest.GetAllDependencies(assetBundle)
                 };
-                infos.Add(info);
+                assetBundleFileInfos.Add(assetBundleFileInfo);
             }
 #endif
             manifestAb.Unload(true);
-            return infos;
+            return assetBundleFileInfos;
         }
 
         /// <summary>
@@ -257,7 +248,7 @@ namespace AssetBundleBrowser
                 AssetBundle assetBundle = AssetBundle.CreateFromMemoryImmediate(File.ReadAllBytes(info.path));
 #endif
 
-                if (null == assetBundle)
+                if (assetBundle == null)
                 {
                     continue;
                 }
@@ -290,40 +281,38 @@ namespace AssetBundleBrowser
             }
         }
 
-        private static PropertyInfo inspectorMode;
-
         /// <summary>
         /// 分析对象的引用
         /// </summary>
-        /// <param name="info"></param>
+        /// <param name="assetBundleFileInfo"></param>
         /// <param name="obj"></param>
-        public static void AnalyzeObjectReference(AssetBundleFileInfo info, Object obj)
+        public static void AnalyzeObjectReference(AssetBundleFileInfo assetBundleFileInfo, Object obj)
         {
-            if (obj == null || info.objDict.ContainsKey(obj))
+            if (obj == null || assetBundleFileInfo.objDict.ContainsKey(obj))
             {
                 return;
             }
 
             var serializedObject = new SerializedObject(obj);
-            info.objDict.Add(obj, serializedObject);
+            assetBundleFileInfo.objDict.Add(obj, serializedObject);
 
-            if (inspectorMode == null)
+            if (s_InspectorMode == null)
             {
-                inspectorMode = typeof(SerializedObject).GetProperty("inspectorMode", BindingFlags.NonPublic | BindingFlags.Instance);
+                s_InspectorMode = typeof(SerializedObject).GetProperty("inspectorMode", BindingFlags.NonPublic | BindingFlags.Instance);
             }
-            inspectorMode.SetValue(serializedObject, InspectorMode.Debug, null);
+            s_InspectorMode.SetValue(serializedObject, InspectorMode.Debug, null);
 
             var it = serializedObject.GetIterator();
             while (it.NextVisible(true))
             {
                 if (it.propertyType == SerializedPropertyType.ObjectReference && it.objectReferenceValue != null)
                 {
-                    AnalyzeObjectReference(info, it.objectReferenceValue);
+                    AnalyzeObjectReference(assetBundleFileInfo, it.objectReferenceValue);
                 }
             }
 
             // 只能用另一种方式获取的引用
-            AnalyzeObjectReference2(info, obj);
+            AnalyzeObjectReference2(assetBundleFileInfo, obj);
         }
 
         /// <summary>

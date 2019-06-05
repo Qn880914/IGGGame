@@ -9,7 +9,7 @@ namespace AssetBundleBrowser
     {
         public static void CreateAndFillWorksheet(ExcelWorksheets wss, string typeName)
         {
-            var dicts = AssetBundleFilesAnalyze.GetAllAssetFileInfo();
+            var dicts = AssetBundleFilesAnalyze.assetFileInfos;
             if (dicts == null)
             {
                 return;

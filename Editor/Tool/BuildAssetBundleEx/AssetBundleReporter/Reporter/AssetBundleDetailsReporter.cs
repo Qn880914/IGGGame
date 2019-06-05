@@ -26,7 +26,7 @@ namespace AssetBundleBrowser
         {
             int startRow = 2;
 
-            List<AssetBundleFileInfo> infos = AssetBundleFilesAnalyze.GetAllAssetBundleFileInfos();
+            List<AssetBundleFileInfo> infos = AssetBundleFilesAnalyze.assetBundleFileInfos;
             foreach (var info in infos)
             {
                 ws.Cells[startRow, 1].Value = info.name + " 所包含的具体资源";

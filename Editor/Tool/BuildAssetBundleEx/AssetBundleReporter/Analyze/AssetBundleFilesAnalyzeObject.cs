@@ -11,38 +11,38 @@ namespace AssetBundleBrowser
     /// </summary>
     public class AssetBundleFilesAnalyzeObject
     {
-        public static void ObjectAddToFileInfo(Object o, SerializedObject serializedObject, AssetBundleFileInfo info)
+        public static void ObjectAddToFileInfo(Object obj, SerializedObject serializedObject, AssetBundleFileInfo info)
         {
-            if (!o)
+            if (obj == null)
             {
                 return;
             }
 
-            string name2 = o.name;
-            string type = o.GetType().ToString();
-            if (type.StartsWith("UnityEngine."))
+            string name2 = obj.name;
+            string type = obj.GetType().ToString();
+            if (type.StartsWith("UnityEngine.", System.StringComparison.Ordinal))
             {
                 type = type.Substring(12);
                 
                 // 如果是内置的组件，就不当作是资源
-                if (o as Component)
+                if (obj as Component)
                 {
                     return;
                 }
             }
-            else if (type == "UnityEditor.Animations.AnimatorController")
+            else if (string.Equals(type, "UnityEditor.Animations.AnimatorController", System.StringComparison.Ordinal))
             {
                 type = "AnimatorController";
             }
-            else if (type == "UnityEditorInternal.AnimatorController")
+            else if (string.Equals(type, "UnityEditorInternal.AnimatorController", System.StringComparison.Ordinal))
             {
                 type = "AnimatorController";
             }
-            else if (type == "UnityEditor.MonoScript")
+            else if (string.Equals(type == "UnityEditor.MonoScript", System.StringComparison.Ordinal))
             {
-                MonoScript ms = o as MonoScript;
+                MonoScript ms = obj as MonoScript;
                 string type2 = ms.GetClass().ToString();
-                if (type2.StartsWith("UnityEngine."))
+                if (type2.StartsWith("UnityEngine.", System.StringComparison.Ordinal))
                 {
                     // 内置的脚本对象也不显示出来
                     return;
@@ -54,12 +54,12 @@ namespace AssetBundleBrowser
             else
             {
                 // 外部的组件脚本，走上面的MonoScript
-                if (o as Component)
+                if (obj as Component)
                 {
                     return;
                 }
                 // 外部的序列化对象，已经被脚本给分析完毕了，不需要再添加进来
-                if (o as ScriptableObject)
+                if (obj as ScriptableObject)
                 {
                     return;
                 }
@@ -69,7 +69,7 @@ namespace AssetBundleBrowser
             }
 
             // 内建的资源排除掉
-            string assetPath = AssetDatabase.GetAssetPath(o);
+            string assetPath = AssetDatabase.GetAssetPath(obj);
             if (!string.IsNullOrEmpty(assetPath))
             {
                 return;
@@ -104,7 +104,7 @@ namespace AssetBundleBrowser
             {
                 // 初次创建对象时链接为空
                 info2.detailHyperLink = new OfficeOpenXml.ExcelHyperLink(System.String.Empty, info2.name);
-                info2.propertys = AnalyzeObject(o, serializedObject, info.rootPath, info.name);
+                info2.propertys = AnalyzeObject(obj, serializedObject, info.rootPath, info.name);
             }
 
             info.assets.Add(info2);

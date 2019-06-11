@@ -418,7 +418,7 @@ namespace IGG.Core.Manager
             bool async = true, bool inData = true, LoadPriority priority = LoadPriority.Normal)
         {
 #if !UNITY_EDITOR && !UNITY_STANDALONE
-            Logger.LogError("LoadFile为编辑器专用方法!");
+            UnityEngine.Debug.LogError("LoadFile为编辑器专用方法!");
             return;
 #endif
 
@@ -439,7 +439,7 @@ namespace IGG.Core.Manager
             bool async = true, bool inData = true, LoadPriority priority = LoadPriority.Normal)
         {
 #if !UNITY_EDITOR && !UNITY_STANDALONE
-            Logger.LogError("LoadAssetFile为编辑器专用方法!");
+            UnityEngine.Debug.LogError("LoadAssetFile为编辑器专用方法!");
             return;
 #endif
 

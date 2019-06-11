@@ -193,7 +193,9 @@ public class ConfigDataHelper
 		}
 	}
 
-	public static bool Censorship
+    public static bool isRelease { get; set; }
+
+    public static bool Censorship
 	{
 		get
 		{

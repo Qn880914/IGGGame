@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: ebbb0ca741dbd0b468dd87a7862feb2c
+labels:
+- Fx_Additive
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: effect/actor/soldier/s_ng_assassin/materials_mat
+  assetBundleVariant: ab

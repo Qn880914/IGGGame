@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 5600af9a27b7e734a8931b060fcb56f1
+labels:
+- Fx_AddStencil
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: effect/scene/e_con2006/materials_mat
+  assetBundleVariant: ab

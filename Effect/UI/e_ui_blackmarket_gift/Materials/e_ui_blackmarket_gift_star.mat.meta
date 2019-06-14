@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: c6422684f147be64db9e102c6c892c6b
+labels:
+- Fx_AddStencil
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: effect/ui/e_ui_blackmarket_gift/materials_mat
+  assetBundleVariant: ab

@@ -64,7 +64,7 @@ namespace IGG.EditorTools
 			PlistElementDict root = doc.root;
 
 			root.SetBoolean("IS_CHINA_MAINLAND", ConfigDataHelper.ChinaMainland);
-			root.SetBoolean("IS_RELEASE", ConfigDataHelper.IsRelease);
+			root.SetBoolean("IS_RELEASE", ConfigDataHelper.isRelease);
 
 			// 对iOS9的影响
 			{
@@ -94,7 +94,7 @@ namespace IGG.EditorTools
 
 			// fb
 			{
-				string idFacebook = ConfigDataHelper.FacebookAppID;
+                string idFacebook = "000"; //ConfigDataHelper.FacebookAppID;
 
 				root.SetString("FacebookAppID", idFacebook);
 				root.SetString("FacebookDisplayName", PlayerSettings.productName);

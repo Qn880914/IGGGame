@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public class ParticleInfo
 {
+    public MainModule main { get; set; }
+
     public struct MinMaxCurve
     {
         private ParticleSystemCurveMode m_Mode;
@@ -65,6 +68,18 @@ public class ParticleInfo
             this.m_ConstantMin = min;
             this.m_ConstantMax = max;
         }
+
+        public MinMaxCurve(ParticleSystem.MinMaxCurve minMaxCurVe)
+        {
+            this.m_Mode = (ParticleSystemCurveMode)minMaxCurVe.mode;
+            this.m_CurveMultiplier = minMaxCurVe.curveMultiplier;
+            this.m_CurveMin = minMaxCurVe.curveMin;
+            this.m_CurveMax = minMaxCurVe.curveMax;
+            this.m_ConstantMin = minMaxCurVe.constantMin;
+            this.m_ConstantMax = minMaxCurVe.constantMax;
+        }
+
+
         public float Evaluate(float time)
         {
             return this.Evaluate(time, 1f);
@@ -103,13 +118,151 @@ public class ParticleInfo
 
         public bool prewarm { get; set; }
 
-        public MinMaxCurve startDelay { get; set; }
+        public ParticleSystem.MinMaxCurve startDelay { get; set; }
         public float startDelayMultiplier { get; set; }
 
-        public MinMaxCurve startLifetime { get; set; }
+        public ParticleSystem.MinMaxCurve startLifetime { get; set; }
         public float startLifetimeMultiplier { get; set; }
 
-        public MinMaxCurve startSpeed { get; set; }
+        public ParticleSystem.MinMaxCurve startSpeed { get; set; }
         public float startSpeedMultiplier { get; set; }
+
+        public bool startSize3D { get; set; }
+        public ParticleSystem.MinMaxCurve startSize { get; set; }
+        public float startSizeMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve startSizeX { get; set; }
+        public float startSizeXMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve startSizeY { get; set; }
+        public float startSizeYMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve startSizeZ { get; set; }
+        public float startSizeZMultiplier { get; set; }
+
+        public bool startRotation3D { get; set; }
+        public ParticleSystem.MinMaxCurve startRotation { get; set; }
+        public float startRotationMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve startRotationX { get; set; }
+        public float startRotationXMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve startRotationY { get; set; }
+        public float startRotationYMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve startRotationZ { get; set; }
+        public float startRotationZMultiplier { get; set; }
+
+        public float flipRotation { get; set; }
+
+        public ParticleSystem.MinMaxGradient startColor { get; set; }
+
+        public ParticleSystem.MinMaxCurve gravityModifier { get; set; }
+        public float gravityModifierMultiplier { get; set; }
+
+        public ParticleSystemSimulationSpace simulationSpace { get; set; }
+
+        public Transform customSimulationSpace { get; set; }
+
+        public float simulationSpeed { get; set; }
+
+        public bool useUnscaledTime { get; set; }
+
+        public ParticleSystemScalingMode scalingMode { get; set; }
+
+        public bool playOnAwake { get; set; }
+
+        public int maxParticles { get; set; }
+
+        public ParticleSystemEmitterVelocityMode emitterVelocityMode { get; set; }
+
+        public ParticleSystemStopAction stopAction { get; set; }
+
+        public ParticleSystemRingBufferMode ringBufferMode { get; set; }
+
+        public Vector2 ringBufferLoopRange { get; set; }
+
+        public ParticleSystemCullingMode cullingMode { get; set; }
+
+        public MainModule(ParticleSystem.MainModule mode)
+        {
+            duration = mode.duration;
+
+            loop = mode.loop;
+            prewarm = mode.prewarm;
+
+            startDelay = mode.startDelay;
+            startDelayMultiplier = mode.startDelayMultiplier;
+
+            startLifetime = mode.startLifetime;
+            startLifetimeMultiplier = mode.startLifetimeMultiplier;
+
+            startSpeed = mode.startSpeed;
+            startSpeedMultiplier = mode.startSpeedMultiplier;
+
+            startSize3D = mode.startSize3D;
+            startSize = mode.startSize;
+            startSizeMultiplier = mode.startSizeMultiplier;
+
+            startSizeX = mode.startSizeX;
+            startSizeXMultiplier = mode.startSizeXMultiplier;
+
+            startSizeY = mode.startSizeY;
+            startSizeYMultiplier = mode.startSizeYMultiplier;
+
+            startSizeZ = mode.startSizeZ;
+            startSizeZMultiplier = mode.startSizeZMultiplier;
+
+            startRotation3D = mode.startRotation3D;
+            startRotation = mode.startRotation;
+            startRotationMultiplier = mode.startRotationMultiplier;
+
+            startRotationX = mode.startRotationX;
+            startRotationXMultiplier = mode.startRotationXMultiplier;
+
+            startRotationY = mode.startRotationY;
+            startRotationYMultiplier = mode.startRotationYMultiplier;
+
+            startRotationZ = mode.startRotationZ;
+            startRotationZMultiplier = mode.startRotationZMultiplier;
+
+            flipRotation = mode.flipRotation;
+
+            startColor = mode.startColor;
+
+            gravityModifier = mode.gravityModifier;
+            gravityModifierMultiplier = mode.gravityModifierMultiplier;
+
+            simulationSpace = mode.simulationSpace;
+
+            customSimulationSpace = mode.customSimulationSpace;
+
+            simulationSpeed = mode.simulationSpeed;
+
+            useUnscaledTime = mode.useUnscaledTime;
+
+            scalingMode = mode.scalingMode;
+
+            playOnAwake = mode.playOnAwake;
+
+            maxParticles = mode.maxParticles;
+
+            emitterVelocityMode = mode.emitterVelocityMode;
+
+            stopAction = mode.stopAction;
+
+            ringBufferMode = mode.ringBufferMode;
+
+            ringBufferLoopRange = mode.ringBufferLoopRange;
+
+            cullingMode = mode.cullingMode;
+        }
+    }
+
+    public void CopyToParticleSystem(ParticleSystem particleStstem)
+    {
+        System.Type mainType = particleStstem.main.GetType();
+        PropertyInfo property = mainType.GetProperty("duration");
+        property.SetValue(particleStstem.main, main.duration);
     }
 }

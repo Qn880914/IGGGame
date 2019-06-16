@@ -1,11 +1,48 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class ParticleInfo
 {
     public MainModule main { get; set; }
+
+    public EmissionModule emission { get; set; }
+
+    public SubEmittersModule subEmitters { get; set; }
+
+    public TextureSheetAnimationModule textureSheetAnimation { get; set; }
+
+    public VelocityOverLifetimeModule velocityOverLifetime { get; set; }
+
+    public LimitVelocityLifetimeModule limitVelocityLifetime { get; set; }
+
+    public InHeritVelocityModule inHeritVelocity { get; set; }
+
+    public ForceOverLifetimeModule forceOverLifetimeModule { get; set; }
+
+    public ColorOverLifetimeModule colorOverLifetime { get; set; }
+
+    public ColorBySpeedModule colorBySpeed { get; set; }
+
+    public SizeOverLifetimeModule sizeOverLifetimeModule { get; set; }
+
+    public SizeBySpeedModule sizeBySpeed { get; set; }
+
+    public RotationOverLifetimeModule rotationOverLifetime { get; set; }
+
+    public RotationBySpeedModule rotationBySpeed { get; set; }
+
+    public ExternalForcesModule externalForces { get; set; }
+
+    public NoiseModule noise { get; set; }
+
+    public CollisionModule collision { get; set; }
+
+    public TriggerModule trigger { get; set; }
+
+    public LightsModule lights { get; set; }
+
+    public TrailModule trail { get; set; }
 
     public struct MinMaxCurve
     {
@@ -257,7 +294,667 @@ public class ParticleInfo
 
             cullingMode = mode.cullingMode;
         }
+
+        public void Copy(ref ParticleSystem.MainModule mode)
+        {
+            mode.duration = duration;
+
+            mode.loop = loop;
+            mode.prewarm = prewarm;
+
+            mode.startDelay = startDelay;
+            mode.startDelayMultiplier = startDelayMultiplier;
+
+            mode.startLifetime = startLifetime;
+            mode.startLifetimeMultiplier = startLifetimeMultiplier;
+
+            mode.startSpeed = startSpeed;
+            mode.startSpeedMultiplier = startSpeedMultiplier;
+
+            mode.startSize3D = startSize3D;
+            mode.startSize = startSize;
+            mode.startSizeMultiplier = startSizeMultiplier;
+
+            mode.startSizeX = startSizeX;
+            mode.startSizeXMultiplier = startSizeXMultiplier;
+
+            mode.startSizeY = startSizeY;
+            mode.startSizeYMultiplier = startSizeYMultiplier;
+
+            mode.startSizeZ = startSizeZ;
+            mode.startSizeZMultiplier = startSizeZMultiplier;
+
+            mode.startRotation3D = startRotation3D;
+            mode.startRotation = startRotation;
+            mode.startRotationMultiplier = startRotationMultiplier;
+
+            mode.startRotationX = startRotationX;
+            mode.startRotationXMultiplier = startRotationXMultiplier;
+
+            mode.startRotationY = startRotationY;
+            mode.startRotationYMultiplier = startRotationYMultiplier;
+
+            mode.startRotationZ = startRotationZ;
+            mode.startRotationZMultiplier = startRotationZMultiplier;
+
+            mode.flipRotation = flipRotation;
+
+            mode.startColor = startColor;
+
+            mode.gravityModifier = gravityModifier;
+            mode.gravityModifierMultiplier = gravityModifierMultiplier;
+
+            mode.simulationSpace = simulationSpace;
+
+            mode.customSimulationSpace = customSimulationSpace;
+
+            mode.simulationSpeed = simulationSpeed;
+
+            mode.useUnscaledTime = useUnscaledTime;
+
+            mode.scalingMode = scalingMode;
+
+            mode.playOnAwake = playOnAwake;
+
+            mode.maxParticles = maxParticles;
+
+            mode.emitterVelocityMode = emitterVelocityMode;
+
+            mode.stopAction = stopAction;
+
+            mode.ringBufferMode = ringBufferMode;
+
+            mode.ringBufferLoopRange = ringBufferLoopRange;
+
+            mode.cullingMode = cullingMode;
+        }
     }
+
+    public struct EmissionModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve rateOverTime { get; set; }
+        public float rateOverTimeMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve rateOverDistance { get; set; }
+        public float rateOverDistanceMultiplier { get; set; }
+
+        public ParticleSystem.Burst [] burst { get; set; }
+
+        public int burstCount { get; set; }
+    }
+
+    public struct ShapeModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystemShapeType shapeType { get; set; }
+
+        public float randomDirectionAmount { get; set; }
+
+        public float sphericalDirectionAmount { get; set; }
+
+        public float randomPositionAmount { get; set; }
+
+        public bool alignToDirection { get; set; }
+
+        public float radius { get; set; }
+
+        public ParticleSystemShapeMultiModeValue radiusMode { get; set; }
+
+        public float radiusSpread { get; set; }
+
+        public ParticleSystem.MinMaxCurve radiusSpeed { get; set; }
+
+        public float radiusSpeedMultiplier { get; set; }
+
+        public float radiusThickness { get; set; }
+
+        public float angle { get; set; }
+
+        public float length { get; set; }
+
+        public Vector3 boxThickness { get; set; }
+
+        public ParticleSystemMeshShapeType meshShapeType { get; set; }
+
+        public Mesh mesh { get; set; }
+
+        public MeshRenderer meshRenderer { get; set; }
+
+        public SkinnedMeshRenderer skinnedMeshRenderer { get; set; }
+
+        public Sprite sprite { get; set; }
+
+        public SpriteRenderer spriteRenderer { get; set; }
+
+        public bool useMeshMaterialIndex { get; set; }
+
+        public int meshMaterialIndex { get; set; }
+
+        public bool useMeshColors { get; set; }
+
+        public float normalOffset { get; set; }
+
+        public ParticleSystemShapeMultiModeValue meshSpawnMode { get; set; }
+
+        public float meshSpawnSpread { get; set; }
+
+        public ParticleSystem.MinMaxCurve meshSpawnSpeed { get; set; }
+        public float meshSpawnSpeedMultiplier { get; set; }
+
+        public float arc { get; set; }
+
+        public ParticleSystemShapeMultiModeValue arcMode { get; set; }
+
+        public float arcSpread { get; set; }
+
+        public ParticleSystem.MinMaxCurve arcSpeed { get; set; }
+        public float arcSpeedMultiplier { get; set; }
+
+        public float donutRadius { get; set; }
+
+        public Vector3 position { get; set; }
+
+        public Vector3 rotation { get; set; }
+
+        public Vector3 scale { get; set; }
+
+        public Texture2D texture { get; set; }
+
+        public ParticleSystemShapeTextureChannel textureClipChannel { get; set; }
+
+        public float textureClipThreshold { get; set; }
+
+        public bool textureColorAffectsParticles { get; set; }
+
+        public bool textureAlphaAffectsParticles { get; set; }
+
+        public bool textureBilinearFiltering { get; set; }
+
+        public int textureUVChannel { get; set; }
+    }
+
+    public struct SubEmittersModule
+    {
+        public bool enabled { get; set; }
+
+        public int subEmittersCount { get; set; }
+
+        public SubEmittersModuleParticleSystem[] subParticleSystem { get; set; }
+
+        public struct SubEmittersModuleParticleSystem
+        {
+            public ParticleSystem particleSystem { get; set; }
+
+            public ParticleSystemSubEmitterType type { get; set; }
+
+            public ParticleSystemSubEmitterProperties properties { get; set; }
+
+            public float emitProbability { get; set; }
+        }
+    }        
+
+    public struct TextureSheetAnimationModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystemAnimationMode mode { get; set; }
+
+        public ParticleSystemAnimationTimeMode timeMode { get; set; }
+
+        public float fps { get; set; }
+
+        public int numTilesX { get; set; }
+
+        public int numTilesY { get; set; }
+
+        public ParticleSystemAnimationType animation { get; set; }
+
+        public ParticleSystemAnimationRowMode rowMode { get; set; }
+
+        public ParticleSystem.MinMaxCurve frameOverTime { get; set; }
+        public float frameOverTimeMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve startFrame { get; set; }
+        public float startFrameMultiplier { get; set; }
+
+        public int cycleCount { get; set; }
+
+        public int rowIndex { get; set; }
+
+        public UVChannelFlags uvChannelMask { get; set; }
+
+        public int spriteCount { get; set; }
+
+        public Vector2 speedRange { get; set; }
+    }
+
+    public struct VelocityOverLifetimeModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve x { get; set; }
+        public float xMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve y { get; set; }
+        public float yMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve z { get; set; }
+        public float zMultiplier { get; set; }
+        
+        public ParticleSystem.MinMaxCurve orbitalx { get; set; }
+        public float orbitalXMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve orbitaly { get; set; }
+        public float orbitalYMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve orbitalz { get; set; }
+        public float orbitalZMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve orbitalOffsetX { get; set; }
+        public float orbitalOffsetXMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve orbitalOffsetY { get; set; }
+        public float orbitalOffsetYMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve orbitalOffsetZ { get; set; }
+        public float orbitalOffsetZMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve radial { get; set; }
+        public float radialMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve speedModifier { get; set; }
+        public float speedModifierMultiplier { get; set; }
+
+        public ParticleSystemSimulationSpace space { get; set; }
+    }
+
+    public struct LimitVelocityLifetimeModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve limitX { get; set; }
+        public float limitXMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve limitY { get; set; }
+        public float limitYMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve limitZ { get; set; }
+        public float limitZMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve limit { get; set; }
+        public float limitMultiplier { get; set; }
+
+        public float dampen { get; set; }
+
+        public bool separateAxes { get; set; }
+
+        public ParticleSystemSimulationSpace space { get; set; }
+
+        public ParticleSystem.MinMaxCurve drag { get; set; }
+        public float dragMultiplier { get; set; }
+
+        public bool multiplyDragByParticleSize { get; set; }
+
+        public bool multiplyDragByParticleVelocity { get; set; }
+    }
+
+    public struct InHeritVelocityModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystemInheritVelocityMode mode { get; set; }
+
+        public ParticleSystem.MinMaxCurve curve { get; set; }
+
+        public float curveMultiplier { get; set; }
+    }
+
+    public struct ForceOverLifetimeModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve x { get; set; }
+
+        public ParticleSystem.MinMaxCurve y { get; set; }
+
+        public ParticleSystem.MinMaxCurve z { get; set; }
+
+        public float xMultiplier { get; set; }
+
+        public float yMultiplier { get; set; }
+
+        public float zMultiplier { get; set; }
+
+        public ParticleSystemSimulationSpace space { get; set; }
+
+        public bool randomized { get; set; }
+    }
+
+    public struct ColorOverLifetimeModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxGradient color { get; set; }
+    }
+
+    public struct ColorBySpeedModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxGradient color { get; set; }
+
+        public Vector2 range { get; set; }
+    }
+
+    public struct SizeOverLifetimeModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve size { get; set; }
+
+        public float sizeMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve x { get; set; }
+
+        public float xMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve y { get; set; }
+
+        public float yMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve z { get; set; }
+
+        public float zMultiplier { get; set; }
+
+        public bool separateAxes { get; set; }
+    }
+
+    public struct SizeBySpeedModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve size { get; set; }
+
+        public float sizeMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve x { get; set; }
+
+        public float xMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve y { get; set; }
+
+        public float yMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve z { get; set; }
+
+        public float zMultiplier { get; set; }
+
+        public bool separateAxes { get; set; }
+
+        public Vector2 range { get; set; }
+    }
+
+    public struct RotationOverLifetimeModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve x { get; set; }
+
+        public float xMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve y { get; set; }
+
+        public float yMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve z { get; set; }
+
+        public float zMultiplier { get; set; }
+
+        public bool separateAxes { get; set; }
+    }
+
+    public struct RotationBySpeedModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve x { get; set; }
+
+        public float xMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve y { get; set; }
+
+        public float yMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve z { get; set; }
+
+        public float zMultiplier { get; set; }
+
+        public bool separateAxes { get; set; }
+
+        public Vector2 range { get; set; }
+    }
+
+    public struct ExternalForcesModule
+    {
+        public bool enabled { get; set; }
+
+        public float multiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve multiplierCurve { get; set; }
+
+        public ParticleSystemGameObjectFilter influenceFilter { get; set; }
+
+        public LayerMask influenceMask { get; set; }
+
+        public int influenceCount { get; set; }
+    }
+
+    public struct NoiseModule
+    {
+        public bool enabled { get; set; }
+
+        public bool separateAxes { get; set; }
+
+        public ParticleSystem.MinMaxCurve strength { get; set; }
+
+        public float strengthMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve strengthX { get; set; }
+
+        public float strengthXMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve strengthY { get; set; }
+
+        public float strengthYMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve strengthZ { get; set; }
+
+        public float strengthZMultiplier { get; set; }
+
+        public float frequency { get; set; }
+
+        public bool damping { get; set; }
+
+        public int octaveCount { get; set; }
+
+        public float octaveMultiplier { get; set; }
+
+        public float octaveScale { get; set; }
+
+        public ParticleSystemNoiseQuality quality { get; set; }
+
+        public ParticleSystem.MinMaxCurve scrollSpeed { get; set; }
+
+        public float scrollSpeedMultiplier { get; set; }
+
+        public bool remapEnabled { get; set; }
+
+        public ParticleSystem.MinMaxCurve remap { get; set; }
+
+        public float remapMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve remapX { get; set; }
+
+        public float remapXMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve remapY { get; set; }
+
+        public float remapYMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve remapZ { get; set; }
+
+        public float remapZMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve positionAmount { get; set; }
+
+        public ParticleSystem.MinMaxCurve rotationAmount { get; set; }
+
+        public ParticleSystem.MinMaxCurve sizeAmount { get; set; }
+    }
+
+    public struct CollisionModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystemCollisionType type { get; set; }
+
+        public ParticleSystemCollisionMode mode { get; set; }
+
+        public ParticleSystem.MinMaxCurve dampen { get; set; }
+
+        public float dampenMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve bounce { get; set; }
+
+        public float bounceMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve lifetimeLoss { get; set; }
+
+        public float lifetimeLossMultiplier { get; set; }
+
+        public float minKillSpeed { get; set; }
+
+        public float maxKillSpeed { get; set; }
+
+        public LayerMask collidesWith { get; set; }
+
+        public bool enableDynamicColliders { get; set; }
+
+        public int maxCollisionShapes { get; set; }
+
+        public ParticleSystemCollisionQuality quality { get; set; }
+
+        public float voxelSize { get; set; }
+
+        public float radiusScale { get; set; }
+
+        public bool sendCollisionMessages { get; set; }
+
+        public float colliderForce { get; set; }
+
+        public bool multiplyColliderForceByCollisionAngle { get; set; }
+
+        public bool multiplyColliderForceByParticleSpeed { get; set; }
+
+        public bool multiplyColliderForceByParticleSize { get; set; }
+
+        public int maxPlaneCount { get; set; }
+    }
+
+    public struct TriggerModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystemOverlapAction inside { get; set; }
+
+        public ParticleSystemOverlapAction outside { get; set; }
+
+        public ParticleSystemOverlapAction enter { get; set; }
+
+        public ParticleSystemOverlapAction exit { get; set; }
+
+        public float radiusScale { get; set; }
+
+        public int maxColliderCount { get; set; }
+    }
+
+    public struct LightsModule
+    {
+        public bool enabled { get; set; }
+
+        public float ratio { get; set; }
+
+        public bool useRandomDistribution { get; set; }
+
+        public Light light { get; set; }
+
+        public bool useParticleColor { get; set; }
+
+        public bool sizeAffectsRange { get; set; }
+
+        public bool alphaAffectsIntensity { get; set; }
+
+        public ParticleSystem.MinMaxCurve range { get; set; }
+
+        public float rangeMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxCurve intensity { get; set; }
+
+        public float intensityMultiplier { get; set; }
+
+        public int maxLights { get; set; }
+    }
+
+    public struct TrailModule
+    {
+        public bool enabled { get; set; }
+
+        public ParticleSystemTrailMode mode { get; set; }
+
+        public float ratio { get; set; }
+
+        public ParticleSystem.MinMaxCurve lifetime { get; set; }
+
+        public float lifetimeMultiplier { get; set; }
+
+        public float minVertexDistance { get; set; }
+
+        public ParticleSystemTrailTextureMode textureMode { get; set; }
+
+        public bool worldSpace { get; set; }
+
+        public bool dieWithParticles { get; set; }
+
+        public bool sizeAffectsWidth { get; set; }
+
+        public bool sizeAffectsLifetime { get; set; }
+
+        public bool inheritParticleColor { get; set; }
+
+        public ParticleSystem.MinMaxGradient colorOverLifetime { get; set; }
+
+        public ParticleSystem.MinMaxCurve widthOverTrail { get; set; }
+
+        public float widthOverTrailMultiplier { get; set; }
+
+        public ParticleSystem.MinMaxGradient colorOverTrail { get; set; }
+
+        public bool generateLightingData { get; set; }
+
+        public int ribbonCount { get; set; }
+
+        public float shadowBias { get; set; }
+
+        public bool splitSubEmitterRibbons { get; set; }
+
+        public bool attachRibbonsToTransform { get; set; }
+    }
+
+    public struct CustomDataModule
+    { }
 
     public void CopyToParticleSystem(ParticleSystem particleStstem)
     {

@@ -380,9 +380,45 @@ public class ParticleInfo
         public ParticleSystem.MinMaxCurve rateOverDistance { get; set; }
         public float rateOverDistanceMultiplier { get; set; }
 
-        public ParticleSystem.Burst [] burst { get; set; }
+        public ParticleSystem.Burst [] bursts { get; set; }
 
         public int burstCount { get; set; }
+
+        public void Init(ParticleSystem.EmissionModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            rateOverTime = mode.rateOverTime;
+            rateOverTimeMultiplier = mode.rateOverTimeMultiplier;
+            rateOverDistance = mode.rateOverDistance;
+            rateOverDistanceMultiplier = mode.rateOverDistanceMultiplier;
+
+            burstCount = mode.burstCount;
+            bursts = new ParticleSystem.Burst[burstCount];
+            for(int i = 0; i < burstCount; ++ i)
+            {
+                bursts[i] = mode.GetBurst(i);
+            }
+        }
+
+        public void Copy(ref ParticleSystem.EmissionModule mode)
+        {
+            mode.enabled = enabled;
+            if(!enabled)
+                return;
+
+            mode.rateOverTime = rateOverTime;
+            mode.rateOverTimeMultiplier = rateOverTimeMultiplier;
+            mode.rateOverDistance = rateOverDistance;
+            mode.rateOverDistanceMultiplier = rateOverDistanceMultiplier;
+
+            mode.burstCount = burstCount;
+            mode.SetBursts(bursts);
+        }
     }
 
     public struct ShapeModule
@@ -474,6 +510,103 @@ public class ParticleInfo
         public bool textureBilinearFiltering { get; set; }
 
         public int textureUVChannel { get; set; }
+
+        public void Init(ParticleSystem.ShapeModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            shapeType = mode.shapeType;
+            randomDirectionAmount = mode.randomDirectionAmount;
+            sphericalDirectionAmount = mode.sphericalDirectionAmount;
+            randomPositionAmount = mode.randomPositionAmount;
+            alignToDirection = mode.alignToDirection;
+
+            switch(shapeType)
+            {
+                case ParticleSystemShapeType.Sphere:
+                case ParticleSystemShapeType.Hemisphere:
+                    {
+                        radius = mode.radius;
+                        radiusThickness = mode.radiusThickness;
+                        arc = mode.arc;
+                        radiusMode = mode.radiusMode;
+                        radiusSpread = mode.radiusSpread;
+                        if (radiusMode == ParticleSystemShapeMultiModeValue.Loop ||
+                            radiusMode == ParticleSystemShapeMultiModeValue.PingPong)
+                        {
+                            radiusSpeed = mode.radiusSpeed;
+                            radiusSpeedMultiplier = mode.radiusSpeedMultiplier;
+                        }
+                        texture = mode.texture;
+                        textureClipChannel = mode.textureClipChannel;
+                        textureClipThreshold = mode.textureClipThreshold;
+                        textureColorAffectsParticles = mode.textureAlphaAffectsParticles;
+                        textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                        textureBilinearFiltering = mode.textureBilinearFiltering;
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.Cone:
+                    {
+                        angle = mode.angle;
+                        radius = mode.radius;
+                        radiusThickness = mode.radiusThickness;
+                        arc = mode.arc;
+                        radiusMode = mode.radiusMode;
+                        radiusSpread = mode.radiusSpread;
+                        if (radiusMode == ParticleSystemShapeMultiModeValue.Loop ||
+                            radiusMode == ParticleSystemShapeMultiModeValue.PingPong)
+                        {
+                            radiusSpeed = mode.radiusSpeed;
+                            radiusSpeedMultiplier = mode.radiusSpeedMultiplier;
+                        }
+                        length = mode.length;
+                        
+                    }
+                    break;
+                case ParticleSystemShapeType.Donut:
+                    break;
+                case ParticleSystemShapeType.Box:
+                    break;
+                case ParticleSystemShapeType.Mesh:
+                    break;
+                case ParticleSystemShapeType.MeshRenderer:
+                    break;
+                case ParticleSystemShapeType.SkinnedMeshRenderer:
+                    break;
+                case ParticleSystemShapeType.Sprite:
+                    break;
+                case ParticleSystemShapeType.SpriteRenderer:
+                    break;
+                case ParticleSystemShapeType.Circle:
+                    break;
+                case ParticleSystemShapeType.BoxEdge:
+                case ParticleSystemShapeType.SingleSidedEdge:
+                    break;
+                case ParticleSystemShapeType.Rectangle:
+                    break;
+            }
+            radius = mode.radius;
+            radiusMode = mode.radiusMode;
+            radiusThickness = mode.radiusThickness;
+            angle = mode.angle;
+            length = mode.length;
+        }
+
+        public void Copy(ref ParticleSystem.ShapeModule mode)
+        {
+            mode.enabled = enabled;
+            if(!enabled)
+            {
+                return;
+            }
+        }
     }
 
     public struct SubEmittersModule

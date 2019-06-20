@@ -25,7 +25,7 @@ public class ParticleInfo
         collision.Init(particleSystem.collision);
         trigger.Init(particleSystem.trigger);
         lights.Init(particleSystem.lights);
-        trail.Init(particleSystem.trail);
+        trail.Init(particleSystem.trails);
     }
 
     public void CopyToParticleSystem(ParticleSystem particleSystem)
@@ -50,10 +50,10 @@ public class ParticleInfo
         velocityOverLifetime.Copy(ref velocityOverLifetimeModule);
 
         ParticleSystem.LimitVelocityOverLifetimeModule limitVelocityLifetimeModule = particleSystem.limitVelocityOverLifetime;
-        limitVelocityLifetime.Copy(ref limitVelocityLifetimeModule);
+        limitVelocityOverLifetime.Copy(ref limitVelocityLifetimeModule);
 
         ParticleSystem.InheritVelocityModule inheriteVelocityModule = particleSystem.inheritVelocity;
-        inHeritVelocity.Copy(ref inheriteVelocityModule);
+        inheritVelocity.Copy(ref inheriteVelocityModule);
 
         ParticleSystem.ForceOverLifetimeModule forceOverLifetimeModule = particleSystem.forceOverLifetime;
         forceOverLifetime.Copy(ref forceOverLifetimeModule);
@@ -105,7 +105,7 @@ public class ParticleInfo
 
     public VelocityOverLifetimeModule velocityOverLifetime { get; set; }
 
-    public LimitVelocityLifetimeModule limitVelocityOverLifetime { get; set; }
+    public LimitVelocityOverLifetimeModule limitVelocityOverLifetime { get; set; }
 
     public InHeritVelocityModule inheritVelocity { get; set; }
 
@@ -1259,7 +1259,7 @@ public class ParticleInfo
             for(int i = 0; i < subEmittersCount; ++i)
             {
                 ParticleSystem particleSystem = ParticleSystemPool.Get();
-                subParticleSystem[i].particleInfo.Copy(particleSystem);
+                subParticleSystem[i].particleInfo.CopyToParticleSystem(particleSystem);
                 mode.AddSubEmitter(particleSystem, subParticleSystem[i].type,
                     subParticleSystem[i].properties, subParticleSystem[i].emitProbability);
             }
@@ -1521,7 +1521,7 @@ public class ParticleInfo
         }
     }
 
-    public struct LimitVelocityLifetimeModule
+    public struct LimitVelocityOverLifetimeModule
     {
         public bool enabled { get; set; }
 

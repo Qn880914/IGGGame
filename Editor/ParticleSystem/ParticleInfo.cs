@@ -1,9 +1,100 @@
-﻿using System.Reflection;
+﻿using IGG.Utility;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class ParticleInfo
 {
+    public ParticleInfo(ParticleSystem particleSystem)
+    {
+        main = new MainModule(particleSystem.main);
+        emission.Init(particleSystem.emission);
+        subEmitters.Init(particleSystem.subEmitters);
+        textureSheetAnimation.Init(particleSystem.textureSheetAnimation);
+        velocityOverLifetime.Init(particleSystem.velocityOverLifetime);
+        limitVelocityOverLifetime.Init(particleSystem.limitVelocityOverLifetime);
+        inheritVelocity.Init(particleSystem.inheritVelocity);
+        forceOverLifetime.Init(particleSystem.forceOverLifetime);
+        colorOverLifetime.Init(particleSystem.colorOverLifetime);
+        colorBySpeed.Init(particleSystem.colorBySpeed);
+        sizeOverLifetime.Init(particleSystem.sizeOverLifetime);
+        sizeBySpeed.Init(particleSystem.sizeBySpeed);
+        rotationOverLifetime.Init(particleSystem.rotationOverLifetime);
+        rotationBySpeed.Init(particleSystem.rotationBySpeed);
+        externalForces.Init(particleSystem.externalForces);
+        noise.Init(particleSystem.noise);
+        collision.Init(particleSystem.collision);
+        trigger.Init(particleSystem.trigger);
+        lights.Init(particleSystem.lights);
+        trail.Init(particleSystem.trail);
+    }
+
+    public void CopyToParticleSystem(ParticleSystem particleSystem)
+    {
+        /*System.Type mainType = particleStstem.main.GetType();
+        PropertyInfo property = mainType.GetProperty("duration");
+        property.SetValue(particleStstem.main, main.duration);*/
+
+        ParticleSystem.MainModule mainModule = particleSystem.main;
+        main.Copy(ref mainModule);
+
+        ParticleSystem.EmissionModule emissionModule = particleSystem.emission;
+        emission.Copy(ref emissionModule);
+
+        ParticleSystem.SubEmittersModule subEmittersModule = particleSystem.subEmitters;
+        subEmitters.Copy(ref subEmittersModule);
+
+        ParticleSystem.TextureSheetAnimationModule textureSheetAnimationModule = particleSystem.textureSheetAnimation;
+        textureSheetAnimation.Copy(ref textureSheetAnimationModule);
+
+        ParticleSystem.VelocityOverLifetimeModule velocityOverLifetimeModule = particleSystem.velocityOverLifetime;
+        velocityOverLifetime.Copy(ref velocityOverLifetimeModule);
+
+        ParticleSystem.LimitVelocityOverLifetimeModule limitVelocityLifetimeModule = particleSystem.limitVelocityOverLifetime;
+        limitVelocityLifetime.Copy(ref limitVelocityLifetimeModule);
+
+        ParticleSystem.InheritVelocityModule inheriteVelocityModule = particleSystem.inheritVelocity;
+        inHeritVelocity.Copy(ref inheriteVelocityModule);
+
+        ParticleSystem.ForceOverLifetimeModule forceOverLifetimeModule = particleSystem.forceOverLifetime;
+        forceOverLifetime.Copy(ref forceOverLifetimeModule);
+
+        ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule = particleSystem.colorOverLifetime;
+        colorOverLifetime.Copy(ref colorOverLifetimeModule);
+
+        ParticleSystem.ColorBySpeedModule colorBySpeedModule = particleSystem.colorBySpeed;
+        colorBySpeed.Copy(ref colorBySpeedModule);
+
+        ParticleSystem.SizeOverLifetimeModule sizeOverLifetimeModule = particleSystem.sizeOverLifetime;
+        sizeOverLifetime.Copy(ref sizeOverLifetimeModule);
+
+        ParticleSystem.SizeBySpeedModule sizeBySpeedModule = particleSystem.sizeBySpeed;
+        sizeBySpeed.Copy(ref sizeBySpeedModule);
+
+        ParticleSystem.RotationOverLifetimeModule rotationOverLifetimeModule = particleSystem.rotationOverLifetime;
+        rotationOverLifetime.Copy(ref rotationOverLifetimeModule);
+
+        ParticleSystem.RotationBySpeedModule rotationBySpeedModule = particleSystem.rotationBySpeed;
+        rotationBySpeed.Copy(ref rotationBySpeedModule);
+
+        ParticleSystem.ExternalForcesModule externalForcesModule = particleSystem.externalForces;
+        externalForces.Copy(ref externalForcesModule);
+
+        ParticleSystem.NoiseModule noiseModule = particleSystem.noise;
+        noise.Copy(ref noiseModule);
+
+        ParticleSystem.CollisionModule collisionModule = particleSystem.collision;
+        collision.Copy(ref collisionModule);
+
+        ParticleSystem.TriggerModule triggerModule = particleSystem.trigger;
+        trigger.Copy(ref triggerModule);
+
+        ParticleSystem.LightsModule lightsModule = particleSystem.lights;
+        lights.Copy(ref lightsModule);
+
+        ParticleSystem.TrailModule trialModule = particleSystem.trails;
+        trail.Copy(ref trialModule);
+    }
+
     public MainModule main { get; set; }
 
     public EmissionModule emission { get; set; }
@@ -14,17 +105,17 @@ public class ParticleInfo
 
     public VelocityOverLifetimeModule velocityOverLifetime { get; set; }
 
-    public LimitVelocityLifetimeModule limitVelocityLifetime { get; set; }
+    public LimitVelocityLifetimeModule limitVelocityOverLifetime { get; set; }
 
-    public InHeritVelocityModule inHeritVelocity { get; set; }
+    public InHeritVelocityModule inheritVelocity { get; set; }
 
-    public ForceOverLifetimeModule forceOverLifetimeModule { get; set; }
+    public ForceOverLifetimeModule forceOverLifetime { get; set; }
 
     public ColorOverLifetimeModule colorOverLifetime { get; set; }
 
     public ColorBySpeedModule colorBySpeed { get; set; }
 
-    public SizeOverLifetimeModule sizeOverLifetimeModule { get; set; }
+    public SizeOverLifetimeModule sizeOverLifetime { get; set; }
 
     public SizeBySpeedModule sizeBySpeed { get; set; }
 
@@ -553,6 +644,7 @@ public class ParticleInfo
                     }
                     break;
                 case ParticleSystemShapeType.Cone:
+                case ParticleSystemShapeType.ConeVolume:
                     {
                         angle = mode.angle;
                         radius = mode.radius;
@@ -567,36 +659,251 @@ public class ParticleInfo
                             radiusSpeedMultiplier = mode.radiusSpeedMultiplier;
                         }
                         length = mode.length;
-                        
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
                     }
                     break;
                 case ParticleSystemShapeType.Donut:
+                    {
+                        radius = mode.radius;
+                        donutRadius = mode.donutRadius;
+                        radiusThickness = mode.radiusThickness;
+                        arc = mode.arc;
+                        arcMode = mode.arcMode;
+                        arcSpread = mode.arcSpread;
+                        arcSpeed = mode.arcSpeed;
+                        arcSpeedMultiplier = mode.arcSpeedMultiplier;
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
                 case ParticleSystemShapeType.Box:
+                case ParticleSystemShapeType.BoxShell:
+                case ParticleSystemShapeType.BoxEdge:
+                    {
+                        boxThickness = mode.boxThickness;
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                    }
                     break;
                 case ParticleSystemShapeType.Mesh:
+                    {
+                        meshShapeType = mode.meshShapeType;
+                        meshSpawnMode = mode.meshSpawnMode;
+                        meshSpawnSpread = mode.meshSpawnSpread;
+                        meshSpawnSpeed = mode.meshSpawnSpeed;
+                        meshSpawnSpeedMultiplier = mode.meshSpawnSpeedMultiplier;
+                        mesh = mode.mesh;
+                        useMeshMaterialIndex = mode.useMeshMaterialIndex;
+                        if(useMeshMaterialIndex)
+                        {
+                            meshMaterialIndex = mode.meshMaterialIndex;
+                        }
+                        useMeshColors = mode.useMeshColors;
+                        normalOffset = mode.normalOffset;
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                            textureUVChannel = mode.textureUVChannel;
+                        }
+
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
                 case ParticleSystemShapeType.MeshRenderer:
+                    {
+                        meshShapeType = mode.meshShapeType;
+                        meshSpawnMode = mode.meshSpawnMode;
+                        meshSpawnSpread = mode.meshSpawnSpread;
+                        meshSpawnSpeed = mode.meshSpawnSpeed;
+                        meshSpawnSpeedMultiplier = mode.meshSpawnSpeedMultiplier;
+                        meshRenderer = mode.meshRenderer;
+                        useMeshMaterialIndex = mode.useMeshMaterialIndex;
+                        if (useMeshMaterialIndex)
+                        {
+                            meshMaterialIndex = mode.meshMaterialIndex;
+                        }
+                        useMeshColors = mode.useMeshColors;
+                        normalOffset = mode.normalOffset;
+                        texture = mode.texture;
+                        if (null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                            textureUVChannel = mode.textureUVChannel;
+                        }
+
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
                 case ParticleSystemShapeType.SkinnedMeshRenderer:
+                    {
+                        meshShapeType = mode.meshShapeType;
+                        meshSpawnMode = mode.meshSpawnMode;
+                        meshSpawnSpread = mode.meshSpawnSpread;
+                        meshSpawnSpeed = mode.meshSpawnSpeed;
+                        meshSpawnSpeedMultiplier = mode.meshSpawnSpeedMultiplier;
+                        skinnedMeshRenderer = mode.skinnedMeshRenderer;
+                        useMeshMaterialIndex = mode.useMeshMaterialIndex;
+                        if (useMeshMaterialIndex)
+                        {
+                            meshMaterialIndex = mode.meshMaterialIndex;
+                        }
+                        useMeshColors = mode.useMeshColors;
+                        normalOffset = mode.normalOffset;
+                        texture = mode.texture;
+                        if (null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                            textureUVChannel = mode.textureUVChannel;
+                        }
+
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
                 case ParticleSystemShapeType.Sprite:
+                    {
+                        meshShapeType = mode.meshShapeType;
+                        sprite = mode.sprite;
+                        normalOffset = mode.normalOffset;
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
                 case ParticleSystemShapeType.SpriteRenderer:
+                    {
+                        meshShapeType = mode.meshShapeType;
+                        spriteRenderer = mode.spriteRenderer;
+                        normalOffset = mode.normalOffset;
+                        texture = mode.texture;
+                        if (null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
                 case ParticleSystemShapeType.Circle:
+                    {
+                        radius = mode.radius;
+                        radiusThickness = mode.radiusThickness;
+                        arc = mode.arc;
+                        arcMode = mode.arcMode;
+                        arcSpread = mode.arcSpread;
+                        arcSpeed = mode.arcSpeed;
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
-                case ParticleSystemShapeType.BoxEdge:
                 case ParticleSystemShapeType.SingleSidedEdge:
+                    {
+                        radius = mode.radius;
+                        radiusMode = mode.radiusMode;
+                        radiusSpread = mode.radiusSpread;
+                        radiusSpeed = mode.radiusSpeed;
+                        radiusSpeedMultiplier = mode.radiusSpeedMultiplier;
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
                 case ParticleSystemShapeType.Rectangle:
+                    {
+                        texture = mode.texture;
+                        if(null != texture)
+                        {
+                            textureClipChannel = mode.textureClipChannel;
+                            textureClipThreshold = mode.textureClipThreshold;
+                            textureColorAffectsParticles = mode.textureColorAffectsParticles;
+                            textureAlphaAffectsParticles = mode.textureAlphaAffectsParticles;
+                            textureBilinearFiltering = mode.textureBilinearFiltering;
+                        }
+                        position = mode.position;
+                        rotation = mode.rotation;
+                        scale = mode.scale;
+                    }
                     break;
             }
-            radius = mode.radius;
-            radiusMode = mode.radiusMode;
-            radiusThickness = mode.radiusThickness;
-            angle = mode.angle;
-            length = mode.length;
         }
 
         public void Copy(ref ParticleSystem.ShapeModule mode)
@@ -605,6 +912,300 @@ public class ParticleInfo
             if(!enabled)
             {
                 return;
+            }
+            mode.shapeType = shapeType;
+            mode.randomDirectionAmount = randomDirectionAmount;
+            mode.sphericalDirectionAmount = sphericalDirectionAmount;
+            mode.randomPositionAmount = randomPositionAmount;
+            mode.alignToDirection = alignToDirection;
+
+            switch (shapeType)
+            {
+                case ParticleSystemShapeType.Sphere:
+                case ParticleSystemShapeType.Hemisphere:
+                    {
+                        mode.radius = radius;
+                        mode.radiusThickness = radiusThickness;
+                        mode.arc = arc;
+                        mode.radiusMode = radiusMode;
+                        mode.radiusSpread = radiusSpread;
+                        if (radiusMode == ParticleSystemShapeMultiModeValue.Loop ||
+                            radiusMode == ParticleSystemShapeMultiModeValue.PingPong)
+                        {
+                            mode.radiusSpeed = radiusSpeed;
+                            mode.radiusSpeedMultiplier = radiusSpeedMultiplier;
+                        }
+                        mode.texture = texture;
+                        mode.textureClipChannel = textureClipChannel;
+                        mode.textureClipThreshold = textureClipThreshold;
+                        mode.textureColorAffectsParticles = textureAlphaAffectsParticles;
+                        mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                        mode.textureBilinearFiltering = textureBilinearFiltering;
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.Cone:
+                case ParticleSystemShapeType.ConeVolume:
+                    {
+                        mode.angle = angle;
+                        mode.radius = radius;
+                        mode.radiusThickness = radiusThickness;
+                        mode.arc = arc;
+                        mode.radiusMode = radiusMode;
+                        mode.radiusSpread = radiusSpread;
+                        if (radiusMode == ParticleSystemShapeMultiModeValue.Loop ||
+                            radiusMode == ParticleSystemShapeMultiModeValue.PingPong)
+                        {
+                            mode.radiusSpeed = radiusSpeed;
+                            mode.radiusSpeedMultiplier = radiusSpeedMultiplier;
+                        }
+                        mode.length = length;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.Donut:
+                    {
+                        mode.radius = radius;
+                        mode.donutRadius = donutRadius;
+                        mode.radiusThickness = radiusThickness;
+                        mode.arc = arc;
+                        mode.arcMode = arcMode;
+                        mode.arcSpread = arcSpread;
+                        mode.arcSpeed = arcSpeed;
+                        mode.arcSpeedMultiplier = arcSpeedMultiplier;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.Box:
+                case ParticleSystemShapeType.BoxShell:
+                case ParticleSystemShapeType.BoxEdge:
+                    {
+                        mode.boxThickness = boxThickness;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                    }
+                    break;
+                case ParticleSystemShapeType.Mesh:
+                    {
+                        mode.meshShapeType = meshShapeType;
+                        mode.meshSpawnMode = meshSpawnMode;
+                        mode.meshSpawnSpread = meshSpawnSpread;
+                        mode.meshSpawnSpeed = meshSpawnSpeed;
+                        mode.meshSpawnSpeedMultiplier = meshSpawnSpeedMultiplier;
+                        mode.mesh = mesh;
+                        mode.useMeshMaterialIndex = useMeshMaterialIndex;
+                        if (useMeshMaterialIndex)
+                        {
+                            mode.meshMaterialIndex = meshMaterialIndex;
+                        }
+                        mode.useMeshColors = useMeshColors;
+                        mode.normalOffset = normalOffset;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                            mode.textureUVChannel = textureUVChannel;
+                        }
+
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.MeshRenderer:
+                    {
+                        mode.meshShapeType = meshShapeType;
+                        mode.meshSpawnMode = meshSpawnMode;
+                        mode.meshSpawnSpread = meshSpawnSpread;
+                        mode.meshSpawnSpeed = meshSpawnSpeed;
+                        mode.meshSpawnSpeedMultiplier = meshSpawnSpeedMultiplier;
+                        mode.meshRenderer = meshRenderer;
+                        mode.useMeshMaterialIndex = useMeshMaterialIndex;
+                        if (useMeshMaterialIndex)
+                        {
+                            mode.meshMaterialIndex = meshMaterialIndex;
+                        }
+                        mode.useMeshColors = useMeshColors;
+                        mode.normalOffset = normalOffset;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                            mode.textureUVChannel = textureUVChannel;
+                        }
+
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.SkinnedMeshRenderer:
+                    {
+                        mode.meshShapeType = meshShapeType;
+                        mode.meshSpawnMode = meshSpawnMode;
+                        mode.meshSpawnSpread = meshSpawnSpread;
+                        mode.meshSpawnSpeed = meshSpawnSpeed;
+                        mode.meshSpawnSpeedMultiplier = meshSpawnSpeedMultiplier;
+                        mode.skinnedMeshRenderer = skinnedMeshRenderer;
+                        mode.useMeshMaterialIndex = useMeshMaterialIndex;
+                        if (useMeshMaterialIndex)
+                        {
+                            mode.meshMaterialIndex = meshMaterialIndex;
+                        }
+                        mode.useMeshColors = useMeshColors;
+                        mode.normalOffset = normalOffset;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                            mode.textureUVChannel = textureUVChannel;
+                        }
+
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.Sprite:
+                    {
+                        mode.meshShapeType = meshShapeType;
+                        mode.sprite = sprite;
+                        mode.normalOffset = normalOffset;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.SpriteRenderer:
+                    {
+                        mode.meshShapeType = meshShapeType;
+                        mode.spriteRenderer = spriteRenderer;
+                        mode.normalOffset = normalOffset;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.Circle:
+                    {
+                        mode.radius = radius;
+                        mode.radiusThickness = radiusThickness;
+                        mode.arc = arc;
+                        mode.arcMode = arcMode;
+                        mode.arcSpread = arcSpread;
+                        mode.arcSpeed = arcSpeed;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.SingleSidedEdge:
+                    {
+                        mode.radius = radius;
+                        mode.radiusMode = radiusMode;
+                        mode.radiusSpread = radiusSpread;
+                        mode.radiusSpeed = radiusSpeed;
+                        mode.radiusSpeedMultiplier = radiusSpeedMultiplier;
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
+                case ParticleSystemShapeType.Rectangle:
+                    {
+                        mode.texture = texture;
+                        if (null != texture)
+                        {
+                            mode.textureClipChannel = textureClipChannel;
+                            mode.textureClipThreshold = textureClipThreshold;
+                            mode.textureColorAffectsParticles = textureColorAffectsParticles;
+                            mode.textureAlphaAffectsParticles = textureAlphaAffectsParticles;
+                            mode.textureBilinearFiltering = textureBilinearFiltering;
+                        }
+                        mode.position = position;
+                        mode.rotation = rotation;
+                        mode.scale = scale;
+                    }
+                    break;
             }
         }
     }
@@ -619,13 +1220,49 @@ public class ParticleInfo
 
         public struct SubEmittersModuleParticleSystem
         {
-            public ParticleSystem particleSystem { get; set; }
+            public ParticleInfo particleInfo { get; set; }
 
             public ParticleSystemSubEmitterType type { get; set; }
 
             public ParticleSystemSubEmitterProperties properties { get; set; }
 
             public float emitProbability { get; set; }
+        }
+
+        public void Init(ParticleSystem.SubEmittersModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            subEmittersCount = mode.subEmittersCount;
+            subParticleSystem = new SubEmittersModuleParticleSystem[subEmittersCount];
+            for(int i = 0; i < subEmittersCount; ++ i)
+            {
+                subParticleSystem[i].particleInfo = new ParticleInfo(mode.GetSubEmitterSystem(i));
+                subParticleSystem[i].type = mode.GetSubEmitterType(i);
+                subParticleSystem[i].properties = mode.GetSubEmitterProperties(i);
+                subParticleSystem[i].emitProbability = mode.GetSubEmitterEmitProbability(i);
+            }
+        }
+
+        public void Copy(ref ParticleSystem.SubEmittersModule mode)
+        {
+            mode.enabled = enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            for(int i = 0; i < subEmittersCount; ++i)
+            {
+                ParticleSystem particleSystem = ParticleSystemPool.Get();
+                subParticleSystem[i].particleInfo.Copy(particleSystem);
+                mode.AddSubEmitter(particleSystem, subParticleSystem[i].type,
+                    subParticleSystem[i].properties, subParticleSystem[i].emitProbability);
+            }
         }
     }        
 
@@ -661,7 +1298,121 @@ public class ParticleInfo
 
         public int spriteCount { get; set; }
 
+        public Sprite[] sprites { get; set; }
+
         public Vector2 speedRange { get; set; }
+
+        public void Init(ParticleSystem.TextureSheetAnimationModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+            this.mode = mode.mode;
+            if (this.mode == ParticleSystemAnimationMode.Grid)
+            {
+                numTilesX = mode.numTilesX;
+                numTilesY = mode.numTilesY;
+                animation = mode.animation;
+                startFrame = mode.startFrame;
+                startFrameMultiplier = mode.startFrameMultiplier;
+                uvChannelMask = mode.uvChannelMask;
+
+                if (animation == ParticleSystemAnimationType.SingleRow)
+                {
+                    rowMode = mode.rowMode;
+                    rowIndex = mode.rowIndex;
+                }
+            }
+            else
+            {
+                spriteCount = mode.spriteCount;
+                sprites = new Sprite[spriteCount];
+                for(int i = 0; i < spriteCount; ++ i)
+                {
+                    sprites[i] = mode.GetSprite(i);
+                }
+            }
+
+            timeMode = mode.timeMode;
+            switch (timeMode)
+            {
+                case ParticleSystemAnimationTimeMode.Lifetime:
+                    {
+                        frameOverTime = mode.frameOverTime;
+                        frameOverTimeMultiplier = mode.frameOverTimeMultiplier;
+                        cycleCount = mode.cycleCount;
+                    }
+                    break;
+                case ParticleSystemAnimationTimeMode.Speed:
+                    {
+                        speedRange = mode.speedRange;
+                        cycleCount = mode.cycleCount;
+                    }
+                    break;
+                case ParticleSystemAnimationTimeMode.FPS:
+                    {
+                        fps = mode.fps;
+                    }
+                    break;
+            }
+        }
+
+        public void Copy(ref ParticleSystem.TextureSheetAnimationModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+            mode.mode = this.mode;
+            if (this.mode == ParticleSystemAnimationMode.Grid)
+            {
+                mode.numTilesX = numTilesX;
+                mode.numTilesY = numTilesY;
+                mode.animation = animation;
+                mode.startFrame = startFrame;
+                mode.startFrameMultiplier = startFrameMultiplier;
+                mode.uvChannelMask = uvChannelMask;
+
+                if (animation == ParticleSystemAnimationType.SingleRow)
+                {
+                    mode.rowMode = rowMode;
+                    mode.rowIndex = rowIndex;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < spriteCount; ++i)
+                {
+                    mode.AddSprite(sprites[i]);
+                }
+            }
+
+            mode.timeMode = timeMode;
+            switch (timeMode)
+            {
+                case ParticleSystemAnimationTimeMode.Lifetime:
+                    {
+                        mode.frameOverTime = frameOverTime;
+                        mode.frameOverTimeMultiplier = frameOverTimeMultiplier;
+                        mode.cycleCount = cycleCount;
+                    }
+                    break;
+                case ParticleSystemAnimationTimeMode.Speed:
+                    {
+                        mode.speedRange = speedRange;
+                        mode.cycleCount = cycleCount;
+                    }
+                    break;
+                case ParticleSystemAnimationTimeMode.FPS:
+                    {
+                        mode.fps = fps;
+                    }
+                    break;
+            }
+        }
     }
 
     public struct VelocityOverLifetimeModule
@@ -677,13 +1428,13 @@ public class ParticleInfo
         public ParticleSystem.MinMaxCurve z { get; set; }
         public float zMultiplier { get; set; }
         
-        public ParticleSystem.MinMaxCurve orbitalx { get; set; }
+        public ParticleSystem.MinMaxCurve orbitalX { get; set; }
         public float orbitalXMultiplier { get; set; }
 
-        public ParticleSystem.MinMaxCurve orbitaly { get; set; }
+        public ParticleSystem.MinMaxCurve orbitalY { get; set; }
         public float orbitalYMultiplier { get; set; }
 
-        public ParticleSystem.MinMaxCurve orbitalz { get; set; }
+        public ParticleSystem.MinMaxCurve orbitalZ { get; set; }
         public float orbitalZMultiplier { get; set; }
 
         public ParticleSystem.MinMaxCurve orbitalOffsetX { get; set; }
@@ -702,6 +1453,72 @@ public class ParticleInfo
         public float speedModifierMultiplier { get; set; }
 
         public ParticleSystemSimulationSpace space { get; set; }
+
+        public void Init(ParticleSystem.VelocityOverLifetimeModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            x = mode.x;
+            xMultiplier = mode.xMultiplier;
+            y = mode.y;
+            yMultiplier = mode.yMultiplier;
+            z = mode.z;
+            zMultiplier = mode.zMultiplier;
+            space = mode.space;
+            orbitalX = mode.orbitalX;
+            orbitalXMultiplier = mode.orbitalXMultiplier;
+            orbitalY = mode.orbitalY;
+            orbitalYMultiplier = mode.orbitalYMultiplier;
+            orbitalZ = mode.orbitalZ;
+            orbitalZMultiplier = mode.orbitalZMultiplier;
+            orbitalOffsetX = mode.orbitalOffsetX;
+            orbitalOffsetXMultiplier = mode.orbitalOffsetXMultiplier;
+            orbitalOffsetY = mode.orbitalOffsetY;
+            orbitalOffsetYMultiplier = mode.orbitalOffsetYMultiplier;
+            orbitalOffsetZ = mode.orbitalOffsetZ;
+            orbitalOffsetZMultiplier = mode.orbitalOffsetZMultiplier;
+            radial = mode.radial;
+            radialMultiplier = mode.radialMultiplier;
+            speedModifier = mode.speedModifier;
+            speedModifierMultiplier = mode.speedModifierMultiplier;
+        }
+
+        public void Copy(ref ParticleSystem.VelocityOverLifetimeModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.x = x;
+            mode.xMultiplier = xMultiplier;
+            mode.y = y;
+            mode.yMultiplier = yMultiplier;
+            mode.z = z;
+            mode.zMultiplier = zMultiplier;
+            mode.space = space;
+            mode.orbitalX = orbitalX;
+            mode.orbitalXMultiplier = orbitalXMultiplier;
+            mode.orbitalY = orbitalY;
+            mode.orbitalYMultiplier = orbitalYMultiplier;
+            mode.orbitalZ = orbitalZ;
+            mode.orbitalZMultiplier = orbitalZMultiplier;
+            mode.orbitalOffsetX = orbitalOffsetX;
+            mode.orbitalOffsetXMultiplier = orbitalOffsetXMultiplier;
+            mode.orbitalOffsetY = orbitalOffsetY;
+            mode.orbitalOffsetYMultiplier = orbitalOffsetYMultiplier;
+            mode.orbitalOffsetZ = orbitalOffsetZ;
+            mode.orbitalOffsetZMultiplier = orbitalOffsetZMultiplier;
+            mode.radial = radial;
+            mode.radialMultiplier = radialMultiplier;
+            mode.speedModifier = speedModifier;
+            mode.speedModifierMultiplier = speedModifierMultiplier;
+        }
     }
 
     public struct LimitVelocityLifetimeModule
@@ -732,6 +1549,60 @@ public class ParticleInfo
         public bool multiplyDragByParticleSize { get; set; }
 
         public bool multiplyDragByParticleVelocity { get; set; }
+
+        public void Init(ParticleSystem.LimitVelocityOverLifetimeModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            separateAxes = mode.separateAxes;
+            if(separateAxes)
+            {
+                limitX = mode.limitX;
+                limitXMultiplier = mode.limitXMultiplier;
+                limitY = mode.limitY;
+                limitYMultiplier = mode.limitYMultiplier;
+                limitZ = mode.limitZ;
+                limitZMultiplier = mode.limitZMultiplier;
+            }
+            limit = mode.limit;
+            limitMultiplier = mode.limitMultiplier;
+            dampen = mode.dampen;
+            drag = mode.drag;
+            dragMultiplier = mode.dragMultiplier;
+            multiplyDragByParticleSize = mode.multiplyDragByParticleSize;
+            multiplyDragByParticleVelocity = mode.multiplyDragByParticleVelocity;
+        }
+
+        public void Copy(ref ParticleSystem.LimitVelocityOverLifetimeModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.separateAxes = separateAxes;
+            if (separateAxes)
+            {
+                mode.limitX = limitX;
+                mode.limitXMultiplier = limitXMultiplier;
+                mode.limitY = limitY;
+                mode.limitYMultiplier = limitYMultiplier;
+                mode.limitZ = limitZ;
+                mode.limitZMultiplier = limitZMultiplier;
+            }
+            mode.limit = limit;
+            mode.limitMultiplier = limitMultiplier;
+            mode.dampen = dampen;
+            mode.drag = drag;
+            mode.dragMultiplier = dragMultiplier;
+            mode.multiplyDragByParticleSize = multiplyDragByParticleSize;
+            mode.multiplyDragByParticleVelocity = multiplyDragByParticleVelocity;
+        }
     }
 
     public struct InHeritVelocityModule
@@ -743,6 +1614,32 @@ public class ParticleInfo
         public ParticleSystem.MinMaxCurve curve { get; set; }
 
         public float curveMultiplier { get; set; }
+
+        public void Init(ParticleSystem.InheritVelocityModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            this.mode = mode.mode;
+            curve = mode.curve;
+            curveMultiplier = mode.curveMultiplier;
+        }
+
+        public void Copy(ref ParticleSystem.InheritVelocityModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.mode = this.mode;
+            mode.curve = curve;
+            mode.curveMultiplier = curveMultiplier;
+        }
     }
 
     public struct ForceOverLifetimeModule
@@ -764,6 +1661,40 @@ public class ParticleInfo
         public ParticleSystemSimulationSpace space { get; set; }
 
         public bool randomized { get; set; }
+
+        public void Init(ParticleSystem.ForceOverLifetimeModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            x = mode.x;
+            xMultiplier = mode.xMultiplier;
+            y = mode.y;
+            yMultiplier = mode.yMultiplier;
+            z = mode.z;
+            zMultiplier = mode.zMultiplier;
+            space = mode.space;
+        }
+
+        public void Copy(ref ParticleSystem.ForceOverLifetimeModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.x = x;
+            mode.xMultiplier = xMultiplier;
+            mode.y = y;
+            mode.yMultiplier = yMultiplier;
+            mode.z = z;
+            mode.zMultiplier = zMultiplier;
+            mode.space = space;
+        }
     }
 
     public struct ColorOverLifetimeModule
@@ -771,6 +1702,28 @@ public class ParticleInfo
         public bool enabled { get; set; }
 
         public ParticleSystem.MinMaxGradient color { get; set; }
+
+        public void Init(ParticleSystem.ColorOverLifetimeModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            color = mode.color;
+        }
+
+        public void Copy(ref ParticleSystem.ColorOverLifetimeModule mode)
+        {
+            mode.enabled = enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            mode.color = color;
+        }
     }
 
     public struct ColorBySpeedModule
@@ -780,6 +1733,30 @@ public class ParticleInfo
         public ParticleSystem.MinMaxGradient color { get; set; }
 
         public Vector2 range { get; set; }
+
+        public void Init(ParticleSystem.ColorBySpeedModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            color = mode.color;
+            range = mode.range;
+        }
+
+        public void Copy(ref ParticleSystem.ColorBySpeedModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.color = color;
+            mode.range = range;
+        }
     }
 
     public struct SizeOverLifetimeModule
@@ -803,6 +1780,56 @@ public class ParticleInfo
         public float zMultiplier { get; set; }
 
         public bool separateAxes { get; set; }
+
+        public void Init(ParticleSystem.SizeOverLifetimeModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            separateAxes = mode.separateAxes;
+            if(separateAxes)
+            {
+                x = mode.x;
+                xMultiplier = mode.xMultiplier;
+                y = mode.y;
+                yMultiplier = mode.yMultiplier;
+                z = mode.z;
+                zMultiplier = mode.zMultiplier;
+            }
+            else
+            {
+                size = mode.size;
+                sizeMultiplier = mode.sizeMultiplier;
+            }
+        }
+
+        public void Copy(ref ParticleSystem.SizeOverLifetimeModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.separateAxes = separateAxes;
+            if (separateAxes)
+            {
+                mode.x = x;
+                mode.xMultiplier = xMultiplier;
+                mode.y = y;
+                mode.yMultiplier = yMultiplier;
+                mode.z = z;
+                mode.zMultiplier = zMultiplier;
+            }
+            else
+            {
+                mode.size = size;
+                mode.sizeMultiplier = sizeMultiplier;
+            }
+        }
     }
 
     public struct SizeBySpeedModule
@@ -828,6 +1855,58 @@ public class ParticleInfo
         public bool separateAxes { get; set; }
 
         public Vector2 range { get; set; }
+
+        public void Init(ParticleSystem.SizeBySpeedModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            range = mode.range;
+            separateAxes = mode.separateAxes;
+            if(separateAxes)
+            {
+                x = mode.x;
+                xMultiplier = mode.xMultiplier;
+                y = mode.y;
+                yMultiplier = mode.yMultiplier;
+                z = mode.z;
+                zMultiplier = mode.zMultiplier;
+            }
+            else
+            {
+                size = mode.size;
+                sizeMultiplier = mode.sizeMultiplier;
+            }
+        }
+
+        public void Copy(ref ParticleSystem.SizeBySpeedModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.range = range;
+            mode.separateAxes = separateAxes;
+            if (separateAxes)
+            {
+                mode.x = x;
+                mode.xMultiplier = xMultiplier;
+                mode.y = y;
+                mode.yMultiplier = yMultiplier;
+                mode.z = z;
+                mode.zMultiplier = zMultiplier;
+            }
+            else
+            {
+                mode.size = size;
+                mode.sizeMultiplier = sizeMultiplier;
+            }
+        }
     }
 
     public struct RotationOverLifetimeModule
@@ -847,6 +1926,56 @@ public class ParticleInfo
         public float zMultiplier { get; set; }
 
         public bool separateAxes { get; set; }
+
+        public void Init(ParticleSystem.RotationOverLifetimeModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            separateAxes = mode.separateAxes;
+            if(separateAxes)
+            {
+                x = mode.x;
+                xMultiplier = mode.xMultiplier;
+                y = mode.y;
+                yMultiplier = mode.yMultiplier;
+                z = mode.z;
+                zMultiplier = mode.zMultiplier;
+            }
+            else
+            {
+                // TODO 
+                // Angular Velocity
+            }
+        }
+
+        public void Copy(ref ParticleSystem.RotationOverLifetimeModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.separateAxes = separateAxes;
+            if (separateAxes)
+            {
+                mode.x = x;
+                mode.xMultiplier = xMultiplier;
+                mode.y = y;
+                mode.yMultiplier = yMultiplier;
+                mode.z = z;
+                mode.zMultiplier = zMultiplier;
+            }
+            else
+            {
+                // TODO 
+                // Angular Velocity
+            }
+        }
     }
 
     public struct RotationBySpeedModule
@@ -868,6 +1997,58 @@ public class ParticleInfo
         public bool separateAxes { get; set; }
 
         public Vector2 range { get; set; }
+
+        public void Init(ParticleSystem.RotationBySpeedModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            range = mode.range;
+            separateAxes = mode.separateAxes;
+            if(separateAxes)
+            {
+                x = mode.x;
+                xMultiplier = mode.xMultiplier;
+                y = mode.y;
+                yMultiplier = mode.yMultiplier;
+                z = mode.z;
+                zMultiplier = mode.zMultiplier;
+            }
+            else
+            {
+                // TODO
+                // Angular Velocity
+            }
+        }
+
+        public void Copy(ref ParticleSystem.RotationBySpeedModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.range = range;
+            mode.separateAxes = separateAxes;
+            if (separateAxes)
+            {
+                mode.x = x;
+                mode.xMultiplier = xMultiplier;
+                mode.y = y;
+                mode.yMultiplier = yMultiplier;
+                mode.z = z;
+                mode.zMultiplier = zMultiplier;
+            }
+            else
+            {
+                // TODO
+                // Angular Velocity
+            }
+        }
     }
 
     public struct ExternalForcesModule
@@ -883,6 +2064,54 @@ public class ParticleInfo
         public LayerMask influenceMask { get; set; }
 
         public int influenceCount { get; set; }
+
+        public ParticleSystemForceField[] forceFields { get; set; }
+
+        public void Init(ParticleSystem.ExternalForcesModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            multiplier = mode.multiplier;
+            multiplierCurve = mode.multiplierCurve;
+            influenceFilter = mode.influenceFilter;
+            influenceMask = mode.influenceMask;
+            if(influenceFilter == ParticleSystemGameObjectFilter.LayerMaskAndList ||
+                influenceFilter == ParticleSystemGameObjectFilter.List)
+            {
+                influenceCount = mode.influenceCount;
+                forceFields = new ParticleSystemForceField[influenceCount];
+                for(int i = 0; i < influenceCount; ++ i)
+                {
+                    forceFields[i] = mode.GetInfluence(i);
+                }
+            }
+        }
+
+        public void Copy(ref ParticleSystem.ExternalForcesModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.multiplier = multiplier;
+            mode.multiplierCurve = multiplierCurve;
+            mode.influenceFilter = influenceFilter;
+            mode.influenceMask = influenceMask;
+            if (influenceFilter == ParticleSystemGameObjectFilter.LayerMaskAndList ||
+                influenceFilter == ParticleSystemGameObjectFilter.List)
+            {
+                for (int i = 0; i < influenceCount; ++i)
+                {
+                    mode.AddInfluence(forceFields[i]);
+                }
+            }
+        }
     }
 
     public struct NoiseModule
@@ -946,6 +2175,108 @@ public class ParticleInfo
         public ParticleSystem.MinMaxCurve rotationAmount { get; set; }
 
         public ParticleSystem.MinMaxCurve sizeAmount { get; set; }
+
+        public void Init(ParticleSystem.NoiseModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            separateAxes = mode.separateAxes;
+            if(separateAxes)
+            {
+                strengthX = mode.strengthX;
+                strengthXMultiplier = mode.strengthXMultiplier;
+                strengthY = mode.strengthY;
+                strengthYMultiplier = mode.strengthYMultiplier;
+                strengthZ = mode.strengthZMultiplier;
+            }
+            else
+            {
+                strength = mode.strength;
+                strengthMultiplier = mode.strengthMultiplier;
+            }
+            remapEnabled = mode.remapEnabled;
+            if(remapEnabled)
+            {
+                remapX = mode.remapX;
+                remapXMultiplier = mode.remapXMultiplier;
+                remapY = mode.remapY;
+                remapYMultiplier = mode.remapYMultiplier;
+                remapZ = mode.remapZ;
+                remapZMultiplier = mode.remapZMultiplier;
+            }
+            else
+            {
+                remap = mode.remap;
+                remapMultiplier = mode.remapMultiplier;
+            }
+
+            frequency = mode.frequency;
+            scrollSpeed = mode.scrollSpeed;
+            scrollSpeedMultiplier = mode.scrollSpeedMultiplier;
+            damping = mode.damping;
+            octaveCount = mode.octaveCount;
+            octaveMultiplier = mode.octaveMultiplier;
+            octaveScale = mode.octaveScale;
+            quality = mode.quality;
+            positionAmount = mode.positionAmount;
+            rotationAmount = mode.rotationAmount;
+            sizeAmount = mode.sizeAmount;
+        }
+
+        public void Copy(ref ParticleSystem.NoiseModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.separateAxes = separateAxes;
+            if (separateAxes)
+            {
+                mode.strengthX = strengthX;
+                mode.strengthXMultiplier = strengthXMultiplier;
+                mode.strengthY = strengthY;
+                mode.strengthYMultiplier = strengthYMultiplier;
+                mode.strengthZ = strengthZMultiplier;
+            }
+            else
+            {
+                mode.strength = strength;
+                mode.strengthMultiplier = strengthMultiplier;
+            }
+            mode.remapEnabled = remapEnabled;
+            if (remapEnabled)
+            {
+                mode.remapX = remapX;
+                mode.remapXMultiplier = remapXMultiplier;
+                mode.remapY = remapY;
+                mode.remapYMultiplier = remapYMultiplier;
+                mode.remapZ = remapZ;
+                mode.remapZMultiplier = remapZMultiplier;
+            }
+            else
+            {
+                mode.remap = remap;
+                mode.remapMultiplier = remapMultiplier;
+            }
+
+            mode.frequency = frequency;
+            mode.scrollSpeed = scrollSpeed;
+            mode.scrollSpeedMultiplier = scrollSpeedMultiplier;
+            mode.damping = damping;
+            mode.octaveCount = octaveCount;
+            mode.octaveMultiplier = octaveMultiplier;
+            mode.octaveScale = octaveScale;
+            mode.quality = quality;
+            mode.positionAmount = positionAmount;
+            mode.rotationAmount = rotationAmount;
+            mode.sizeAmount = sizeAmount;
+        }
     }
 
     public struct CollisionModule
@@ -995,6 +2326,102 @@ public class ParticleInfo
         public bool multiplyColliderForceByParticleSize { get; set; }
 
         public int maxPlaneCount { get; set; }
+
+        public Transform[] transformPlanes { get; set; }
+
+        public void Init(ParticleSystem.CollisionModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            type = mode.type;
+            if(type == ParticleSystemCollisionType.Planes)
+            {
+                maxPlaneCount = mode.maxPlaneCount;
+                transformPlanes = new Transform[maxPlaneCount];
+                for(int i = 0; i < maxPlaneCount; ++ i)
+                {
+                    transformPlanes[i] = mode.GetPlane(i);
+                }
+                // TODO
+                // Visualization
+                // scale Plane
+            }
+            else
+            {
+                this.mode = mode.mode;
+                quality = mode.quality;
+                collidesWith = mode.collidesWith;
+                maxCollisionShapes = mode.maxCollisionShapes;
+                enableDynamicColliders = mode.enableDynamicColliders;
+                colliderForce = mode.colliderForce;
+                multiplyColliderForceByCollisionAngle = mode.multiplyColliderForceByCollisionAngle;
+                multiplyColliderForceByParticleSize = mode.multiplyColliderForceByParticleSize;
+                multiplyColliderForceByParticleSpeed = mode.multiplyColliderForceByParticleSpeed;
+
+            }
+            dampen = mode.dampen;
+            dampenMultiplier = mode.dampenMultiplier;
+            bounce = mode.bounce;
+            bounceMultiplier = mode.bounceMultiplier;
+            lifetimeLoss = mode.lifetimeLoss;
+            lifetimeLossMultiplier = mode.lifetimeLossMultiplier;
+            minKillSpeed = mode.minKillSpeed;
+            maxKillSpeed = mode.maxKillSpeed;
+            radiusScale = mode.radiusScale;
+            sendCollisionMessages = mode.sendCollisionMessages;
+            // TODO
+            // Visualize Bounds
+        }
+
+        public void Copy(ref ParticleSystem.CollisionModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.type = type;
+            if (type == ParticleSystemCollisionType.Planes)
+            {
+                for (int i = 0; i < maxPlaneCount; ++i)
+                {
+                    mode.SetPlane(i, transformPlanes[i]);
+                }
+                // TODO
+                // Visualization
+                // scale Plane
+            }
+            else
+            {
+                mode.mode = this.mode;
+                mode.quality = quality;
+                mode.collidesWith = collidesWith;
+                mode.maxCollisionShapes = maxCollisionShapes;
+                mode.enableDynamicColliders = enableDynamicColliders;
+                mode.colliderForce = colliderForce;
+                mode.multiplyColliderForceByCollisionAngle = multiplyColliderForceByCollisionAngle;
+                mode.multiplyColliderForceByParticleSize = multiplyColliderForceByParticleSize;
+                mode.multiplyColliderForceByParticleSpeed = multiplyColliderForceByParticleSpeed;
+
+            }
+            mode.dampen = dampen;
+            mode.dampenMultiplier = dampenMultiplier;
+            mode.bounce = bounce;
+            mode.bounceMultiplier = bounceMultiplier;
+            mode.lifetimeLoss = lifetimeLoss;
+            mode.lifetimeLossMultiplier = lifetimeLossMultiplier;
+            mode.minKillSpeed = minKillSpeed;
+            mode.maxKillSpeed = maxKillSpeed;
+            mode.radiusScale = radiusScale;
+            mode.sendCollisionMessages = sendCollisionMessages;
+            // TODO
+            // Visualize Bounds
+        }
     }
 
     public struct TriggerModule
@@ -1012,6 +2439,54 @@ public class ParticleInfo
         public float radiusScale { get; set; }
 
         public int maxColliderCount { get; set; }
+
+        public Component[] colliders { get; set; }
+
+        public void Init(ParticleSystem.TriggerModule mode)
+        {
+            enabled = mode.enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            maxColliderCount = mode.maxColliderCount;
+            colliders = new Component[maxColliderCount];
+            for (int i = 0; i < maxColliderCount; ++i)
+            {
+                colliders[i] = mode.GetCollider(i);
+            }
+
+            inside = mode.inside;
+            outside = mode.outside;
+            enter = mode.enter;
+            exit = mode.exit;
+            radiusScale = mode.radiusScale;
+            // TODO 
+            // Visualize Bounds
+        }
+
+        public void Copy(ref ParticleSystem.TriggerModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            for (int i = 0; i < maxColliderCount; ++i)
+            {
+                mode.SetCollider(i, colliders[i]);
+            }
+
+            mode.inside = inside;
+            mode.outside = outside;
+            mode.enter = enter;
+            mode.exit = exit;
+            mode.radiusScale = radiusScale;
+            // TODO 
+            // Visualize Bounds}
+        }
     }
 
     public struct LightsModule
@@ -1039,6 +2514,48 @@ public class ParticleInfo
         public float intensityMultiplier { get; set; }
 
         public int maxLights { get; set; }
+
+        public void Init(ParticleSystem.LightsModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            light = mode.light;
+            ratio = mode.ratio;
+            useRandomDistribution = mode.useRandomDistribution;
+            useParticleColor = mode.useParticleColor;
+            sizeAffectsRange = mode.sizeAffectsRange;
+            alphaAffectsIntensity = mode.alphaAffectsIntensity;
+            range = mode.range;
+            rangeMultiplier = mode.rangeMultiplier;
+            intensity = mode.intensity;
+            intensityMultiplier = mode.intensityMultiplier;
+            maxLights = mode.maxLights;
+        }
+
+        public void Copy(ref ParticleSystem.LightsModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.light = light;
+            mode.ratio = ratio;
+            mode.useRandomDistribution = useRandomDistribution;
+            mode.useParticleColor = useParticleColor;
+            mode.sizeAffectsRange = sizeAffectsRange;
+            mode.alphaAffectsIntensity = alphaAffectsIntensity;
+            mode.range = range;
+            mode.rangeMultiplier = rangeMultiplier;
+            mode.intensity = intensity;
+            mode.intensityMultiplier = intensityMultiplier;
+            mode.maxLights = maxLights;
+        }
     }
 
     public struct TrailModule
@@ -1084,15 +2601,82 @@ public class ParticleInfo
         public bool splitSubEmitterRibbons { get; set; }
 
         public bool attachRibbonsToTransform { get; set; }
+
+        public void Init(ParticleSystem.TrailModule mode)
+        {
+            enabled = mode.enabled;
+            if(!enabled)
+            {
+                return;
+            }
+
+            this.mode = mode.mode;
+            if(this.mode == ParticleSystemTrailMode.PerParticle)
+            {
+                ratio = mode.ratio;
+                lifetime = mode.lifetime;
+                lifetimeMultiplier = mode.lifetimeMultiplier;
+                minVertexDistance = mode.minVertexDistance;
+                worldSpace = mode.worldSpace;
+                dieWithParticles = mode.dieWithParticles;
+                textureMode = mode.textureMode;
+                sizeAffectsLifetime = mode.sizeAffectsLifetime;
+            }
+            else
+            {
+                ribbonCount = mode.ribbonCount;
+                splitSubEmitterRibbons = mode.splitSubEmitterRibbons;
+                attachRibbonsToTransform = mode.attachRibbonsToTransform;
+                textureMode = mode.textureMode;
+            }
+            sizeAffectsWidth = mode.sizeAffectsWidth;
+            inheritParticleColor = mode.inheritParticleColor;
+            colorOverLifetime = mode.colorOverLifetime;
+            widthOverTrail = mode.widthOverTrail;
+            widthOverTrailMultiplier = mode.widthOverTrailMultiplier;
+            colorOverTrail = mode.colorOverTrail;
+            generateLightingData = mode.generateLightingData;
+            shadowBias = mode.shadowBias;
+        }
+
+        public void Copy(ref ParticleSystem.TrailModule mode)
+        {
+            mode.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }
+
+            mode.mode = this.mode;
+            if (this.mode == ParticleSystemTrailMode.PerParticle)
+            {
+                mode.ratio = ratio;
+                mode.lifetime = lifetime;
+                mode.lifetimeMultiplier = lifetimeMultiplier;
+                mode.minVertexDistance = minVertexDistance;
+                mode.worldSpace = worldSpace;
+                mode.dieWithParticles = dieWithParticles;
+                mode.textureMode = textureMode;
+                mode.sizeAffectsLifetime = sizeAffectsLifetime;
+            }
+            else
+            {
+                mode.ribbonCount = ribbonCount;
+                mode.splitSubEmitterRibbons = splitSubEmitterRibbons;
+                mode.attachRibbonsToTransform = attachRibbonsToTransform;
+                mode.textureMode = textureMode;
+            }
+            mode.sizeAffectsWidth = sizeAffectsWidth;
+            mode.inheritParticleColor = inheritParticleColor;
+            mode.colorOverLifetime = colorOverLifetime;
+            mode.widthOverTrail = widthOverTrail;
+            mode.widthOverTrailMultiplier = widthOverTrailMultiplier;
+            mode.colorOverTrail = colorOverTrail;
+            mode.generateLightingData = generateLightingData;
+            mode.shadowBias = shadowBias;
+        }
     }
 
     public struct CustomDataModule
     { }
-
-    public void CopyToParticleSystem(ParticleSystem particleStstem)
-    {
-        System.Type mainType = particleStstem.main.GetType();
-        PropertyInfo property = mainType.GetProperty("duration");
-        property.SetValue(particleStstem.main, main.duration);
-    }
 }

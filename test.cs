@@ -8,6 +8,8 @@ public class test : MonoBehaviour
 
     private static System.Func<int, Player> analyzeCustomDepend;
 
+    [SerializeField] private ParticleSystem m_ParticleSystem;
+
     Dictionary<string, Player> m_Players = new Dictionary<string, Player>();
     // Start is called before the first frame update
     void Start()
@@ -24,6 +26,7 @@ public class test : MonoBehaviour
         m_Players.Add("2", new Player());
         m_Players.Add("3", new Player());
         m_Players.Add("4", new Player());*/
+        int k = 0;
 
 
         //m_EffectGameObject = (GameObject)Resources.Load("e_con3005_fx");

@@ -1,4 +1,5 @@
 ﻿using IGG.Utility;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -6,26 +7,28 @@ public class ParticleInfo
 {
     public ParticleInfo(ParticleSystem particleSystem)
     {
-        main = new MainModule(particleSystem.main);
-        emission.Init(particleSystem.emission);
-        subEmitters.Init(particleSystem.subEmitters);
-        textureSheetAnimation.Init(particleSystem.textureSheetAnimation);
-        velocityOverLifetime.Init(particleSystem.velocityOverLifetime);
-        limitVelocityOverLifetime.Init(particleSystem.limitVelocityOverLifetime);
-        inheritVelocity.Init(particleSystem.inheritVelocity);
-        forceOverLifetime.Init(particleSystem.forceOverLifetime);
-        colorOverLifetime.Init(particleSystem.colorOverLifetime);
-        colorBySpeed.Init(particleSystem.colorBySpeed);
-        sizeOverLifetime.Init(particleSystem.sizeOverLifetime);
-        sizeBySpeed.Init(particleSystem.sizeBySpeed);
-        rotationOverLifetime.Init(particleSystem.rotationOverLifetime);
-        rotationBySpeed.Init(particleSystem.rotationBySpeed);
-        externalForces.Init(particleSystem.externalForces);
-        noise.Init(particleSystem.noise);
-        collision.Init(particleSystem.collision);
-        trigger.Init(particleSystem.trigger);
-        lights.Init(particleSystem.lights);
-        trail.Init(particleSystem.trails);
+        m_MainModule = new MainModule(particleSystem.main);
+        m_EmissionModule.Init(particleSystem.emission);
+        m_ShapeModule.Init(particleSystem.shape);
+        m_SubEmittersModule.Init(particleSystem.subEmitters);
+        m_TextureSheetAnimationModule.Init(particleSystem.textureSheetAnimation);
+        m_VelocityOverLifetimeModule.Init(particleSystem.velocityOverLifetime);
+        m_LimitVelocityOverLifetimeModule.Init(particleSystem.limitVelocityOverLifetime);
+        m_InHeritVelocityModule.Init(particleSystem.inheritVelocity);
+        m_ForceOverLifetimeModule.Init(particleSystem.forceOverLifetime);
+        m_ColorOverLifetimeModule.Init(particleSystem.colorOverLifetime);
+        m_ColorBySpeedModule.Init(particleSystem.colorBySpeed);
+        m_SizeOverLifetimeModule.Init(particleSystem.sizeOverLifetime);
+        m_SizeBySpeedModule.Init(particleSystem.sizeBySpeed);
+        m_RotationOverLifetimeModule.Init(particleSystem.rotationOverLifetime);
+        m_RotationBySpeedModule.Init(particleSystem.rotationBySpeed);
+        m_ExternalForcesModule.Init(particleSystem.externalForces);
+        m_NoiseModule.Init(particleSystem.noise);
+        m_CollisionModule.Init(particleSystem.collision);
+        m_TriggerModule.Init(particleSystem.trigger);
+        m_LightsModule.Init(particleSystem.lights);
+        m_TrailModule.Init(particleSystem.trails);
+        m_ParticleSystemRender = new ParticleSystemRender(particleSystem.gameObject.GetComponent<UnityEngine.ParticleSystemRenderer>());
     }
 
     public void CopyToParticleSystem(ParticleSystem particleSystem)
@@ -35,105 +38,136 @@ public class ParticleInfo
         property.SetValue(particleStstem.main, main.duration);*/
 
         ParticleSystem.MainModule mainModule = particleSystem.main;
-        main.Copy(ref mainModule);
+        m_MainModule.Copy(ref mainModule);
 
         ParticleSystem.EmissionModule emissionModule = particleSystem.emission;
-        emission.Copy(ref emissionModule);
+        m_EmissionModule.Copy(ref emissionModule);
+
+        ParticleSystem.ShapeModule shapeModule = particleSystem.shape;
+        m_ShapeModule.Copy(ref shapeModule);
 
         ParticleSystem.SubEmittersModule subEmittersModule = particleSystem.subEmitters;
-        subEmitters.Copy(ref subEmittersModule);
+        m_SubEmittersModule.Copy(ref subEmittersModule);
 
         ParticleSystem.TextureSheetAnimationModule textureSheetAnimationModule = particleSystem.textureSheetAnimation;
-        textureSheetAnimation.Copy(ref textureSheetAnimationModule);
+        m_TextureSheetAnimationModule.Copy(ref textureSheetAnimationModule);
 
         ParticleSystem.VelocityOverLifetimeModule velocityOverLifetimeModule = particleSystem.velocityOverLifetime;
-        velocityOverLifetime.Copy(ref velocityOverLifetimeModule);
+        m_VelocityOverLifetimeModule.Copy(ref velocityOverLifetimeModule);
 
         ParticleSystem.LimitVelocityOverLifetimeModule limitVelocityLifetimeModule = particleSystem.limitVelocityOverLifetime;
-        limitVelocityOverLifetime.Copy(ref limitVelocityLifetimeModule);
+        m_LimitVelocityOverLifetimeModule.Copy(ref limitVelocityLifetimeModule);
 
         ParticleSystem.InheritVelocityModule inheriteVelocityModule = particleSystem.inheritVelocity;
-        inheritVelocity.Copy(ref inheriteVelocityModule);
+        m_InHeritVelocityModule.Copy(ref inheriteVelocityModule);
 
         ParticleSystem.ForceOverLifetimeModule forceOverLifetimeModule = particleSystem.forceOverLifetime;
-        forceOverLifetime.Copy(ref forceOverLifetimeModule);
+        m_ForceOverLifetimeModule.Copy(ref forceOverLifetimeModule);
 
         ParticleSystem.ColorOverLifetimeModule colorOverLifetimeModule = particleSystem.colorOverLifetime;
-        colorOverLifetime.Copy(ref colorOverLifetimeModule);
+        m_ColorOverLifetimeModule.Copy(ref colorOverLifetimeModule);
 
         ParticleSystem.ColorBySpeedModule colorBySpeedModule = particleSystem.colorBySpeed;
-        colorBySpeed.Copy(ref colorBySpeedModule);
+        m_ColorBySpeedModule.Copy(ref colorBySpeedModule);
 
         ParticleSystem.SizeOverLifetimeModule sizeOverLifetimeModule = particleSystem.sizeOverLifetime;
-        sizeOverLifetime.Copy(ref sizeOverLifetimeModule);
+        m_SizeOverLifetimeModule.Copy(ref sizeOverLifetimeModule);
 
         ParticleSystem.SizeBySpeedModule sizeBySpeedModule = particleSystem.sizeBySpeed;
-        sizeBySpeed.Copy(ref sizeBySpeedModule);
+        m_SizeBySpeedModule.Copy(ref sizeBySpeedModule);
 
         ParticleSystem.RotationOverLifetimeModule rotationOverLifetimeModule = particleSystem.rotationOverLifetime;
-        rotationOverLifetime.Copy(ref rotationOverLifetimeModule);
+        m_RotationOverLifetimeModule.Copy(ref rotationOverLifetimeModule);
 
         ParticleSystem.RotationBySpeedModule rotationBySpeedModule = particleSystem.rotationBySpeed;
-        rotationBySpeed.Copy(ref rotationBySpeedModule);
+        m_RotationBySpeedModule.Copy(ref rotationBySpeedModule);
 
         ParticleSystem.ExternalForcesModule externalForcesModule = particleSystem.externalForces;
-        externalForces.Copy(ref externalForcesModule);
+        m_ExternalForcesModule.Copy(ref externalForcesModule);
 
         ParticleSystem.NoiseModule noiseModule = particleSystem.noise;
-        noise.Copy(ref noiseModule);
+        m_NoiseModule.Copy(ref noiseModule);
 
         ParticleSystem.CollisionModule collisionModule = particleSystem.collision;
-        collision.Copy(ref collisionModule);
+        m_CollisionModule.Copy(ref collisionModule);
 
         ParticleSystem.TriggerModule triggerModule = particleSystem.trigger;
-        trigger.Copy(ref triggerModule);
+        m_TriggerModule.Copy(ref triggerModule);
 
         ParticleSystem.LightsModule lightsModule = particleSystem.lights;
-        lights.Copy(ref lightsModule);
+        m_LightsModule.Copy(ref lightsModule);
 
         ParticleSystem.TrailModule trialModule = particleSystem.trails;
-        trail.Copy(ref trialModule);
+        m_TrailModule.Copy(ref trialModule);
+
+        m_ParticleSystemRender.Copy(particleSystem.gameObject.GetComponent<UnityEngine.ParticleSystemRenderer>());
     }
 
-    public MainModule main { get; set; }
+    private MainModule m_MainModule;
+    public MainModule main { get { return m_MainModule; } set { m_MainModule = value; } }
 
-    public EmissionModule emission { get; set; }
+    private EmissionModule m_EmissionModule;
+    public EmissionModule emission { get { return m_EmissionModule; } set { m_EmissionModule = value; } }
 
-    public SubEmittersModule subEmitters { get; set; }
+    private ShapeModule m_ShapeModule;
+    public ShapeModule shape { get { return m_ShapeModule; } set { m_ShapeModule = value; } }
 
-    public TextureSheetAnimationModule textureSheetAnimation { get; set; }
+    private SubEmittersModule m_SubEmittersModule;
+    public SubEmittersModule subEmitters { get { return m_SubEmittersModule; } set { m_SubEmittersModule = value; } }
 
-    public VelocityOverLifetimeModule velocityOverLifetime { get; set; }
+    private TextureSheetAnimationModule m_TextureSheetAnimationModule;
+    public TextureSheetAnimationModule textureSheetAnimation { get { return m_TextureSheetAnimationModule; } set { m_TextureSheetAnimationModule = value; } }
 
-    public LimitVelocityOverLifetimeModule limitVelocityOverLifetime { get; set; }
+    private VelocityOverLifetimeModule m_VelocityOverLifetimeModule;
+    public VelocityOverLifetimeModule velocityOverLifetime { get { return m_VelocityOverLifetimeModule; } set { m_VelocityOverLifetimeModule = value; } }
 
-    public InHeritVelocityModule inheritVelocity { get; set; }
+    private LimitVelocityOverLifetimeModule m_LimitVelocityOverLifetimeModule;
+    public LimitVelocityOverLifetimeModule limitVelocityOverLifetime { get { return m_LimitVelocityOverLifetimeModule; } set { m_LimitVelocityOverLifetimeModule = value; } }
 
-    public ForceOverLifetimeModule forceOverLifetime { get; set; }
+    private InHeritVelocityModule m_InHeritVelocityModule;
+    public InHeritVelocityModule inheritVelocity { get { return m_InHeritVelocityModule; } set { m_InHeritVelocityModule = value; } }
 
-    public ColorOverLifetimeModule colorOverLifetime { get; set; }
+    private ForceOverLifetimeModule m_ForceOverLifetimeModule;
+    public ForceOverLifetimeModule forceOverLifetime { get { return m_ForceOverLifetimeModule; } set { m_ForceOverLifetimeModule = value; } }
 
-    public ColorBySpeedModule colorBySpeed { get; set; }
+    private ColorOverLifetimeModule m_ColorOverLifetimeModule;
+    public ColorOverLifetimeModule colorOverLifetime { get { return m_ColorOverLifetimeModule; } set { m_ColorOverLifetimeModule = value; } }
 
-    public SizeOverLifetimeModule sizeOverLifetime { get; set; }
+    private ColorBySpeedModule m_ColorBySpeedModule;
+    public ColorBySpeedModule colorBySpeed { get { return m_ColorBySpeedModule; } set { m_ColorBySpeedModule = value; } }
 
-    public SizeBySpeedModule sizeBySpeed { get; set; }
+    private SizeOverLifetimeModule m_SizeOverLifetimeModule;
+    public SizeOverLifetimeModule sizeOverLifetime { get { return m_SizeOverLifetimeModule; } set { m_SizeOverLifetimeModule = value; } }
 
-    public RotationOverLifetimeModule rotationOverLifetime { get; set; }
+    private SizeBySpeedModule m_SizeBySpeedModule;
+    public SizeBySpeedModule sizeBySpeed { get { return m_SizeBySpeedModule; } set { m_SizeBySpeedModule = value; } }
 
-    public RotationBySpeedModule rotationBySpeed { get; set; }
+    private RotationOverLifetimeModule m_RotationOverLifetimeModule;
+    public RotationOverLifetimeModule rotationOverLifetime { get { return m_RotationOverLifetimeModule; } set { m_RotationOverLifetimeModule = value; } }
 
-    public ExternalForcesModule externalForces { get; set; }
+    private RotationBySpeedModule m_RotationBySpeedModule;
+    public RotationBySpeedModule rotationBySpeed { get { return m_RotationBySpeedModule; } set { m_RotationBySpeedModule = value; } }
 
-    public NoiseModule noise { get; set; }
+    private ExternalForcesModule m_ExternalForcesModule;
+    public ExternalForcesModule externalForces { get { return m_ExternalForcesModule; } set { m_ExternalForcesModule = value; } }
 
-    public CollisionModule collision { get; set; }
+    private NoiseModule m_NoiseModule;
+    public NoiseModule noise { get { return m_NoiseModule; } set { m_NoiseModule = value; } }
 
-    public TriggerModule trigger { get; set; }
+    private CollisionModule m_CollisionModule;
+    public CollisionModule collision { get { return m_CollisionModule; } set { m_CollisionModule = value; } }
 
-    public LightsModule lights { get; set; }
+    private TriggerModule m_TriggerModule;
+    public TriggerModule trigger { get { return m_TriggerModule; } set { m_TriggerModule = value; } }
 
-    public TrailModule trail { get; set; }
+    private LightsModule m_LightsModule;
+    public LightsModule lights { get { return m_LightsModule; } set { m_LightsModule = value; } }
+
+    private TrailModule m_TrailModule;
+    public TrailModule trail { get { return m_TrailModule; } set { m_TrailModule = value; } }
+
+    private ParticleSystemRender m_ParticleSystemRender;
+    public ParticleSystemRender render { get { return m_ParticleSystemRender; } set { m_ParticleSystemRender = value; } }
 
     public struct MinMaxCurve
     {
@@ -471,14 +505,14 @@ public class ParticleInfo
         public ParticleSystem.MinMaxCurve rateOverDistance { get; set; }
         public float rateOverDistanceMultiplier { get; set; }
 
-        public ParticleSystem.Burst [] bursts { get; set; }
+        public ParticleSystem.Burst[] bursts { get; set; }
 
         public int burstCount { get; set; }
 
         public void Init(ParticleSystem.EmissionModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -490,7 +524,7 @@ public class ParticleInfo
 
             burstCount = mode.burstCount;
             bursts = new ParticleSystem.Burst[burstCount];
-            for(int i = 0; i < burstCount; ++ i)
+            for (int i = 0; i < burstCount; ++i)
             {
                 bursts[i] = mode.GetBurst(i);
             }
@@ -499,7 +533,7 @@ public class ParticleInfo
         public void Copy(ref ParticleSystem.EmissionModule mode)
         {
             mode.enabled = enabled;
-            if(!enabled)
+            if (!enabled)
                 return;
 
             mode.rateOverTime = rateOverTime;
@@ -605,7 +639,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.ShapeModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -616,7 +650,7 @@ public class ParticleInfo
             randomPositionAmount = mode.randomPositionAmount;
             alignToDirection = mode.alignToDirection;
 
-            switch(shapeType)
+            switch (shapeType)
             {
                 case ParticleSystemShapeType.Sphere:
                 case ParticleSystemShapeType.Hemisphere:
@@ -660,7 +694,7 @@ public class ParticleInfo
                         }
                         length = mode.length;
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -684,7 +718,7 @@ public class ParticleInfo
                         arcSpeed = mode.arcSpeed;
                         arcSpeedMultiplier = mode.arcSpeedMultiplier;
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -703,7 +737,7 @@ public class ParticleInfo
                     {
                         boxThickness = mode.boxThickness;
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -722,14 +756,14 @@ public class ParticleInfo
                         meshSpawnSpeedMultiplier = mode.meshSpawnSpeedMultiplier;
                         mesh = mode.mesh;
                         useMeshMaterialIndex = mode.useMeshMaterialIndex;
-                        if(useMeshMaterialIndex)
+                        if (useMeshMaterialIndex)
                         {
                             meshMaterialIndex = mode.meshMaterialIndex;
                         }
                         useMeshColors = mode.useMeshColors;
                         normalOffset = mode.normalOffset;
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -812,7 +846,7 @@ public class ParticleInfo
                         sprite = mode.sprite;
                         normalOffset = mode.normalOffset;
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -853,7 +887,7 @@ public class ParticleInfo
                         arcSpread = mode.arcSpread;
                         arcSpeed = mode.arcSpeed;
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -874,7 +908,7 @@ public class ParticleInfo
                         radiusSpeed = mode.radiusSpeed;
                         radiusSpeedMultiplier = mode.radiusSpeedMultiplier;
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -890,7 +924,7 @@ public class ParticleInfo
                 case ParticleSystemShapeType.Rectangle:
                     {
                         texture = mode.texture;
-                        if(null != texture)
+                        if (null != texture)
                         {
                             textureClipChannel = mode.textureClipChannel;
                             textureClipThreshold = mode.textureClipThreshold;
@@ -909,7 +943,7 @@ public class ParticleInfo
         public void Copy(ref ParticleSystem.ShapeModule mode)
         {
             mode.enabled = enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1232,14 +1266,14 @@ public class ParticleInfo
         public void Init(ParticleSystem.SubEmittersModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             subEmittersCount = mode.subEmittersCount;
             subParticleSystem = new SubEmittersModuleParticleSystem[subEmittersCount];
-            for(int i = 0; i < subEmittersCount; ++ i)
+            for (int i = 0; i < subEmittersCount; ++i)
             {
                 subParticleSystem[i].particleInfo = new ParticleInfo(mode.GetSubEmitterSystem(i));
                 subParticleSystem[i].type = mode.GetSubEmitterType(i);
@@ -1251,12 +1285,12 @@ public class ParticleInfo
         public void Copy(ref ParticleSystem.SubEmittersModule mode)
         {
             mode.enabled = enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
-            for(int i = 0; i < subEmittersCount; ++i)
+            for (int i = 0; i < subEmittersCount; ++i)
             {
                 ParticleSystem particleSystem = ParticleSystemPool.Get();
                 subParticleSystem[i].particleInfo.CopyToParticleSystem(particleSystem);
@@ -1264,7 +1298,7 @@ public class ParticleInfo
                     subParticleSystem[i].properties, subParticleSystem[i].emitProbability);
             }
         }
-    }        
+    }
 
     public struct TextureSheetAnimationModule
     {
@@ -1305,7 +1339,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.TextureSheetAnimationModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1329,7 +1363,7 @@ public class ParticleInfo
             {
                 spriteCount = mode.spriteCount;
                 sprites = new Sprite[spriteCount];
-                for(int i = 0; i < spriteCount; ++ i)
+                for (int i = 0; i < spriteCount; ++i)
                 {
                     sprites[i] = mode.GetSprite(i);
                 }
@@ -1427,7 +1461,7 @@ public class ParticleInfo
 
         public ParticleSystem.MinMaxCurve z { get; set; }
         public float zMultiplier { get; set; }
-        
+
         public ParticleSystem.MinMaxCurve orbitalX { get; set; }
         public float orbitalXMultiplier { get; set; }
 
@@ -1457,7 +1491,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.VelocityOverLifetimeModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1553,13 +1587,13 @@ public class ParticleInfo
         public void Init(ParticleSystem.LimitVelocityOverLifetimeModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             separateAxes = mode.separateAxes;
-            if(separateAxes)
+            if (separateAxes)
             {
                 limitX = mode.limitX;
                 limitXMultiplier = mode.limitXMultiplier;
@@ -1618,7 +1652,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.InheritVelocityModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1665,7 +1699,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.ForceOverLifetimeModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1706,7 +1740,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.ColorOverLifetimeModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1717,7 +1751,7 @@ public class ParticleInfo
         public void Copy(ref ParticleSystem.ColorOverLifetimeModule mode)
         {
             mode.enabled = enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1737,7 +1771,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.ColorBySpeedModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -1784,13 +1818,13 @@ public class ParticleInfo
         public void Init(ParticleSystem.SizeOverLifetimeModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             separateAxes = mode.separateAxes;
-            if(separateAxes)
+            if (separateAxes)
             {
                 x = mode.x;
                 xMultiplier = mode.xMultiplier;
@@ -1859,14 +1893,14 @@ public class ParticleInfo
         public void Init(ParticleSystem.SizeBySpeedModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             range = mode.range;
             separateAxes = mode.separateAxes;
-            if(separateAxes)
+            if (separateAxes)
             {
                 x = mode.x;
                 xMultiplier = mode.xMultiplier;
@@ -1930,13 +1964,13 @@ public class ParticleInfo
         public void Init(ParticleSystem.RotationOverLifetimeModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             separateAxes = mode.separateAxes;
-            if(separateAxes)
+            if (separateAxes)
             {
                 x = mode.x;
                 xMultiplier = mode.xMultiplier;
@@ -2001,14 +2035,14 @@ public class ParticleInfo
         public void Init(ParticleSystem.RotationBySpeedModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             range = mode.range;
             separateAxes = mode.separateAxes;
-            if(separateAxes)
+            if (separateAxes)
             {
                 x = mode.x;
                 xMultiplier = mode.xMultiplier;
@@ -2070,7 +2104,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.ExternalForcesModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -2079,12 +2113,12 @@ public class ParticleInfo
             multiplierCurve = mode.multiplierCurve;
             influenceFilter = mode.influenceFilter;
             influenceMask = mode.influenceMask;
-            if(influenceFilter == ParticleSystemGameObjectFilter.LayerMaskAndList ||
+            if (influenceFilter == ParticleSystemGameObjectFilter.LayerMaskAndList ||
                 influenceFilter == ParticleSystemGameObjectFilter.List)
             {
                 influenceCount = mode.influenceCount;
                 forceFields = new ParticleSystemForceField[influenceCount];
-                for(int i = 0; i < influenceCount; ++ i)
+                for (int i = 0; i < influenceCount; ++i)
                 {
                     forceFields[i] = mode.GetInfluence(i);
                 }
@@ -2179,13 +2213,13 @@ public class ParticleInfo
         public void Init(ParticleSystem.NoiseModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             separateAxes = mode.separateAxes;
-            if(separateAxes)
+            if (separateAxes)
             {
                 strengthX = mode.strengthX;
                 strengthXMultiplier = mode.strengthXMultiplier;
@@ -2199,7 +2233,7 @@ public class ParticleInfo
                 strengthMultiplier = mode.strengthMultiplier;
             }
             remapEnabled = mode.remapEnabled;
-            if(remapEnabled)
+            if (remapEnabled)
             {
                 remapX = mode.remapX;
                 remapXMultiplier = mode.remapXMultiplier;
@@ -2332,17 +2366,17 @@ public class ParticleInfo
         public void Init(ParticleSystem.CollisionModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             type = mode.type;
-            if(type == ParticleSystemCollisionType.Planes)
+            if (type == ParticleSystemCollisionType.Planes)
             {
                 maxPlaneCount = mode.maxPlaneCount;
                 transformPlanes = new Transform[maxPlaneCount];
-                for(int i = 0; i < maxPlaneCount; ++ i)
+                for (int i = 0; i < maxPlaneCount; ++i)
                 {
                     transformPlanes[i] = mode.GetPlane(i);
                 }
@@ -2518,7 +2552,7 @@ public class ParticleInfo
         public void Init(ParticleSystem.LightsModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
@@ -2605,13 +2639,13 @@ public class ParticleInfo
         public void Init(ParticleSystem.TrailModule mode)
         {
             enabled = mode.enabled;
-            if(!enabled)
+            if (!enabled)
             {
                 return;
             }
 
             this.mode = mode.mode;
-            if(this.mode == ParticleSystemTrailMode.PerParticle)
+            if (this.mode == ParticleSystemTrailMode.PerParticle)
             {
                 ratio = mode.ratio;
                 lifetime = mode.lifetime;
@@ -2679,4 +2713,182 @@ public class ParticleInfo
 
     public struct CustomDataModule
     { }
+
+    public class ParticleSystemRender// : Renderer
+    {
+        public ParticleSystemRenderMode renderMode { get; set; }
+
+        public float cameraVelocityScale { get; set; }
+
+        public float velocityScale { get; set; }
+
+        public float lengthScale { get; set; }
+
+        public Mesh mesh { get; set; }
+
+        public float normalDirection { get; set; }
+
+        public Material material { get; set; }
+
+        public Material trailMaterial { get; set; }
+
+        public ParticleSystemSortMode sortMode { get; set; }
+
+        public float sortingFudge { get; set; }
+
+        public float minParticleSize { get; set; }
+
+        public float maxParticleSize { get; set; }
+
+        public ParticleSystemRenderSpace alignment { get; set; }
+
+        public Vector3 flip { get; set; }
+
+        public bool allowRoll { get; set; }
+
+        public Vector3 pivot { get; set; }
+
+        // TODO  
+        // Visualize Pivot
+
+        public SpriteMaskInteraction maskInteraction { get; set; }
+
+        // TODO 
+        // Apply Active Color Space
+
+        public int activeVertexStreamsCount { get; set; }
+
+        public ShadowCastingMode shadowCastingMode { get; set; }
+
+        public bool receiveShadows { get; set; }
+
+        public List<ParticleSystemVertexStream> streams { get; set; }
+
+        public float shadowBias { get; set; }
+
+        //public ShadowCastingMode castShows { get; set; }
+
+        //public bool receiveShows { get; set; }
+
+        public MotionVectorGenerationMode motionVectorGenerationMode { get; set; }
+
+        public int sortingLayerID { get; set; }
+
+        public int sortingOrder { get; set; }
+
+        public LightProbeUsage lightProbeUsage;
+
+        public GameObject lightProbeProxyVolumeOverride { get; set; }
+
+        public ReflectionProbeUsage reflectionProbeUsage { get; set; }
+
+        public Transform probeAnchor { get; set; }
+
+        public ParticleSystemRender(UnityEngine.ParticleSystemRenderer render)
+        {
+            /*enabled = render.enabled;
+            if(!enabled)
+            {
+                return;
+            }*/
+
+            renderMode = render.renderMode;
+            switch (renderMode)
+            {
+                case ParticleSystemRenderMode.Billboard:
+                    break;
+                case ParticleSystemRenderMode.Stretch:
+                    {
+                        cameraVelocityScale = render.cameraVelocityScale;
+                        velocityScale = render.velocityScale;
+                        lengthScale = render.lengthScale;
+                    }
+                    break;
+                case ParticleSystemRenderMode.Mesh:
+                    {
+                        mesh = render.mesh;
+                    }
+                    break;
+            }
+            normalDirection = render.normalDirection;
+            material = render.material;
+            trailMaterial = render.trailMaterial;
+            sortMode = render.sortMode;
+            sortingFudge = render.sortingFudge;
+            minParticleSize = render.minParticleSize;
+            maxParticleSize = render.maxParticleSize;
+            alignment = render.alignment;
+            flip = render.flip;
+            allowRoll = render.allowRoll;
+            pivot = render.pivot;
+            maskInteraction = render.maskInteraction;
+
+            activeVertexStreamsCount = render.activeVertexStreamsCount;
+            streams = new List<ParticleSystemVertexStream>();
+            render.GetActiveVertexStreams(streams);
+            shadowCastingMode = render.shadowCastingMode;
+            receiveShadows = render.receiveShadows;
+            shadowBias = render.shadowBias;
+            motionVectorGenerationMode = render.motionVectorGenerationMode;
+            sortingLayerID = render.sortingLayerID;
+            sortingOrder = render.sortingOrder;
+            lightProbeUsage = render.lightProbeUsage;
+            lightProbeProxyVolumeOverride = render.lightProbeProxyVolumeOverride;
+            reflectionProbeUsage = render.reflectionProbeUsage;
+            probeAnchor = render.probeAnchor;
+        }
+
+        public void Copy(UnityEngine.ParticleSystemRenderer render)
+        {
+            /*render.enabled = enabled;
+            if (!enabled)
+            {
+                return;
+            }*/
+
+            render.renderMode = renderMode;
+            switch (renderMode)
+            {
+                case ParticleSystemRenderMode.Billboard:
+                    break;
+                case ParticleSystemRenderMode.Stretch:
+                    {
+                        render.cameraVelocityScale = cameraVelocityScale;
+                        render.velocityScale = velocityScale;
+                        render.lengthScale = lengthScale;
+                    }
+                    break;
+                case ParticleSystemRenderMode.Mesh:
+                    {
+                        render.mesh = mesh;
+                    }
+                    break;
+            }
+            render.normalDirection = normalDirection;
+            render.material = material;
+            render.trailMaterial = trailMaterial;
+            render.sortMode = sortMode;
+            render.sortingFudge = sortingFudge;
+            render.minParticleSize = minParticleSize;
+            render.maxParticleSize = maxParticleSize;
+            render.alignment = alignment;
+            render.flip = flip;
+            render.allowRoll = allowRoll;
+            render.pivot = pivot;
+            render.maskInteraction = maskInteraction;
+
+            render.SetActiveVertexStreams(streams);
+
+            render.shadowCastingMode = shadowCastingMode;
+            render.receiveShadows = receiveShadows;
+            render.shadowBias = shadowBias;
+            render.motionVectorGenerationMode = motionVectorGenerationMode;
+            render.sortingLayerID = sortingLayerID;
+            render.sortingOrder = sortingOrder;
+            render.lightProbeUsage = lightProbeUsage;
+            render.lightProbeProxyVolumeOverride = lightProbeProxyVolumeOverride;
+            render.reflectionProbeUsage = reflectionProbeUsage;
+            render.probeAnchor = probeAnchor;
+        }
+    }
 }

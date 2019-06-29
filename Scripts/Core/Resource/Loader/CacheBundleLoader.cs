@@ -30,7 +30,7 @@ namespace IGG.Core.Resource
             }
 
             bool isCache = false;
-            string path = LoadManager.instance.GetResourcePath(this.path, ref isCache, async);
+            string path = ResourceManager.instance.GetResourcePath(this.path, ref isCache, async);
             if (async)
             {
                 string pathDst = FileUtil.GetAssetBundleFullPath(path);
@@ -58,7 +58,7 @@ namespace IGG.Core.Resource
 
                             // 加到后台解压
                             path = FileUtil.GetAssetBundleFullPath(path);
-                            LoadManager.instance.AddToDownloadOrCache(path);
+                            ResourceManager.instance.AddToDownloadOrCache(path);
                         }
                     }
 

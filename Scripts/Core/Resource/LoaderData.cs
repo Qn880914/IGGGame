@@ -11,7 +11,7 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 回调函数列表
         /// </summary>
-        public List<LoadManager.CompleteCallback> completeCallbacks;
+        public List<LoadCompleteCallback> completeCallbacks;
 
         /// <summary>
         /// 加载器

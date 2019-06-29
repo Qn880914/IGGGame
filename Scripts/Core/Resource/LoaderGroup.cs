@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace IGG.Core.Resource
 {
-    public class LoaderGroup : MonoBehaviour
+    public class LoaderGroup
     {
         /// <summary>
         /// 加载列表
@@ -29,7 +29,7 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 优先级
         /// </summary>
-        public LoadManager.LoadPriority priority { get; set; }
+        public LoadPriority priority { get; set; }
 
         /// <summary>
         /// 加载中
@@ -121,7 +121,7 @@ namespace IGG.Core.Resource
         /// <param name="completeCallback">回调</param>
         /// <param name="async">异步</param>
         /// <param name="insert">插队</param>
-        public void Add(LoaderType type, string path, object param, LoadManager.LoaderGroupCompleteCallback completeCallback,
+        public void Add(LoaderType type, string path, object param, LoaderGroupCompleteCallback completeCallback,
                         bool async, bool insert)
         {
             LoaderInfo loaderInfo = new LoaderInfo
@@ -178,22 +178,6 @@ namespace IGG.Core.Resource
             isLoading = false;
 
             m_LoaderInfo = null;
-        }
-
-        /// <summary>
-        /// 加载信息
-        /// </summary>
-        private class LoaderInfo
-        {
-            /// <summary>
-            /// 回调
-            /// </summary>
-            public LoadManager.LoaderGroupCompleteCallback completeCallback;
-
-            /// <summary>
-            /// 加载器
-            /// </summary>
-            public Loader loader;
         }
     }
 }

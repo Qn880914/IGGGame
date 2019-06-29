@@ -10,23 +10,8 @@ using UnityEngine.SceneManagement;
 
 namespace IGG.Core.Manager
 {
-    public class LoadManager : IGG.Utility.Singleton<LoadManager>, IManager
+    public class ResourceManager : IGG.Utility.Singleton<ResourceManager>, IManager
     {
-        public delegate void LoaderGroupCompleteCallback(LoaderGroup group, object data);
-
-        public delegate void CompleteCallback(object data);
-
-        public delegate void ProgressCallback(float progress);
-
-        // 加载优先级
-        public enum LoadPriority
-        {
-            Normal,
-            High,
-
-            Quantity,
-        }
-
         private readonly AssetBundleCache m_cache;
 
         private readonly DownloadOrCache m_downloadOrCache;
@@ -54,7 +39,7 @@ namespace IGG.Core.Manager
 
         public bool enabled { get; set; }
 
-        public LoadManager()
+        public ResourceManager()
         {
             if (ConstantData.enableCache)
             {
@@ -100,8 +85,8 @@ namespace IGG.Core.Manager
 
         public void OnUpdate(float deltaTime)
         {
-            m_task.Update();
-            m_cache.Update();
+            m_task.OnUpdate(deltaTime);
+            m_cache.OnUpdate(deltaTime);
             m_downloadOrCache.Update();
             UpdateUnpacker();
         }
@@ -414,7 +399,7 @@ namespace IGG.Core.Manager
         // ------------------------------------------------------------------------------------------
         // 编辑器专用加载
         // 加载Assets目录下的文件(编辑器专用,带后缀)
-        public void LoadFile(string path, CompleteCallback completeCallback,
+        public void LoadFile(string path, LoadCompleteCallback completeCallback,
             bool async = true, bool inData = true, LoadPriority priority = LoadPriority.Normal)
         {
 #if !UNITY_EDITOR && !UNITY_STANDALONE
@@ -435,7 +420,7 @@ namespace IGG.Core.Manager
         }
 
         // 加载资源(Assets目录下,带后缀)
-        public void LoadAssetFile(string path, CompleteCallback completeCallback, Type type = null,
+        public void LoadAssetFile(string path, LoadCompleteCallback completeCallback, Type type = null,
             bool async = true, bool inData = true, LoadPriority priority = LoadPriority.Normal)
         {
 #if !UNITY_EDITOR && !UNITY_STANDALONE
@@ -460,7 +445,7 @@ namespace IGG.Core.Manager
 
         // 全平台加载
         // 加载流文件(remote==false时先从persistentData读,没有找到则从streamingAssets读,带后缀)
-        public void LoadStream(string path, CompleteCallback completeCallback,
+        public void LoadStream(string path, LoadCompleteCallback completeCallback,
             bool async = true, bool remote = false, bool isFullPath = false,
             LoadPriority priority = LoadPriority.Normal)
         {
@@ -485,7 +470,7 @@ namespace IGG.Core.Manager
         }
 
         // 加载资源(Resource目录下,不带后缀)
-        public void LoadResource(string path, CompleteCallback completeCallback,
+        public void LoadResource(string path, LoadCompleteCallback completeCallback,
             bool async = true, LoadPriority priority = LoadPriority.Normal)
         {
             m_task.AddLoadTask(null, LoaderType.Resource, path, null, (group, data) =>
@@ -495,7 +480,7 @@ namespace IGG.Core.Manager
         }
 
         // 加载关卡
-        public void LoadScene(string name, CompleteCallback completeCallback, bool async = true, bool additive = false)
+        public void LoadScene(string name, LoadCompleteCallback completeCallback, bool async = true, bool additive = false)
         {
             LoaderGroup group = m_task.PopGroup(LoadPriority.High);
             if (!additive)
@@ -539,7 +524,7 @@ namespace IGG.Core.Manager
         }
 
         // 加载AssetBundle(先从persistentData读,没有找到则从streamingAssets读)
-        public void LoadBundle(string path, CompleteCallback completeCallback,
+        public void LoadBundle(string path, LoadCompleteCallback completeCallback,
             bool async = true, bool persistent = false, bool manifest = true,
             LoadPriority priority = LoadPriority.Normal)
         {
@@ -583,7 +568,7 @@ namespace IGG.Core.Manager
         }
 
         // 加载资源
-        public void LoadAsset(string path, Type type, CompleteCallback onLoaded,
+        public void LoadAsset(string path, Type type, LoadCompleteCallback onLoaded,
             bool async = true, bool persistent = false, bool inData = true,
             LoadPriority priority = LoadPriority.Normal)
         {
@@ -784,7 +769,7 @@ namespace IGG.Core.Manager
 
         // ------------------------------------------------------------------------------------------
         // 文件/目录是否存在
-        private bool CheckFileExist(string path, CompleteCallback completeCallback, bool isFile = true)
+        private bool CheckFileExist(string path, LoadCompleteCallback completeCallback, bool isFile = true)
         {
             bool exist = isFile ? File.Exists(path) : Directory.Exists(path);
             if (!exist)

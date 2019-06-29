@@ -20,7 +20,7 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 回调函数
         /// </summary>
-        public LoadManager.LoaderGroupCompleteCallback completeCallback;
+        public LoaderGroupCompleteCallback completeCallback;
     }
 }
 

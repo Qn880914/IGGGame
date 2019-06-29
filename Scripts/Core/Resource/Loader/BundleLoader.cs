@@ -27,7 +27,7 @@ namespace IGG.Core.Resource
         {
             base.Start();
 
-            string path = LoadManager.instance.GetResourcePath(this.path);
+            string path = ResourceManager.instance.GetResourcePath(this.path);
             if (string.IsNullOrEmpty(path))
             {
                 OnFailed();

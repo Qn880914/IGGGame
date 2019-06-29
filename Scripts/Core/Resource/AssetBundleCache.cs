@@ -1,6 +1,6 @@
 ﻿#region Namespace
 
-using IGG.Core.Manager;
+using IGG.StateMachine;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -174,7 +174,7 @@ namespace IGG.Core.Resource
     /// <summary>
     ///     <para> assebundle cache </para>
     /// </summary>
-    public class AssetBundleCache
+    public class AssetBundleCache : IUpdate
     {
         /// <summary>
         /// 缓存队列
@@ -199,7 +199,7 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 更新
         /// </summary>
-        public void Update()
+        public void OnUpdate(float deltaTime)
         {
             if (ConstantData.assetBundleCacheTime > 0 &&
                 UnityEngine.Time.realtimeSinceStartup - m_LastClearTime >= ConstantData.assetBundleCacheTime)
@@ -359,7 +359,7 @@ namespace IGG.Core.Resource
         /// <param name="persistent">是否常驻</param>
         /// <param name="async">是否异步</param>
         /// <returns>已缓存(是-引用计数+1,并返回true, 否-返回false)</returns>
-        public bool CheckAssetBundleInfo(LoaderGroup group, string name, LoadManager.LoaderGroupCompleteCallback callback,
+        public bool CheckAssetBundleInfo(LoaderGroup group, string name, LoaderGroupCompleteCallback callback,
             bool persistent, bool async)
         {
             AssetBundleInfo assetBundleInfo = GetAssetBundleInfo(name, persistent);

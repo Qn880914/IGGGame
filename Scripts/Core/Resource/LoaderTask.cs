@@ -1,13 +1,14 @@
 ﻿using IGG.Core.Manager;
+using IGG.StateMachine;
 using IGG.Utility;
 using System.Collections.Generic;
 
 namespace IGG.Core.Resource
 {
-    public class LoaderTask
+    public class LoaderTask : IUpdate
     {
         /// <summary>
-        /// 加载队列数
+        /// 同一时间 加载队列数
         /// </summary>
         private const int kMaxGroupCount = 10;
 
@@ -29,28 +30,25 @@ namespace IGG.Core.Resource
         /// <summary>
         /// 等待中的加载组
         /// </summary>
-        private readonly Dictionary<LoadManager.LoadPriority, Queue<LoaderGroup>> m_DicLoaderGroupWaits =
-            new Dictionary<LoadManager.LoadPriority, Queue<LoaderGroup>>();
+        private readonly Dictionary<LoadPriority, Queue<LoaderGroup>> m_DicLoaderGroupWaits =
+            new Dictionary<LoadPriority, Queue<LoaderGroup>>();
 
         public LoaderTask()
         {
-            for (int i = 0; i < (int)LoadManager.LoadPriority.Quantity; ++i)
+            for (int i = 0; i < (int)LoadPriority.Quantity; ++i)
             {
-                m_DicLoaderGroupWaits.Add((LoadManager.LoadPriority)i, new Queue<LoaderGroup>());
+                m_DicLoaderGroupWaits.Add((LoadPriority)i, new Queue<LoaderGroup>());
             }
+        }
+
+        public void OnUpdate(float deltaTime)
+        {
+            UpdateGroup();
+            UpdateAsyncCallback();
         }
 
         public void Clear()
         {
-        }
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        public void Update()
-        {
-            UpdateGroup();
-            UpdateAsyncCallback();
         }
 
         /// <summary>
@@ -95,7 +93,7 @@ namespace IGG.Core.Resource
                     {
                         referenceCount = 0,
                         loader = LoaderPool.Get(type),
-                        completeCallbacks = new List<LoadManager.CompleteCallback>()
+                        completeCallbacks = new List<LoadCompleteCallback>()
                     };
                 }
 
@@ -117,7 +115,7 @@ namespace IGG.Core.Resource
         /// </summary>
         /// <param name="loader">加载器</param>
         /// <param name="completeCallback">回调</param>
-        public void PushCallback(Loader loader, LoadManager.CompleteCallback completeCallback)
+        public void PushCallback(Loader loader, LoadCompleteCallback completeCallback)
         {
             if (null == completeCallback)
             {
@@ -154,7 +152,7 @@ namespace IGG.Core.Resource
         /// 获得加载组
         /// </summary>
         /// <returns></returns>
-        public LoaderGroup PopGroup(LoadManager.LoadPriority priority = LoadManager.LoadPriority.Normal)
+        public LoaderGroup PopGroup(LoadPriority priority = LoadPriority.Normal)
         {
             LoaderGroup group = LoaderGroupPool.Get(this);
             group.priority = priority;
@@ -169,9 +167,9 @@ namespace IGG.Core.Resource
         private bool StartNextGroup()
         {
             LoaderGroup loaderGroup = null;
-            for (int i = (int)LoadManager.LoadPriority.Quantity - 1; i >= 0; --i)
+            for (int i = (int)LoadPriority.Quantity - 1; i >= 0; --i)
             {
-                Queue<LoaderGroup> groups = m_DicLoaderGroupWaits[(LoadManager.LoadPriority)i];
+                Queue<LoaderGroup> groups = m_DicLoaderGroupWaits[(LoadPriority)i];
                 if (groups.Count == 0)
                 {
                     continue;
@@ -236,8 +234,8 @@ namespace IGG.Core.Resource
         /// <param name="insert">插入</param>
         /// <returns></returns>
         public void AddLoadTask(LoaderGroup group, LoaderType type, string path, object param,
-                                LoadManager.LoaderGroupCompleteCallback completeCallback, bool async,
-                                LoadManager.LoadPriority priority = LoadManager.LoadPriority.Normal, bool insert = false)
+                                LoaderGroupCompleteCallback completeCallback, bool async,
+                                LoadPriority priority = LoadPriority.Normal, bool insert = false)
         {
             if (!async)
             {
@@ -267,7 +265,7 @@ namespace IGG.Core.Resource
         /// <param name="callback">回调</param>
         /// <param name="group">加载组</param>
         /// <param name="data">资源对象</param>
-        public void AddAsyncCallback(LoadManager.LoaderGroupCompleteCallback callback, LoaderGroup group, object data)
+        public void AddAsyncCallback(LoaderGroupCompleteCallback callback, LoaderGroup group, object data)
         {
             if (null == callback)
             {
